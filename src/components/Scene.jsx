@@ -9,22 +9,25 @@ const Scene = () => {
     const objects = useStore((state) => state.objects);
     const selectObject = useStore((state) => state.selectObject);
     const selectedId = useStore((state) => state.selectedId);
+    const transformMode = useStore((state) => state.transformMode);
 
     return (
         <Canvas
             shadows
-            camera={{ position: [5, 5, 5], fov: 50 }}
-            style={{ background: '#1a1a1a', width: '100%', height: '100%' }}
+            camera={{ position: [9, 7.5, 9], fov: 44 }}
+            style={{ width: '100%', height: '100%' }}
             onPointerMissed={() => selectObject(null)}
         >
+            <color attach="background" args={['#11151d']} />
             <SoftShadows />
-            <ambientLight intensity={0.5} />
+            <ambientLight intensity={0.6} />
             <directionalLight
-                position={[10, 10, 5]}
-                intensity={1}
+                position={[10, 12, 8]}
+                intensity={1.1}
                 castShadow
-                shadow-mapSize={[1024, 1024]}
+                shadow-mapSize={[2048, 2048]}
             />
+            <directionalLight position={[-8, 10, -6]} intensity={0.25} />
 
             <Floor />
 
@@ -36,7 +39,8 @@ const Scene = () => {
                     color={obj.color}
                     position={obj.position}
                     rotation={obj.rotation}
-                    scale={obj.scale}
+                    dimensions={obj.dimensions}
+                    transformMode={transformMode}
                     isSelected={obj.id === selectedId}
                     onClick={(e) => {
                         e.stopPropagation();
@@ -45,7 +49,13 @@ const Scene = () => {
                 />
             ))}
 
-            <OrbitControls makeDefault />
+            <OrbitControls
+                makeDefault
+                enableDamping
+                minDistance={4}
+                maxDistance={32}
+                maxPolarAngle={Math.PI / 2.03}
+            />
         </Canvas>
     );
 };

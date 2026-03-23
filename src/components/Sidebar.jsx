@@ -1,57 +1,84 @@
 import React from 'react';
 import useStore from '../store/useStore';
-
-const FURNITURE_ITEMS = [
-    { id: 'cube', label: 'Cube', icon: '📦' },
-    { id: 'table', label: 'Table', icon: '🪑' },
-    { id: 'chair', label: 'Chair', icon: '💺' },
-    { id: 'bed', label: 'Bed', icon: '🛏️' },
-    { id: 'sofa', label: 'Sofa', icon: '🛋️' },
-    { id: 'cabinet', label: 'Cabinet', icon: '🗄️' },
-];
+import {
+    OBJECT_CATALOG,
+    OBJECT_GROUPS,
+    toDisplayValue,
+} from '../lib/objectCatalog';
 
 const Sidebar = () => {
     const addObject = useStore((state) => state.addObject);
+    const unitSystem = useStore((state) => state.unitSystem);
 
     return (
         <div style={{
-            width: '250px',
-            background: '#2a2a2a',
+            width: '290px',
+            background: 'rgba(13,17,23,0.96)',
             color: '#fff',
-            padding: '20px',
+            padding: '22px',
             display: 'flex',
             flexDirection: 'column',
-            gap: '10px',
-            borderRight: '1px solid #444',
+            gap: '16px',
+            borderRight: '1px solid rgba(255,255,255,0.08)',
             overflowY: 'auto'
         }}>
-            <h2 style={{ margin: '0 0 20px 0', fontSize: '1.2rem', borderBottom: '1px solid #444', paddingBottom: '10px' }}>Furniture</h2>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
-                {FURNITURE_ITEMS.map((item) => (
-                    <button
-                        key={item.id}
-                        onClick={() => addObject(item.id)}
-                        style={{
-                            background: '#3a3a3a',
-                            border: '1px solid #444',
-                            borderRadius: '8px',
-                            padding: '15px',
-                            color: '#fff',
-                            cursor: 'pointer',
-                            display: 'flex',
-                            flexDirection: 'column',
-                            alignItems: 'center',
-                            gap: '8px',
-                            transition: 'background 0.2s'
-                        }}
-                        onMouseOver={(e) => e.currentTarget.style.background = '#4a4a4a'}
-                        onMouseOut={(e) => e.currentTarget.style.background = '#3a3a3a'}
-                    >
-                        <span style={{ fontSize: '24px' }}>{item.icon}</span>
-                        <span style={{ fontSize: '14px' }}>{item.label}</span>
-                    </button>
-                ))}
+            <div>
+                <h2 style={{ margin: 0, fontSize: '1.2rem' }}>Catalog</h2>
+                <p style={{ margin: '8px 0 0 0', color: '#97a3b6', fontSize: '0.88rem', lineHeight: 1.5 }}>
+                    Walls, furniture, appliances, and bathroom fixtures can all be added from here.
+                </p>
             </div>
+
+            {OBJECT_GROUPS.map((group) => {
+                const items = OBJECT_CATALOG.filter((item) => item.group === group.id);
+
+                return (
+                    <section key={group.id}>
+                        <h3
+                            style={{
+                                margin: '0 0 10px 0',
+                                fontSize: '0.8rem',
+                                textTransform: 'uppercase',
+                                letterSpacing: '0.08em',
+                                color: '#7f8da3',
+                            }}
+                        >
+                            {group.label}
+                        </h3>
+
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+                            {items.map((item) => (
+                                <button
+                                    key={item.id}
+                                    onClick={() => addObject(item.id)}
+                                    style={{
+                                        background: 'linear-gradient(180deg, #1b2430 0%, #151c25 100%)',
+                                        border: '1px solid rgba(255,255,255,0.08)',
+                                        borderRadius: '14px',
+                                        padding: '12px',
+                                        color: '#fff',
+                                        cursor: 'pointer',
+                                        display: 'flex',
+                                        flexDirection: 'column',
+                                        gap: '8px',
+                                        alignItems: 'flex-start',
+                                        textAlign: 'left',
+                                    }}
+                                >
+                                    <span style={{ fontSize: '0.92rem', fontWeight: 600 }}>
+                                        {item.label}
+                                    </span>
+                                    <span style={{ fontSize: '0.72rem', color: '#90a0b5', lineHeight: 1.35 }}>
+                                        {toDisplayValue(item.dimensions[0], unitSystem)} x{' '}
+                                        {toDisplayValue(item.dimensions[1], unitSystem)} x{' '}
+                                        {toDisplayValue(item.dimensions[2], unitSystem)} {unitSystem}
+                                    </span>
+                                </button>
+                            ))}
+                        </div>
+                    </section>
+                );
+            })}
         </div>
     );
 };

@@ -15,10 +15,10 @@ const Floor = () => {
                     selectObject(null);
                 }}
             >
-                <planeGeometry args={[20, 20]} />
-                <meshStandardMaterial color="#333333" />
+                <planeGeometry args={[40, 40]} />
+                <meshStandardMaterial color="#232832" />
             </mesh>
-            <gridHelper args={[20, 20, 0x666666, 0x444444]} />
+            <gridHelper args={[40, 40, 0x4d5a70, 0x2f3948]} />
         </group>
     );
 };

@@ -1,72 +1,100 @@
 import React from 'react';
 import useStore from '../store/useStore';
+import {
+    UNIT_SYSTEMS,
+    degreesToRadians,
+    fromDisplayValue,
+    getObjectLabel,
+    radiansToDegrees,
+    toDisplayValue,
+} from '../lib/objectCatalog';
 
 const PropertiesPanel = () => {
     const selectedId = useStore((state) => state.selectedId);
     const objects = useStore((state) => state.objects);
     const updateObject = useStore((state) => state.updateObject);
     const removeObject = useStore((state) => state.removeObject);
+    const unitSystem = useStore((state) => state.unitSystem);
 
     const selectedObject = objects.find((obj) => obj.id === selectedId);
+    const unit = UNIT_SYSTEMS[unitSystem] ?? UNIT_SYSTEMS.m;
 
     if (!selectedObject) {
         return (
             <div style={{
-                width: '250px',
-                background: '#2a2a2a',
-                color: '#888',
-                padding: '20px',
-                borderLeft: '1px solid #444',
+                width: '300px',
+                background: 'rgba(13,17,23,0.96)',
+                color: '#8d9bb0',
+                padding: '22px',
+                borderLeft: '1px solid rgba(255,255,255,0.08)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                textAlign: 'center'
+                textAlign: 'center',
+                lineHeight: 1.6,
             }}>
-                Select an object to view properties
+                Select an object to edit position, rotation, size, and color.
             </div>
         );
     }
 
-    const handleChange = (key, value, index = null) => {
-        if (index !== null) {
-            const newArray = [...selectedObject[key]];
-            newArray[index] = parseFloat(value);
-            updateObject(selectedId, { [key]: newArray });
-        } else {
-            updateObject(selectedId, { [key]: value });
+    const handleVectorChange = (key, value, index, parser = Number) => {
+        const parsed = parser(value);
+
+        if (!Number.isFinite(parsed)) {
+            return;
         }
+
+        const nextVector = [...selectedObject[key]];
+        nextVector[index] = parsed;
+        updateObject(selectedId, { [key]: nextVector });
+    };
+
+    const handleChange = (key, value) => {
+        updateObject(selectedId, { [key]: value });
     };
 
     return (
         <div style={{
-            width: '250px',
-            background: '#2a2a2a',
+            width: '300px',
+            background: 'rgba(13,17,23,0.96)',
             color: '#fff',
-            padding: '20px',
-            borderLeft: '1px solid #444',
+            padding: '22px',
+            borderLeft: '1px solid rgba(255,255,255,0.08)',
             overflowY: 'auto'
         }}>
-            <h2 style={{ margin: '0 0 20px 0', fontSize: '1.2rem', borderBottom: '1px solid #444', paddingBottom: '10px' }}>Properties</h2>
+            <h2 style={{ margin: '0 0 20px 0', fontSize: '1.2rem', borderBottom: '1px solid rgba(255,255,255,0.08)', paddingBottom: '10px' }}>
+                Properties
+            </h2>
 
             <div style={{ marginBottom: '20px' }}>
                 <label style={{ display: 'block', marginBottom: '5px', color: '#aaa', fontSize: '12px' }}>Type</label>
-                <div style={{ padding: '8px', background: '#333', borderRadius: '4px', textTransform: 'capitalize' }}>
-                    {selectedObject.type}
+                <div style={{ padding: '10px', background: '#1a212c', borderRadius: '8px' }}>
+                    {getObjectLabel(selectedObject.type)}
                 </div>
             </div>
 
             <div style={{ marginBottom: '20px' }}>
-                <label style={{ display: 'block', marginBottom: '10px', color: '#aaa', fontSize: '12px' }}>Position</label>
+                <label style={{ display: 'block', marginBottom: '10px', color: '#aaa', fontSize: '12px' }}>
+                    Position ({unit.label})
+                </label>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '5px' }}>
                     {['X', 'Y', 'Z'].map((axis, i) => (
                         <div key={axis}>
                             <label style={{ display: 'block', fontSize: '10px', marginBottom: '2px', color: '#666' }}>{axis}</label>
                             <input
                                 type="number"
-                                step="0.1"
-                                value={selectedObject.position[i]}
-                                onChange={(e) => handleChange('position', e.target.value, i)}
-                                style={{ width: '100%', background: '#333', border: 'none', color: '#fff', padding: '5px', borderRadius: '4px' }}
+                                step={unit.step}
+                                value={toDisplayValue(selectedObject.position[i], unitSystem)}
+                                onChange={(e) =>
+                                    handleVectorChange(
+                                        'position',
+                                        e.target.value,
+                                        i,
+                                        (rawValue) => fromDisplayValue(rawValue, unitSystem),
+                                    )
+                                }
+                                style={{ width: '100%', background: '#1a212c', border: 'none', color: '#fff', padding: '8px', borderRadius: '6px' }}
                             />
                         </div>
                     ))}
@@ -74,17 +102,26 @@ const PropertiesPanel = () => {
             </div>
 
             <div style={{ marginBottom: '20px' }}>
-                <label style={{ display: 'block', marginBottom: '10px', color: '#aaa', fontSize: '12px' }}>Rotation</label>
+                <label style={{ display: 'block', marginBottom: '10px', color: '#aaa', fontSize: '12px' }}>
+                    Rotation (deg)
+                </label>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '5px' }}>
                     {['X', 'Y', 'Z'].map((axis, i) => (
                         <div key={axis}>
                             <label style={{ display: 'block', fontSize: '10px', marginBottom: '2px', color: '#666' }}>{axis}</label>
                             <input
                                 type="number"
-                                step="0.1"
-                                value={selectedObject.rotation[i]}
-                                onChange={(e) => handleChange('rotation', e.target.value, i)}
-                                style={{ width: '100%', background: '#333', border: 'none', color: '#fff', padding: '5px', borderRadius: '4px' }}
+                                step="5"
+                                value={radiansToDegrees(selectedObject.rotation[i])}
+                                onChange={(e) =>
+                                    handleVectorChange(
+                                        'rotation',
+                                        e.target.value,
+                                        i,
+                                        degreesToRadians,
+                                    )
+                                }
+                                style={{ width: '100%', background: '#1a212c', border: 'none', color: '#fff', padding: '8px', borderRadius: '6px' }}
                             />
                         </div>
                     ))}
@@ -92,17 +129,26 @@ const PropertiesPanel = () => {
             </div>
 
             <div style={{ marginBottom: '20px' }}>
-                <label style={{ display: 'block', marginBottom: '10px', color: '#aaa', fontSize: '12px' }}>Scale</label>
+                <label style={{ display: 'block', marginBottom: '10px', color: '#aaa', fontSize: '12px' }}>
+                    Size ({unit.label})
+                </label>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '5px' }}>
-                    {['X', 'Y', 'Z'].map((axis, i) => (
+                    {['W', 'H', 'D'].map((axis, i) => (
                         <div key={axis}>
                             <label style={{ display: 'block', fontSize: '10px', marginBottom: '2px', color: '#666' }}>{axis}</label>
                             <input
                                 type="number"
-                                step="0.1"
-                                value={selectedObject.scale[i]}
-                                onChange={(e) => handleChange('scale', e.target.value, i)}
-                                style={{ width: '100%', background: '#333', border: 'none', color: '#fff', padding: '5px', borderRadius: '4px' }}
+                                step={unit.step}
+                                value={toDisplayValue(selectedObject.dimensions[i], unitSystem)}
+                                onChange={(e) =>
+                                    handleVectorChange(
+                                        'dimensions',
+                                        e.target.value,
+                                        i,
+                                        (rawValue) => fromDisplayValue(rawValue, unitSystem),
+                                    )
+                                }
+                                style={{ width: '100%', background: '#1a212c', border: 'none', color: '#fff', padding: '8px', borderRadius: '6px' }}
                             />
                         </div>
                     ))}
@@ -115,7 +161,7 @@ const PropertiesPanel = () => {
                     type="color"
                     value={selectedObject.color}
                     onChange={(e) => handleChange('color', e.target.value)}
-                    style={{ width: '100%', height: '40px', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
+                    style={{ width: '100%', height: '44px', border: 'none', borderRadius: '8px', cursor: 'pointer', background: '#1a212c' }}
                 />
             </div>
 
@@ -123,11 +169,11 @@ const PropertiesPanel = () => {
                 onClick={() => removeObject(selectedId)}
                 style={{
                     width: '100%',
-                    padding: '10px',
-                    background: '#ff4444',
+                    padding: '12px',
+                    background: '#a93e3e',
                     color: 'white',
                     border: 'none',
-                    borderRadius: '4px',
+                    borderRadius: '8px',
                     cursor: 'pointer',
                     marginTop: '20px'
                 }}
