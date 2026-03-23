@@ -22,13 +22,6 @@ const Sidebar = () => {
             borderRight: '1px solid rgba(255,255,255,0.08)',
             overflowY: 'auto'
         }}>
-            <div>
-                <h2 style={{ margin: 0, fontSize: '1.2rem' }}>Catalog</h2>
-                <p style={{ margin: '8px 0 0 0', color: '#97a3b6', fontSize: '0.88rem', lineHeight: 1.5 }}>
-                    Walls, furniture, appliances, and bathroom fixtures can all be added from here.
-                </p>
-            </div>
-
             {OBJECT_GROUPS.map((group) => {
                 const items = OBJECT_CATALOG.filter((item) => item.group === group.id);
 

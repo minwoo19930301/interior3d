@@ -54,6 +54,14 @@ const PropertiesPanel = () => {
         updateObject(selectedId, { [key]: value });
     };
 
+    const rotateAroundYAxis = (deltaDegrees) => {
+        const nextRotation = [...selectedObject.rotation];
+        nextRotation[1] = degreesToRadians(
+            radiansToDegrees(selectedObject.rotation[1]) + deltaDegrees,
+        );
+        updateObject(selectedId, { rotation: nextRotation });
+    };
+
     return (
         <div style={{
             width: '300px',
@@ -125,6 +133,20 @@ const PropertiesPanel = () => {
                             />
                         </div>
                     ))}
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '6px', marginTop: '10px' }}>
+                    <button
+                        onClick={() => rotateAroundYAxis(-90)}
+                        style={{ background: '#1a212c', color: '#fff', border: '1px solid rgba(255,255,255,0.08)' }}
+                    >
+                        Y -90°
+                    </button>
+                    <button
+                        onClick={() => rotateAroundYAxis(90)}
+                        style={{ background: '#1a212c', color: '#fff', border: '1px solid rgba(255,255,255,0.08)' }}
+                    >
+                        Y +90°
+                    </button>
                 </div>
             </div>
 

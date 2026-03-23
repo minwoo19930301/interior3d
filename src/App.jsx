@@ -86,39 +86,12 @@ function App() {
               left: 18,
               right: 18,
               display: 'flex',
-              justifyContent: 'space-between',
+              justifyContent: 'flex-end',
               gap: '16px',
               alignItems: 'flex-start',
               pointerEvents: 'none',
             }}
           >
-            <div
-              style={{
-                padding: '16px 18px',
-                borderRadius: '20px',
-                background: 'rgba(10,14,20,0.82)',
-                color: '#f5f7fa',
-                border: '1px solid rgba(255,255,255,0.08)',
-                boxShadow: '0 16px 40px rgba(0,0,0,0.24)',
-                maxWidth: '460px',
-                pointerEvents: 'auto',
-                backdropFilter: 'blur(16px)',
-              }}
-            >
-              <h1 style={{ margin: 0, fontSize: '1.2rem' }}>Interior 3D Planner</h1>
-              <p
-                style={{
-                  margin: '8px 0 0 0',
-                  fontSize: '0.86rem',
-                  lineHeight: 1.5,
-                  color: '#b8c2cf',
-                }}
-              >
-                Add walls, rotate furniture, switch between meters and
-                centimeters, and share the current layout by URL.
-              </p>
-            </div>
-
             <div
               style={{
                 display: 'flex',
@@ -127,6 +100,7 @@ function App() {
                 flexWrap: 'wrap',
                 justifyContent: 'flex-end',
                 pointerEvents: 'auto',
+                marginLeft: 'auto',
               }}
             >
               <div style={{ display: 'flex', gap: '8px', ...badgeStyle }}>

@@ -24,6 +24,13 @@ const CylinderPart = ({ radiusTop, radiusBottom = radiusTop, height, segments = 
     </mesh>
 );
 
+const TorusPart = ({ radius, tube, position, rotation, color, material }) => (
+    <mesh position={position} rotation={rotation} castShadow receiveShadow>
+        <torusGeometry args={[radius, tube, 24, 60]} />
+        <meshStandardMaterial {...commonMaterial(color, material)} />
+    </mesh>
+);
+
 function renderFurniture(type, dimensions, color) {
     const [width, height, depth] = dimensions;
 
@@ -237,11 +244,72 @@ function renderFurniture(type, dimensions, color) {
     }
 
     if (type === 'toilet') {
+        const baseHeight = height * 0.36;
+        const bowlHeight = height * 0.28;
+        const tankHeight = height * 0.3;
+        const tankDepth = depth * 0.28;
+
         return (
             <group>
-                <BoxPart size={[width * 0.72, height * 0.35, depth * 0.58]} position={[0, height * 0.175, depth * 0.1]} color={color} />
-                <CylinderPart radiusTop={width * 0.26} radiusBottom={width * 0.24} height={height * 0.16} position={[0, height * 0.42, depth * 0.06]} color="#e7edf3" />
-                <BoxPart size={[width * 0.66, height * 0.28, depth * 0.24]} position={[0, height * 0.68, -depth * 0.2]} color="#eef2f6" />
+                <CylinderPart
+                    radiusTop={width * 0.18}
+                    radiusBottom={width * 0.12}
+                    height={baseHeight}
+                    position={[0, baseHeight / 2, depth * 0.1]}
+                    color={color}
+                />
+                <CylinderPart
+                    radiusTop={width * 0.26}
+                    radiusBottom={width * 0.21}
+                    height={bowlHeight}
+                    position={[0, baseHeight + bowlHeight / 2 - 0.02, depth * 0.06]}
+                    color={color}
+                />
+                <CylinderPart
+                    radiusTop={width * 0.14}
+                    radiusBottom={width * 0.11}
+                    height={height * 0.16}
+                    position={[0, baseHeight + bowlHeight * 0.34, depth * 0.07]}
+                    color="#dfe7ef"
+                />
+                <TorusPart
+                    radius={width * 0.19}
+                    tube={height * 0.034}
+                    position={[0, baseHeight + bowlHeight * 0.6, depth * 0.07]}
+                    rotation={[Math.PI / 2, 0, 0]}
+                    color="#f7fafc"
+                />
+                <BoxPart
+                    size={[width * 0.62, height * 0.035, depth * 0.48]}
+                    position={[0, baseHeight + bowlHeight * 0.73, depth * 0.03]}
+                    color="#f6f9fc"
+                    rotation={[0.12, 0, 0]}
+                />
+                <BoxPart
+                    size={[width * 0.68, tankHeight, tankDepth]}
+                    position={[0, height - tankHeight / 2, -depth * 0.22]}
+                    color={color}
+                />
+                <BoxPart
+                    size={[width * 0.66, height * 0.03, tankDepth]}
+                    position={[0, height - height * 0.015, -depth * 0.22]}
+                    color="#f4f7fa"
+                />
+                <CylinderPart
+                    radiusTop={0.026}
+                    height={0.03}
+                    position={[0, height - 0.004, -depth * 0.18]}
+                    color="#b8c1ca"
+                    material={{ metalness: 0.8, roughness: 0.24 }}
+                />
+                <CylinderPart
+                    radiusTop={0.018}
+                    height={height * 0.14}
+                    position={[0, height * 0.9, -depth * 0.38]}
+                    rotation={[Math.PI / 2, 0, 0]}
+                    color="#c8d1d9"
+                    material={{ metalness: 0.72, roughness: 0.26 }}
+                />
             </group>
         );
     }
@@ -299,27 +367,33 @@ const Furniture = ({
         });
     };
 
-    const group = (
-        <group
-            ref={groupRef}
-            position={position}
-            rotation={rotation}
-            onClick={onClick}
-        >
-            {content}
-            {outline}
-        </group>
+    return (
+        <>
+            <group
+                ref={groupRef}
+                position={position}
+                rotation={rotation}
+                onClick={onClick}
+            >
+                {content}
+                {outline}
+            </group>
+
+            {isSelected ? (
+                <TransformControls
+                    object={groupRef}
+                    mode={transformMode}
+                    space={transformMode === 'rotate' ? 'local' : 'world'}
+                    showX={transformMode !== 'rotate'}
+                    showY
+                    showZ={transformMode !== 'rotate'}
+                    rotationSnap={transformMode === 'rotate' ? Math.PI / 24 : undefined}
+                    onMouseUp={handleObjectChange}
+                    onTouchEnd={handleObjectChange}
+                />
+            ) : null}
+        </>
     );
-
-    if (isSelected) {
-        return (
-            <TransformControls mode={transformMode} onObjectChange={handleObjectChange}>
-                {group}
-            </TransformControls>
-        );
-    }
-
-    return group;
 };
 
 export default Furniture;
