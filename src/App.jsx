@@ -32,12 +32,44 @@ function copyText(text) {
   return Promise.resolve();
 }
 
+function isEditableTarget(target) {
+  if (!(target instanceof HTMLElement)) {
+    return false;
+  }
+
+  const tagName = target.tagName;
+
+  return (
+    target.isContentEditable ||
+    tagName === 'INPUT' ||
+    tagName === 'TEXTAREA' ||
+    tagName === 'SELECT'
+  );
+}
+
+function actionButtonStyle(enabled) {
+  return {
+    border: 'none',
+    padding: '0.35rem 0.7rem',
+    background: enabled ? '#253042' : 'transparent',
+    color: enabled ? '#fff' : '#718097',
+    opacity: enabled ? 1 : 0.72,
+  };
+}
+
 function App() {
   const objects = useStore((state) => state.objects);
+  const selectedId = useStore((state) => state.selectedId);
   const unitSystem = useStore((state) => state.unitSystem);
   const setUnitSystem = useStore((state) => state.setUnitSystem);
   const transformMode = useStore((state) => state.transformMode);
   const setTransformMode = useStore((state) => state.setTransformMode);
+  const clipboardObject = useStore((state) => state.clipboardObject);
+  const historyPastLength = useStore((state) => state.historyPast.length);
+  const copySelectedObject = useStore((state) => state.copySelectedObject);
+  const pasteClipboardObject = useStore((state) => state.pasteClipboardObject);
+  const undo = useStore((state) => state.undo);
+  const redo = useStore((state) => state.redo);
   const [shareStatus, setShareStatus] = useState('idle');
 
   useEffect(() => {
@@ -52,6 +84,48 @@ function App() {
     const timeout = window.setTimeout(() => setShareStatus('idle'), 2200);
     return () => window.clearTimeout(timeout);
   }, [shareStatus]);
+
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      if (isEditableTarget(event.target)) {
+        return;
+      }
+
+      const hasModifier = event.metaKey || event.ctrlKey;
+
+      if (!hasModifier) {
+        return;
+      }
+
+      const key = event.key.toLowerCase();
+
+      if (key === 'c') {
+        event.preventDefault();
+        copySelectedObject();
+        return;
+      }
+
+      if (key === 'v') {
+        event.preventDefault();
+        pasteClipboardObject();
+        return;
+      }
+
+      if (key === 'z' && !event.shiftKey) {
+        event.preventDefault();
+        undo();
+        return;
+      }
+
+      if ((key === 'z' && event.shiftKey) || key === 'y') {
+        event.preventDefault();
+        redo();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [copySelectedObject, pasteClipboardObject, redo, undo]);
 
   const handleCopyShareLink = async () => {
     try {
@@ -154,6 +228,30 @@ function App() {
                   }}
                 >
                   cm
+                </button>
+              </div>
+
+              <div style={{ display: 'flex', gap: '8px', ...badgeStyle }}>
+                <button
+                  onClick={() => copySelectedObject()}
+                  disabled={!selectedId}
+                  style={actionButtonStyle(Boolean(selectedId))}
+                >
+                  Copy
+                </button>
+                <button
+                  onClick={() => pasteClipboardObject()}
+                  disabled={!clipboardObject}
+                  style={actionButtonStyle(Boolean(clipboardObject))}
+                >
+                  Paste
+                </button>
+                <button
+                  onClick={() => undo()}
+                  disabled={historyPastLength === 0}
+                  style={actionButtonStyle(historyPastLength > 0)}
+                >
+                  Undo
                 </button>
               </div>
 

@@ -11,6 +11,8 @@ import {
 import { loadSceneFromUrl } from '../lib/sceneUrl';
 
 const initialScene = loadSceneFromUrl();
+const HISTORY_LIMIT = 60;
+const PASTE_OFFSET = [0.45, 0, 0.45];
 
 function createSceneObject(type, index) {
   const definition = getObjectDefinition(type);
@@ -23,6 +25,39 @@ function createSceneObject(type, index) {
     dimensions: [...definition.dimensions],
     color: definition.color,
   };
+}
+
+function cloneSceneObject(object) {
+  return {
+    id: object.id,
+    type: object.type,
+    position: [...object.position],
+    rotation: [...object.rotation],
+    dimensions: [...object.dimensions],
+    color: object.color,
+  };
+}
+
+function cloneClipboardObject(object) {
+  return {
+    type: object.type,
+    position: [...object.position],
+    rotation: [...object.rotation],
+    dimensions: [...object.dimensions],
+    color: object.color,
+  };
+}
+
+function createHistoryEntry(state) {
+  return {
+    objects: state.objects.map(cloneSceneObject),
+    selectedId: state.selectedId,
+  };
+}
+
+function pushHistoryEntry(historyPast, state) {
+  const nextHistory = [...historyPast, createHistoryEntry(state)];
+  return nextHistory.slice(-HISTORY_LIMIT);
 }
 
 function patchObject(currentObject, newData) {
@@ -57,16 +92,34 @@ const initialObjects = (initialScene?.objects ?? []).map((object) => ({
   ...normalizeObject(object),
 }));
 
-const useStore = create((set) => ({
+function createPastedObject(clipboardObject) {
+  return {
+    id: uuidv4(),
+    type: clipboardObject.type,
+    position: clipboardObject.position.map(
+      (value, index) => value + (PASTE_OFFSET[index] ?? 0),
+    ),
+    rotation: [...clipboardObject.rotation],
+    dimensions: [...clipboardObject.dimensions],
+    color: clipboardObject.color,
+  };
+}
+
+const useStore = create((set, get) => ({
   objects: initialObjects,
   selectedId: null,
   unitSystem: initialScene?.unitSystem === 'cm' ? 'cm' : 'm',
   transformMode: 'translate',
+  clipboardObject: null,
+  historyPast: [],
+  historyFuture: [],
 
   addObject: (type) =>
     set((state) => {
       const newObject = createSceneObject(type, state.objects.length);
       return {
+        historyPast: pushHistoryEntry(state.historyPast, state),
+        historyFuture: [],
         objects: [...state.objects, newObject],
         selectedId: newObject.id,
       };
@@ -74,6 +127,12 @@ const useStore = create((set) => ({
 
   removeObject: (id) =>
     set((state) => ({
+      historyPast:
+        state.objects.some((object) => object.id === id)
+          ? pushHistoryEntry(state.historyPast, state)
+          : state.historyPast,
+      historyFuture:
+        state.objects.some((object) => object.id === id) ? [] : state.historyFuture,
       objects: state.objects.filter((object) => object.id !== id),
       selectedId: state.selectedId === id ? null : state.selectedId,
     })),
@@ -89,11 +148,86 @@ const useStore = create((set) => ({
     }),
 
   updateObject: (id, newData) =>
-    set((state) => ({
-      objects: state.objects.map((object) =>
-        object.id === id ? patchObject(object, newData) : object,
-      ),
-    })),
+    set((state) => {
+      const hasTarget = state.objects.some((object) => object.id === id);
+
+      if (!hasTarget) {
+        return state;
+      }
+
+      return {
+        historyPast: pushHistoryEntry(state.historyPast, state),
+        historyFuture: [],
+        objects: state.objects.map((object) =>
+          object.id === id ? patchObject(object, newData) : object,
+        ),
+      };
+    }),
+
+  copySelectedObject: () => {
+    const state = get();
+    const selectedObject = state.objects.find(
+      (object) => object.id === state.selectedId,
+    );
+
+    if (!selectedObject) {
+      return false;
+    }
+
+    set({ clipboardObject: cloneClipboardObject(selectedObject) });
+    return true;
+  },
+
+  pasteClipboardObject: () =>
+    set((state) => {
+      if (!state.clipboardObject) {
+        return state;
+      }
+
+      const newObject = createPastedObject(state.clipboardObject);
+
+      return {
+        historyPast: pushHistoryEntry(state.historyPast, state),
+        historyFuture: [],
+        objects: [...state.objects, newObject],
+        selectedId: newObject.id,
+      };
+    }),
+
+  undo: () =>
+    set((state) => {
+      const previousEntry = state.historyPast[state.historyPast.length - 1];
+
+      if (!previousEntry) {
+        return state;
+      }
+
+      return {
+        historyPast: state.historyPast.slice(0, -1),
+        historyFuture: [createHistoryEntry(state), ...state.historyFuture].slice(
+          0,
+          HISTORY_LIMIT,
+        ),
+        objects: previousEntry.objects.map(cloneSceneObject),
+        selectedId: previousEntry.selectedId,
+      };
+    }),
+
+  redo: () =>
+    set((state) => {
+      const nextEntry = state.historyFuture[0];
+
+      if (!nextEntry) {
+        return state;
+      }
+
+      return {
+        historyPast: pushHistoryEntry(state.historyPast, state),
+        historyFuture: state.historyFuture.slice(1),
+        objects: nextEntry.objects.map(cloneSceneObject),
+        selectedId: nextEntry.selectedId,
+      };
+    }),
 }));
 
 export default useStore;
