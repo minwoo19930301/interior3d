@@ -33,6 +33,7 @@ function compactObject(object) {
     r: object.rotation.map((value) => roundNumber(value, 3)),
     d: object.dimensions.map((value) => roundNumber(value, 2)),
     c: object.color,
+    x: object.isOpen ? 1 : 0,
   };
 }
 
@@ -67,6 +68,7 @@ export function parseSceneParam(rawScene) {
           rotation: item.r,
           dimensions: item.d,
           color: item.c,
+          isOpen: Boolean(item.x),
         }),
       ),
     };
@@ -114,4 +116,3 @@ export function syncSceneToUrl(sceneState) {
     window.history.replaceState({}, '', nextUrl);
   }
 }
-

@@ -5,6 +5,7 @@ import {
     degreesToRadians,
     fromDisplayValue,
     getObjectLabel,
+    isObjectOpenable,
     radiansToDegrees,
     toDisplayValue,
 } from '../lib/objectCatalog';
@@ -14,6 +15,7 @@ const PropertiesPanel = () => {
     const objects = useStore((state) => state.objects);
     const updateObject = useStore((state) => state.updateObject);
     const removeObject = useStore((state) => state.removeObject);
+    const toggleObjectOpen = useStore((state) => state.toggleObjectOpen);
     const unitSystem = useStore((state) => state.unitSystem);
 
     const selectedObject = objects.find((obj) => obj.id === selectedId);
@@ -186,6 +188,23 @@ const PropertiesPanel = () => {
                     style={{ width: '100%', height: '44px', border: 'none', borderRadius: '8px', cursor: 'pointer', background: '#1a212c' }}
                 />
             </div>
+
+            {isObjectOpenable(selectedObject.type) ? (
+                <button
+                    onClick={() => toggleObjectOpen(selectedId)}
+                    style={{
+                        width: '100%',
+                        padding: '12px',
+                        background: '#1a212c',
+                        color: '#fff',
+                        border: '1px solid rgba(255,255,255,0.08)',
+                        borderRadius: '8px',
+                        cursor: 'pointer',
+                    }}
+                >
+                    {selectedObject.isOpen ? 'Close' : 'Open'}
+                </button>
+            ) : null}
 
             <button
                 onClick={() => removeObject(selectedId)}

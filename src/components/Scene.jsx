@@ -4,12 +4,14 @@ import { OrbitControls, SoftShadows } from '@react-three/drei';
 import Floor from './Floor';
 import Furniture from './Furniture';
 import useStore from '../store/useStore';
+import { isObjectOpenable } from '../lib/objectCatalog';
 
 const Scene = () => {
     const objects = useStore((state) => state.objects);
     const selectObject = useStore((state) => state.selectObject);
     const selectedId = useStore((state) => state.selectedId);
     const transformMode = useStore((state) => state.transformMode);
+    const toggleObjectOpen = useStore((state) => state.toggleObjectOpen);
 
     return (
         <Canvas
@@ -42,9 +44,18 @@ const Scene = () => {
                     dimensions={obj.dimensions}
                     transformMode={transformMode}
                     isSelected={obj.id === selectedId}
+                    isOpen={obj.isOpen}
                     onClick={(e) => {
                         e.stopPropagation();
                         selectObject(obj.id);
+                    }}
+                    onDoubleClick={(e) => {
+                        e.stopPropagation();
+                        selectObject(obj.id);
+
+                        if (isObjectOpenable(obj.type)) {
+                            toggleObjectOpen(obj.id);
+                        }
                     }}
                 />
             ))}

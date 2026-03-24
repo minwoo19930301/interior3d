@@ -24,6 +24,7 @@ function createSceneObject(type, index) {
     rotation: [0, 0, 0],
     dimensions: [...definition.dimensions],
     color: definition.color,
+    isOpen: definition.openable ? false : undefined,
   };
 }
 
@@ -35,6 +36,7 @@ function cloneSceneObject(object) {
     rotation: [...object.rotation],
     dimensions: [...object.dimensions],
     color: object.color,
+    isOpen: object.isOpen,
   };
 }
 
@@ -45,6 +47,7 @@ function cloneClipboardObject(object) {
     rotation: [...object.rotation],
     dimensions: [...object.dimensions],
     color: object.color,
+    isOpen: object.isOpen,
   };
 }
 
@@ -80,6 +83,12 @@ function patchObject(currentObject, newData) {
           normalizeVector(newData.dimensions, currentObject.dimensions),
         )
       : currentObject.dimensions,
+    isOpen:
+      definition.openable && newData.isOpen !== undefined
+        ? Boolean(newData.isOpen)
+        : definition.openable
+          ? Boolean(currentObject.isOpen)
+          : undefined,
     color:
       newData.color !== undefined
         ? normalizeColor(newData.color, currentObject.color)
@@ -102,6 +111,7 @@ function createPastedObject(clipboardObject) {
     rotation: [...clipboardObject.rotation],
     dimensions: [...clipboardObject.dimensions],
     color: clipboardObject.color,
+    isOpen: clipboardObject.isOpen,
   };
 }
 
@@ -146,6 +156,21 @@ const useStore = create((set, get) => ({
         historyFuture: [],
         objects: [...state.objects, ...newObjects],
         selectedId: lastObject?.id ?? state.selectedId,
+      };
+    }),
+
+  replaceObjects: (rawObjects) =>
+    set((state) => {
+      const nextObjects = Array.isArray(rawObjects)
+        ? rawObjects.map(createPreparedObject)
+        : [];
+      const lastObject = nextObjects[nextObjects.length - 1];
+
+      return {
+        historyPast: pushHistoryEntry(state.historyPast, state),
+        historyFuture: [],
+        objects: nextObjects,
+        selectedId: lastObject?.id ?? null,
       };
     }),
 
@@ -201,6 +226,25 @@ const useStore = create((set, get) => ({
     set({ clipboardObject: cloneClipboardObject(selectedObject) });
     return true;
   },
+
+  toggleObjectOpen: (id) =>
+    set((state) => {
+      const targetObject = state.objects.find((object) => object.id === id);
+
+      if (!targetObject || targetObject.isOpen === undefined) {
+        return state;
+      }
+
+      return {
+        historyPast: pushHistoryEntry(state.historyPast, state),
+        historyFuture: [],
+        objects: state.objects.map((object) =>
+          object.id === id
+            ? { ...object, isOpen: !object.isOpen }
+            : object,
+        ),
+      };
+    }),
 
   pasteClipboardObject: () =>
     set((state) => {

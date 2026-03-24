@@ -16,7 +16,7 @@ export const OBJECT_GROUPS = [
 export const OBJECT_CATALOG = [
   {
     id: 'room',
-    label: 'Room',
+    label: 'House',
     group: 'structure',
     dimensions: [4, 2.4, 4],
     minDimensions: [2, 2, 2],
@@ -46,6 +46,15 @@ export const OBJECT_CATALOG = [
     dimensions: [3.2, 0.12, 3.2],
     minDimensions: [1, 0.05, 1],
     color: '#e4e8ed',
+  },
+  {
+    id: 'door',
+    label: 'Door',
+    group: 'structure',
+    dimensions: [0.9, 2.1, 0.12],
+    minDimensions: [0.7, 1.9, 0.08],
+    color: '#9f7b59',
+    openable: true,
   },
   {
     id: 'cube',
@@ -110,6 +119,7 @@ export const OBJECT_CATALOG = [
     dimensions: [0.9, 1.6, 0.45],
     minDimensions: [0.45, 0.8, 0.3],
     color: '#8a715b',
+    openable: true,
   },
   {
     id: 'wardrobe',
@@ -118,6 +128,7 @@ export const OBJECT_CATALOG = [
     dimensions: [1.6, 2.1, 0.65],
     minDimensions: [0.8, 1.5, 0.4],
     color: '#8b7968',
+    openable: true,
   },
   {
     id: 'refrigerator',
@@ -191,6 +202,10 @@ export function getObjectLabel(type) {
   return getObjectDefinition(type).label;
 }
 
+export function isObjectOpenable(type) {
+  return Boolean(getObjectDefinition(type).openable);
+}
+
 export function normalizeNumber(value, fallback = 0) {
   const parsed = Number(value);
   return Number.isFinite(parsed) ? parsed : fallback;
@@ -239,6 +254,7 @@ export function normalizeObject(rawObject) {
       normalizeVector(rawObject?.dimensions, definition.dimensions),
     ),
     color: normalizeColor(rawObject?.color, definition.color),
+    isOpen: definition.openable ? Boolean(rawObject?.isOpen) : undefined,
   };
 }
 

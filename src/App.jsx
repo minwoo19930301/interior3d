@@ -6,7 +6,7 @@ import ErrorBoundary from './components/ErrorBoundary';
 import RoomPlannerModal from './components/RoomPlannerModal';
 import useStore from './store/useStore';
 import { buildSceneUrl, syncSceneToUrl } from './lib/sceneUrl';
-import { buildRoomObjects } from './lib/roomBuilder';
+import { buildHouseObjects } from './lib/roomBuilder';
 import { getObjectLabel, toDisplayValue } from './lib/objectCatalog';
 
 const badgeStyle = {
@@ -72,6 +72,7 @@ function App() {
   const copySelectedObject = useStore((state) => state.copySelectedObject);
   const pasteClipboardObject = useStore((state) => state.pasteClipboardObject);
   const addObjects = useStore((state) => state.addObjects);
+  const replaceObjects = useStore((state) => state.replaceObjects);
   const undo = useStore((state) => state.undo);
   const redo = useStore((state) => state.redo);
   const [shareStatus, setShareStatus] = useState('idle');
@@ -143,7 +144,14 @@ function App() {
   };
 
   const handleCreateRoom = (roomConfig) => {
-    addObjects(buildRoomObjects(roomConfig));
+    const nextObjects = buildHouseObjects(roomConfig);
+
+    if (roomConfig.replaceExisting) {
+      replaceObjects(nextObjects);
+    } else {
+      addObjects(nextObjects);
+    }
+
     setIsRoomPlannerOpen(false);
   };
 

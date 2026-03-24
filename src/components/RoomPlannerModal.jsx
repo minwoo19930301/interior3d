@@ -1,75 +1,120 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import {
   UNIT_SYSTEMS,
   fromDisplayValue,
   toDisplayValue,
 } from '../lib/objectCatalog';
+import { HOUSE_TEMPLATES, getHouseTemplate } from '../lib/roomBuilder';
 
-const initialRoomState = {
-  width: 4,
-  depth: 4,
-  wallHeight: 2.4,
+const initialPlannerState = {
+  templateId: HOUSE_TEMPLATES[0].id,
+  scale: 1,
+  wallHeight: 2.5,
   wallThickness: 0.12,
   includeFloor: true,
   includeCeiling: false,
-  openings: {
-    north: false,
-    east: false,
-    south: false,
-    west: false,
-  },
+  includeDoors: true,
+  replaceExisting: true,
 };
 
-function WallToggle({ label, isOpen, onToggle }) {
+function TemplatePreview({ template }) {
+  const previewWidth = 280;
+  const previewHeight = 220;
+  const inset = 16;
+  const scale = Math.min(
+    (previewWidth - inset * 2) / template.footprint.width,
+    (previewHeight - inset * 2) / template.footprint.depth,
+  );
+  const originX = previewWidth / 2;
+  const originY = previewHeight / 2;
+
   return (
-    <button
-      onClick={onToggle}
+    <div
       style={{
         width: '100%',
-        padding: '10px 12px',
-        borderRadius: '10px',
+        height: `${previewHeight}px`,
+        borderRadius: '18px',
+        background:
+          'linear-gradient(180deg, rgba(31,41,55,0.95) 0%, rgba(17,24,39,0.96) 100%)',
         border: '1px solid rgba(255,255,255,0.08)',
-        background: isOpen ? '#22334a' : '#1a212c',
-        color: '#fff',
+        position: 'relative',
+        overflow: 'hidden',
       }}
     >
-      {label}: {isOpen ? 'Open' : 'Wall'}
-    </button>
+      <div
+        style={{
+          position: 'absolute',
+          inset: 0,
+          backgroundImage:
+            'linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px)',
+          backgroundSize: '22px 22px',
+          opacity: 0.5,
+        }}
+      />
+
+      {template.rooms.map((room) => {
+        const width = room.width * scale;
+        const height = room.depth * scale;
+        const left = originX + room.x * scale - width / 2;
+        const top = originY + room.z * scale - height / 2;
+
+        return (
+          <div
+            key={`${template.id}-${room.label}-${room.x}-${room.z}`}
+            style={{
+              position: 'absolute',
+              left,
+              top,
+              width,
+              height,
+              borderRadius: '12px',
+              border: '1px solid rgba(255,255,255,0.16)',
+              background:
+                room.accent
+                  ? `${room.accent}cc`
+                  : 'linear-gradient(180deg, rgba(102,132,175,0.34) 0%, rgba(58,76,102,0.28) 100%)',
+              color: '#f7fafc',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: '0.72rem',
+              fontWeight: 600,
+              letterSpacing: '0.02em',
+              textAlign: 'center',
+              padding: '6px',
+            }}
+          >
+            {room.label}
+          </div>
+        );
+      })}
+    </div>
   );
 }
 
 const RoomPlannerModal = ({ isOpen, unitSystem, onClose, onCreate }) => {
-  const [roomState, setRoomState] = useState(initialRoomState);
+  const [plannerState, setPlannerState] = useState(initialPlannerState);
   const unit = UNIT_SYSTEMS[unitSystem] ?? UNIT_SYSTEMS.m;
+  const selectedTemplate = useMemo(
+    () => getHouseTemplate(plannerState.templateId),
+    [plannerState.templateId],
+  );
 
   if (!isOpen) {
     return null;
   }
 
-  const updateDimension = (key, rawValue) => {
-    const nextValue = fromDisplayValue(rawValue, unitSystem);
-
-    setRoomState((current) => ({
+  const updatePlanner = (patch) => {
+    setPlannerState((current) => ({
       ...current,
-      [key]: nextValue,
+      ...patch,
     }));
   };
 
-  const toggleBoolean = (key) => {
-    setRoomState((current) => ({
-      ...current,
-      [key]: !current[key],
-    }));
-  };
-
-  const toggleOpening = (key) => {
-    setRoomState((current) => ({
-      ...current,
-      openings: {
-        ...current.openings,
-        [key]: !current.openings[key],
-      },
-    }));
+  const updateMeasuredValue = (key, rawValue) => {
+    updatePlanner({
+      [key]: fromDisplayValue(rawValue, unitSystem),
+    });
   };
 
   return (
@@ -77,7 +122,7 @@ const RoomPlannerModal = ({ isOpen, unitSystem, onClose, onCreate }) => {
       style={{
         position: 'absolute',
         inset: 0,
-        background: 'rgba(5, 8, 12, 0.68)',
+        background: 'rgba(5, 8, 12, 0.7)',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
@@ -87,7 +132,9 @@ const RoomPlannerModal = ({ isOpen, unitSystem, onClose, onCreate }) => {
     >
       <div
         style={{
-          width: 'min(720px, 100%)',
+          width: 'min(980px, 100%)',
+          maxHeight: 'min(760px, calc(100vh - 48px))',
+          overflowY: 'auto',
           background: '#11161f',
           border: '1px solid rgba(255,255,255,0.08)',
           borderRadius: '24px',
@@ -106,9 +153,9 @@ const RoomPlannerModal = ({ isOpen, unitSystem, onClose, onCreate }) => {
           }}
         >
           <div>
-            <h2 style={{ margin: 0, fontSize: '1.25rem' }}>Room Planner</h2>
+            <h2 style={{ margin: 0, fontSize: '1.25rem' }}>House Planner</h2>
             <p style={{ margin: '8px 0 0 0', color: '#8c99ad', fontSize: '0.9rem' }}>
-              Set room size and decide which sides stay open.
+              Pick a full home template, then adjust wall size, ceiling, and doors.
             </p>
           </div>
 
@@ -129,95 +176,114 @@ const RoomPlannerModal = ({ isOpen, unitSystem, onClose, onCreate }) => {
         <div
           style={{
             display: 'grid',
-            gridTemplateColumns: '1.15fr 0.85fr',
+            gridTemplateColumns: 'minmax(260px, 0.9fr) minmax(320px, 1.1fr)',
             gap: '20px',
           }}
         >
           <div
             style={{
-              padding: '18px',
-              borderRadius: '18px',
-              background: '#161d27',
-              border: '1px solid rgba(255,255,255,0.06)',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '12px',
             }}
           >
-            <WallToggle
-              label="North"
-              isOpen={roomState.openings.north}
-              onToggle={() => toggleOpening('north')}
-            />
+            {HOUSE_TEMPLATES.map((template) => {
+              const isSelected = template.id === plannerState.templateId;
 
-            <div
-              style={{
-                display: 'grid',
-                gridTemplateColumns: '110px 1fr 110px',
-                alignItems: 'center',
-                gap: '12px',
-                margin: '12px 0',
-              }}
-            >
-              <WallToggle
-                label="West"
-                isOpen={roomState.openings.west}
-                onToggle={() => toggleOpening('west')}
-              />
-
-              <div
-                style={{
-                  minHeight: '190px',
-                  borderRadius: '18px',
-                  border: '1px solid rgba(255,255,255,0.08)',
-                  background:
-                    'linear-gradient(180deg, rgba(42,54,71,0.58) 0%, rgba(23,31,42,0.76) 100%)',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  gap: '8px',
-                }}
-              >
-                <div style={{ fontSize: '0.95rem', fontWeight: 600 }}>
-                  {toDisplayValue(roomState.width, unitSystem)} x{' '}
-                  {toDisplayValue(roomState.depth, unitSystem)} {unit.label}
-                </div>
-                <div style={{ color: '#8fa0b8', fontSize: '0.82rem' }}>
-                  Height {toDisplayValue(roomState.wallHeight, unitSystem)} {unit.label}
-                </div>
-              </div>
-
-              <WallToggle
-                label="East"
-                isOpen={roomState.openings.east}
-                onToggle={() => toggleOpening('east')}
-              />
-            </div>
-
-            <WallToggle
-              label="South"
-              isOpen={roomState.openings.south}
-              onToggle={() => toggleOpening('south')}
-            />
+              return (
+                <button
+                  key={template.id}
+                  onClick={() => updatePlanner({ templateId: template.id })}
+                  style={{
+                    width: '100%',
+                    textAlign: 'left',
+                    padding: '14px 16px',
+                    borderRadius: '16px',
+                    border: isSelected
+                      ? '1px solid rgba(79,140,255,0.7)'
+                      : '1px solid rgba(255,255,255,0.08)',
+                    background: isSelected ? '#192538' : '#161d27',
+                    color: '#fff',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '6px',
+                  }}
+                >
+                  <span style={{ fontSize: '0.95rem', fontWeight: 700 }}>
+                    {template.label}
+                  </span>
+                  <span style={{ color: '#8fa0b8', fontSize: '0.8rem', lineHeight: 1.45 }}>
+                    {template.description}
+                  </span>
+                  <span style={{ color: '#677489', fontSize: '0.72rem' }}>
+                    {toDisplayValue(template.footprint.width, unitSystem)} x{' '}
+                    {toDisplayValue(template.footprint.depth, unitSystem)} {unit.label}
+                  </span>
+                </button>
+              );
+            })}
           </div>
 
           <div
             style={{
-              padding: '18px',
-              borderRadius: '18px',
-              background: '#161d27',
-              border: '1px solid rgba(255,255,255,0.06)',
               display: 'flex',
               flexDirection: 'column',
-              gap: '14px',
+              gap: '18px',
             }}
           >
-            {[
-              ['width', 'Width'],
-              ['depth', 'Depth'],
-              ['wallHeight', 'Wall Height'],
-              ['wallThickness', 'Wall Thickness'],
-            ].map(([key, label]) => (
+            <div
+              style={{
+                padding: '18px',
+                borderRadius: '18px',
+                background: '#161d27',
+                border: '1px solid rgba(255,255,255,0.06)',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '12px',
+              }}
+            >
+              <div>
+                <div style={{ fontSize: '1rem', fontWeight: 700 }}>
+                  {selectedTemplate.label}
+                </div>
+                <div style={{ marginTop: '6px', color: '#8fa0b8', fontSize: '0.84rem' }}>
+                  {selectedTemplate.description}
+                </div>
+              </div>
+
+              <TemplatePreview template={selectedTemplate} />
+
+              <div
+                style={{
+                  display: 'flex',
+                  gap: '10px',
+                  flexWrap: 'wrap',
+                  color: '#9cb0c9',
+                  fontSize: '0.8rem',
+                }}
+              >
+                <div>
+                  Width {toDisplayValue(selectedTemplate.footprint.width * plannerState.scale, unitSystem)} {unit.label}
+                </div>
+                <div>
+                  Depth {toDisplayValue(selectedTemplate.footprint.depth * plannerState.scale, unitSystem)} {unit.label}
+                </div>
+                <div>Rooms {selectedTemplate.rooms.length}</div>
+              </div>
+            </div>
+
+            <div
+              style={{
+                padding: '18px',
+                borderRadius: '18px',
+                background: '#161d27',
+                border: '1px solid rgba(255,255,255,0.06)',
+                display: 'grid',
+                gridTemplateColumns: '1fr 1fr',
+                gap: '14px',
+              }}
+            >
               <label
-                key={key}
                 style={{
                   display: 'flex',
                   flexDirection: 'column',
@@ -226,13 +292,18 @@ const RoomPlannerModal = ({ isOpen, unitSystem, onClose, onCreate }) => {
                   fontSize: '0.82rem',
                 }}
               >
-                {label}
+                Scale
                 <input
                   type="number"
-                  min="0"
-                  step={unit.step}
-                  value={toDisplayValue(roomState[key], unitSystem)}
-                  onChange={(event) => updateDimension(key, event.target.value)}
+                  min="0.7"
+                  max="1.6"
+                  step="0.05"
+                  value={plannerState.scale}
+                  onChange={(event) =>
+                    updatePlanner({
+                      scale: Math.max(0.7, Math.min(1.6, Number(event.target.value) || 1)),
+                    })
+                  }
                   style={{
                     width: '100%',
                     background: '#1d2430',
@@ -243,40 +314,133 @@ const RoomPlannerModal = ({ isOpen, unitSystem, onClose, onCreate }) => {
                   }}
                 />
               </label>
-            ))}
 
-            <label style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-              <input
-                type="checkbox"
-                checked={roomState.includeFloor}
-                onChange={() => toggleBoolean('includeFloor')}
-              />
-              <span>Include floor</span>
-            </label>
+              <label
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '6px',
+                  color: '#aab5c4',
+                  fontSize: '0.82rem',
+                }}
+              >
+                Wall Height ({unit.label})
+                <input
+                  type="number"
+                  min="0"
+                  step={unit.step}
+                  value={toDisplayValue(plannerState.wallHeight, unitSystem)}
+                  onChange={(event) => updateMeasuredValue('wallHeight', event.target.value)}
+                  style={{
+                    width: '100%',
+                    background: '#1d2430',
+                    border: '1px solid rgba(255,255,255,0.08)',
+                    color: '#fff',
+                    padding: '10px 12px',
+                    borderRadius: '10px',
+                  }}
+                />
+              </label>
 
-            <label style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-              <input
-                type="checkbox"
-                checked={roomState.includeCeiling}
-                onChange={() => toggleBoolean('includeCeiling')}
-              />
-              <span>Include ceiling</span>
-            </label>
+              <label
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '6px',
+                  color: '#aab5c4',
+                  fontSize: '0.82rem',
+                }}
+              >
+                Wall Thickness ({unit.label})
+                <input
+                  type="number"
+                  min="0"
+                  step={unit.step}
+                  value={toDisplayValue(plannerState.wallThickness, unitSystem)}
+                  onChange={(event) =>
+                    updateMeasuredValue('wallThickness', event.target.value)
+                  }
+                  style={{
+                    width: '100%',
+                    background: '#1d2430',
+                    border: '1px solid rgba(255,255,255,0.08)',
+                    color: '#fff',
+                    padding: '10px 12px',
+                    borderRadius: '10px',
+                  }}
+                />
+              </label>
 
-            <button
-              onClick={() => onCreate(roomState)}
-              style={{
-                marginTop: 'auto',
-                padding: '0.8rem 1rem',
-                borderRadius: '12px',
-                border: 'none',
-                background: '#4064e8',
-                color: '#fff',
-              }}
-            >
-              Create Room
-            </button>
+              <div
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'center',
+                  gap: '10px',
+                }}
+              >
+                {[
+                  ['includeFloor', 'Include floor'],
+                  ['includeCeiling', 'Include ceiling'],
+                  ['includeDoors', 'Add doors'],
+                  ['replaceExisting', 'Replace current scene'],
+                ].map(([key, label]) => (
+                  <label
+                    key={key}
+                    style={{
+                      display: 'flex',
+                      gap: '10px',
+                      alignItems: 'center',
+                      color: '#dce3ec',
+                      fontSize: '0.86rem',
+                    }}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={plannerState[key]}
+                      onChange={() => updatePlanner({ [key]: !plannerState[key] })}
+                    />
+                    <span>{label}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
           </div>
+        </div>
+
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'flex-end',
+            gap: '12px',
+            marginTop: '20px',
+          }}
+        >
+          <button
+            onClick={onClose}
+            style={{
+              borderRadius: '12px',
+              border: '1px solid rgba(255,255,255,0.08)',
+              background: '#161d27',
+              color: '#fff',
+              padding: '0.75rem 1rem',
+            }}
+          >
+            Cancel
+          </button>
+          <button
+            onClick={() => onCreate(plannerState)}
+            style={{
+              borderRadius: '12px',
+              border: 'none',
+              background: '#4b83ff',
+              color: '#fff',
+              padding: '0.75rem 1.1rem',
+              fontWeight: 700,
+            }}
+          >
+            Build house
+          </button>
         </div>
       </div>
     </div>

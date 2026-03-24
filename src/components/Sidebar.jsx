@@ -65,7 +65,7 @@ const Sidebar = ({ onOpenRoomPlanner }) => {
                                     </span>
                                     <span style={{ fontSize: '0.72rem', color: '#90a0b5', lineHeight: 1.35 }}>
                                         {item.planner
-                                            ? 'Open planner'
+                                            ? 'Preset layouts'
                                             : `${toDisplayValue(item.dimensions[0], unitSystem)} x ${toDisplayValue(item.dimensions[1], unitSystem)} x ${toDisplayValue(item.dimensions[2], unitSystem)} ${unitSystem}`}
                                     </span>
                                 </button>
