@@ -15,12 +15,37 @@ export const OBJECT_GROUPS = [
 
 export const OBJECT_CATALOG = [
   {
+    id: 'room',
+    label: 'Room',
+    group: 'structure',
+    dimensions: [4, 2.4, 4],
+    minDimensions: [2, 2, 2],
+    color: '#d7d1c7',
+    planner: true,
+  },
+  {
     id: 'wall',
     label: 'Wall',
     group: 'structure',
     dimensions: [3.2, 2.4, 0.12],
     minDimensions: [0.6, 1.4, 0.05],
     color: '#d7d1c7',
+  },
+  {
+    id: 'floorPanel',
+    label: 'Floor',
+    group: 'structure',
+    dimensions: [3.2, 0.12, 3.2],
+    minDimensions: [1, 0.05, 1],
+    color: '#8b6f57',
+  },
+  {
+    id: 'ceilingPanel',
+    label: 'Ceiling',
+    group: 'structure',
+    dimensions: [3.2, 0.12, 3.2],
+    minDimensions: [1, 0.05, 1],
+    color: '#e4e8ed',
   },
   {
     id: 'cube',
@@ -247,4 +272,3 @@ export function radiansToDegrees(value) {
 export function degreesToRadians(value) {
   return roundNumber((normalizeNumber(value, 0) * Math.PI) / 180, 4);
 }
-

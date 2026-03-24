@@ -105,6 +105,13 @@ function createPastedObject(clipboardObject) {
   };
 }
 
+function createPreparedObject(rawObject) {
+  return {
+    id: uuidv4(),
+    ...normalizeObject(rawObject),
+  };
+}
+
 const useStore = create((set, get) => ({
   objects: initialObjects,
   selectedId: null,
@@ -122,6 +129,23 @@ const useStore = create((set, get) => ({
         historyFuture: [],
         objects: [...state.objects, newObject],
         selectedId: newObject.id,
+      };
+    }),
+
+  addObjects: (rawObjects) =>
+    set((state) => {
+      if (!Array.isArray(rawObjects) || rawObjects.length === 0) {
+        return state;
+      }
+
+      const newObjects = rawObjects.map(createPreparedObject);
+      const lastObject = newObjects[newObjects.length - 1];
+
+      return {
+        historyPast: pushHistoryEntry(state.historyPast, state),
+        historyFuture: [],
+        objects: [...state.objects, ...newObjects],
+        selectedId: lastObject?.id ?? state.selectedId,
       };
     }),
 

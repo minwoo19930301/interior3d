@@ -3,8 +3,11 @@ import Scene from './components/Scene';
 import Sidebar from './components/Sidebar';
 import PropertiesPanel from './components/PropertiesPanel';
 import ErrorBoundary from './components/ErrorBoundary';
+import RoomPlannerModal from './components/RoomPlannerModal';
 import useStore from './store/useStore';
 import { buildSceneUrl, syncSceneToUrl } from './lib/sceneUrl';
+import { buildRoomObjects } from './lib/roomBuilder';
+import { getObjectLabel, toDisplayValue } from './lib/objectCatalog';
 
 const badgeStyle = {
   padding: '0.55rem 0.85rem',
@@ -68,9 +71,12 @@ function App() {
   const historyPastLength = useStore((state) => state.historyPast.length);
   const copySelectedObject = useStore((state) => state.copySelectedObject);
   const pasteClipboardObject = useStore((state) => state.pasteClipboardObject);
+  const addObjects = useStore((state) => state.addObjects);
   const undo = useStore((state) => state.undo);
   const redo = useStore((state) => state.redo);
   const [shareStatus, setShareStatus] = useState('idle');
+  const [isRoomPlannerOpen, setIsRoomPlannerOpen] = useState(false);
+  const selectedObject = objects.find((object) => object.id === selectedId);
 
   useEffect(() => {
     syncSceneToUrl({ objects, unitSystem });
@@ -136,6 +142,11 @@ function App() {
     }
   };
 
+  const handleCreateRoom = (roomConfig) => {
+    addObjects(buildRoomObjects(roomConfig));
+    setIsRoomPlannerOpen(false);
+  };
+
   return (
     <ErrorBoundary>
       <div
@@ -148,10 +159,18 @@ function App() {
           overflow: 'hidden',
         }}
       >
-        <Sidebar />
+        <Sidebar onOpenRoomPlanner={() => setIsRoomPlannerOpen(true)} />
 
         <div style={{ flex: 1, position: 'relative', minWidth: 0 }}>
           <Scene />
+          {isRoomPlannerOpen ? (
+            <RoomPlannerModal
+              isOpen={isRoomPlannerOpen}
+              unitSystem={unitSystem}
+              onClose={() => setIsRoomPlannerOpen(false)}
+              onCreate={handleCreateRoom}
+            />
+          ) : null}
 
           <div
             style={{
@@ -160,12 +179,37 @@ function App() {
               left: 18,
               right: 18,
               display: 'flex',
-              justifyContent: 'flex-end',
+              justifyContent: 'space-between',
               gap: '16px',
               alignItems: 'flex-start',
               pointerEvents: 'none',
             }}
           >
+            <div
+              style={{
+                display: 'flex',
+                gap: '10px',
+                alignItems: 'center',
+                flexWrap: 'wrap',
+                pointerEvents: 'auto',
+              }}
+            >
+              <div style={{ ...badgeStyle, color: '#9cb0c9' }}>
+                Grid {toDisplayValue(1, unitSystem)} {unitSystem}
+              </div>
+              <div style={{ ...badgeStyle, color: '#9cb0c9' }}>
+                Scene {toDisplayValue(40, unitSystem)} x {toDisplayValue(40, unitSystem)} {unitSystem}
+              </div>
+              {selectedObject ? (
+                <div style={{ ...badgeStyle, color: '#f5f7fa' }}>
+                  {getObjectLabel(selectedObject.type)}{' '}
+                  {toDisplayValue(selectedObject.dimensions[0], unitSystem)} x{' '}
+                  {toDisplayValue(selectedObject.dimensions[1], unitSystem)} x{' '}
+                  {toDisplayValue(selectedObject.dimensions[2], unitSystem)} {unitSystem}
+                </div>
+              ) : null}
+            </div>
+
             <div
               style={{
                 display: 'flex',

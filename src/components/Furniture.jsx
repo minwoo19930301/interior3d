@@ -43,6 +43,24 @@ function renderFurniture(type, dimensions, color) {
         );
     }
 
+    if (type === 'floorPanel') {
+        return (
+            <group>
+                <BoxPart size={[width, height, depth]} position={[0, -height / 2, 0]} color={color} />
+                <BoxPart size={[width * 0.98, 0.02, depth * 0.98]} position={[0, 0.01, 0]} color="#a48769" />
+            </group>
+        );
+    }
+
+    if (type === 'ceilingPanel') {
+        return (
+            <group>
+                <BoxPart size={[width, height, depth]} position={[0, height / 2, 0]} color={color} />
+                <BoxPart size={[width * 0.96, 0.015, depth * 0.96]} position={[0, 0.01, 0]} color="#f2f5f8" />
+            </group>
+        );
+    }
+
     if (type === 'table') {
         const topThickness = Math.max(0.05, height * 0.08);
         const legSize = Math.min(0.1, Math.min(width, depth) * 0.1);
