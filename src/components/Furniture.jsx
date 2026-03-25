@@ -1,8 +1,8 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useMemo, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { TransformControls } from '@react-three/drei';
 import useStore from '../store/useStore';
-import { clampDimensions, roundNumber } from '../lib/objectCatalog';
+import { clampDimensions, getObjectDefinition, roundNumber } from '../lib/objectCatalog';
 
 const commonMaterial = (color, extra = {}) => ({
   color,
@@ -18,6 +18,10 @@ function mixHexColors(baseColor, targetColor, amount) {
 }
 
 function areDimensionsEqual(current, next) {
+  return current.every((value, index) => Math.abs(value - next[index]) < 0.001);
+}
+
+function arePositionsEqual(current, next) {
   return current.every((value, index) => Math.abs(value - next[index]) < 0.001);
 }
 
@@ -531,16 +535,17 @@ const Furniture = ({
   const updateObject = useStore((state) => state.updateObject);
   const groupRef = useRef(null);
   const resizeStateRef = useRef(null);
-  const draftDimensionsRef = useRef(dimensions);
-  const [draftDimensions, setDraftDimensions] = useState(null);
-  const activeDimensions =
-    transformMode === 'resize' && isSelected && draftDimensions
-      ? draftDimensions
-      : dimensions;
-
-  useEffect(() => {
-    draftDimensionsRef.current = activeDimensions;
-  }, [activeDimensions]);
+  const draftTransformRef = useRef(null);
+  const [draftTransform, setDraftTransform] = useState(null);
+  const activeTransform =
+    transformMode === 'resize' && isSelected && draftTransform
+      ? draftTransform
+      : null;
+  const activeDimensions = activeTransform?.dimensions ?? dimensions;
+  const activePosition = activeTransform?.position ?? position;
+  const definition = getObjectDefinition(type);
+  const minWidth = definition.minDimensions?.[0] ?? 0.2;
+  const minDepth = definition.minDimensions?.[2] ?? 0.05;
 
   const content = useMemo(
     () => renderFurniture(type, activeDimensions, color, isOpen, swing),
@@ -582,16 +587,28 @@ const Furniture = ({
 
     const worldPosition = new THREE.Vector3();
     object.getWorldPosition(worldPosition);
+    const startDimensions = [...dimensions];
+    const startPosition = [...position];
+
     resizeStateRef.current = {
       pointerId: event.pointerId,
       plane: new THREE.Plane().setFromNormalAndCoplanarPoint(
         new THREE.Vector3(0, 1, 0),
         worldPosition,
       ),
+      matrixWorld: object.matrixWorld.clone(),
+      inverseMatrixWorld: object.matrixWorld.clone().invert(),
       signX,
       signZ,
+      startDimensions,
+      startPosition,
     };
-    setDraftDimensions(dimensions);
+    const nextTransform = {
+      dimensions: startDimensions,
+      position: startPosition,
+    };
+    draftTransformRef.current = nextTransform;
+    setDraftTransform(nextTransform);
   };
 
   const handleResizeMove = (event) => {
@@ -602,30 +619,56 @@ const Furniture = ({
     }
 
     event.stopPropagation();
-    const object = groupRef.current;
-
-    if (!object) {
-      return;
-    }
-
     const intersectionPoint = new THREE.Vector3();
 
     if (!event.ray.intersectPlane(resizeState.plane, intersectionPoint)) {
       return;
     }
 
-    const localPoint = object.worldToLocal(intersectionPoint.clone());
-    const nextDimensions = clampDimensions(type, [
-      roundNumber(Math.abs(localPoint.x) * 2),
-      activeDimensions[1],
-      roundNumber(Math.abs(localPoint.z) * 2),
-    ]);
+    const localPoint = intersectionPoint
+      .clone()
+      .applyMatrix4(resizeState.inverseMatrixWorld);
+    const startWidth = resizeState.startDimensions[0];
+    const startDepth = resizeState.startDimensions[2];
+    let minX = -startWidth / 2;
+    let maxX = startWidth / 2;
+    let minZ = -startDepth / 2;
+    let maxZ = startDepth / 2;
 
-    setDraftDimensions((current) => [
-      nextDimensions[0],
-      current?.[1] ?? dimensions[1],
-      nextDimensions[2],
+    if (resizeState.signX > 0) {
+      maxX = Math.max(localPoint.x, minX + minWidth);
+    } else if (resizeState.signX < 0) {
+      minX = Math.min(localPoint.x, maxX - minWidth);
+    }
+
+    if (resizeState.signZ > 0) {
+      maxZ = Math.max(localPoint.z, minZ + minDepth);
+    } else if (resizeState.signZ < 0) {
+      minZ = Math.min(localPoint.z, maxZ - minDepth);
+    }
+
+    const nextDimensions = clampDimensions(type, [
+      roundNumber(maxX - minX),
+      resizeState.startDimensions[1],
+      roundNumber(maxZ - minZ),
     ]);
+    const localCenter = new THREE.Vector3(
+      resizeState.signX === 0 ? 0 : (minX + maxX) / 2,
+      0,
+      resizeState.signZ === 0 ? 0 : (minZ + maxZ) / 2,
+    );
+    const worldCenter = localCenter.applyMatrix4(resizeState.matrixWorld);
+    const nextTransform = {
+      dimensions: nextDimensions,
+      position: [
+        roundNumber(worldCenter.x),
+        roundNumber(resizeState.startPosition[1]),
+        roundNumber(worldCenter.z),
+      ],
+    };
+
+    draftTransformRef.current = nextTransform;
+    setDraftTransform(nextTransform);
   };
 
   const finishResize = (event) => {
@@ -639,13 +682,21 @@ const Furniture = ({
     event.target.releasePointerCapture?.(event.pointerId);
     resizeStateRef.current = null;
 
-    if (!areDimensionsEqual(dimensions, draftDimensionsRef.current)) {
-      updateObject(id, { dimensions: draftDimensionsRef.current });
-      setDraftDimensions(null);
+    const nextTransform = draftTransformRef.current;
+
+    if (
+      nextTransform &&
+      (!areDimensionsEqual(dimensions, nextTransform.dimensions) ||
+        !arePositionsEqual(position, nextTransform.position))
+    ) {
+      updateObject(id, nextTransform);
+      draftTransformRef.current = null;
+      setDraftTransform(null);
       return;
     }
 
-    setDraftDimensions(null);
+    draftTransformRef.current = null;
+    setDraftTransform(null);
   };
 
   const resizeHandleSize = Math.min(
@@ -663,6 +714,10 @@ const Furniture = ({
           [-1, 1],
           [1, -1],
           [1, 1],
+          [-1, 0],
+          [1, 0],
+          [0, -1],
+          [0, 1],
         ].map(([signX, signZ]) => (
           <mesh
             key={`${signX}-${signZ}`}
@@ -678,7 +733,17 @@ const Furniture = ({
             onPointerUp={finishResize}
             onPointerCancel={finishResize}
           >
-            <sphereGeometry args={[resizeHandleSize / 2, 18, 18]} />
+            {signX !== 0 && signZ !== 0 ? (
+              <sphereGeometry args={[resizeHandleSize / 2, 18, 18]} />
+            ) : (
+              <boxGeometry
+                args={[
+                  signX === 0 ? resizeHandleSize * 1.25 : resizeHandleSize * 0.78,
+                  resizeHandleSize * 0.58,
+                  signZ === 0 ? resizeHandleSize * 1.25 : resizeHandleSize * 0.78,
+                ]}
+              />
+            )}
             <meshStandardMaterial
               color="#4b83ff"
               emissive="#1f4fb3"
@@ -695,7 +760,7 @@ const Furniture = ({
     <>
       <group
         ref={groupRef}
-        position={position}
+        position={activePosition}
         rotation={rotation}
         onClick={onClick}
         onDoubleClick={onDoubleClick}
