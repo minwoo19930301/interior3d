@@ -1,4 +1,4 @@
-import { normalizeObject, roundNumber } from './objectCatalog';
+import { normalizeObject, roundNumber, UNIT_SYSTEMS } from './objectCatalog';
 
 const SCENE_QUERY_KEY = 'scene';
 
@@ -38,11 +38,15 @@ function compactObject(object) {
   };
 }
 
+function normalizeUnitSystem(unitSystem) {
+  return UNIT_SYSTEMS[unitSystem] ? unitSystem : 'm';
+}
+
 export function serializeScene({ objects, unitSystem }) {
   return encodeBase64Url(
     JSON.stringify({
       v: 1,
-      u: unitSystem === 'cm' ? 'cm' : 'm',
+      u: normalizeUnitSystem(unitSystem),
       o: objects.map(compactObject),
     }),
   );
@@ -61,7 +65,7 @@ export function parseSceneParam(rawScene) {
     }
 
     return {
-      unitSystem: payload.u === 'cm' ? 'cm' : 'm',
+      unitSystem: normalizeUnitSystem(payload.u),
       objects: payload.o.map((item) =>
         normalizeObject({
           type: item.t,
@@ -95,7 +99,7 @@ export function buildSceneUrl({ objects, unitSystem }) {
 
   const url = new URL(window.location.href);
 
-  if (objects.length === 0 && unitSystem !== 'cm') {
+  if (objects.length === 0 && normalizeUnitSystem(unitSystem) === 'm') {
     url.searchParams.delete(SCENE_QUERY_KEY);
   } else {
     url.searchParams.set(

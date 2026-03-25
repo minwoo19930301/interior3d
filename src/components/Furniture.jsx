@@ -533,19 +533,18 @@ const Furniture = ({
   onDoubleClick,
 }) => {
   const updateObject = useStore((state) => state.updateObject);
+  const setObjectTransforming = useStore((state) => state.setObjectTransforming);
   const groupRef = useRef(null);
   const resizeStateRef = useRef(null);
   const draftTransformRef = useRef(null);
   const [draftTransform, setDraftTransform] = useState(null);
-  const activeTransform =
-    transformMode === 'resize' && isSelected && draftTransform
-      ? draftTransform
-      : null;
+  const activeTransform = isSelected && draftTransform ? draftTransform : null;
   const activeDimensions = activeTransform?.dimensions ?? dimensions;
   const activePosition = activeTransform?.position ?? position;
   const definition = getObjectDefinition(type);
   const minWidth = definition.minDimensions?.[0] ?? 0.2;
   const minDepth = definition.minDimensions?.[2] ?? 0.05;
+  const controlMode = transformMode === 'rotate' ? 'rotate' : 'translate';
 
   const content = useMemo(
     () => renderFurniture(type, activeDimensions, color, isOpen, swing),
@@ -573,10 +572,6 @@ const Furniture = ({
   };
 
   const handleResizeStart = (signX, signZ) => (event) => {
-    if (transformMode !== 'resize') {
-      return;
-    }
-
     event.stopPropagation();
     event.target.setPointerCapture?.(event.pointerId);
     const object = groupRef.current;
@@ -603,6 +598,7 @@ const Furniture = ({
       startDimensions,
       startPosition,
     };
+    setObjectTransforming(true);
     const nextTransform = {
       dimensions: startDimensions,
       position: startPosition,
@@ -681,6 +677,7 @@ const Furniture = ({
     event.stopPropagation();
     event.target.releasePointerCapture?.(event.pointerId);
     resizeStateRef.current = null;
+    setObjectTransforming(false);
 
     const nextTransform = draftTransformRef.current;
 
@@ -708,7 +705,7 @@ const Furniture = ({
     Math.max(0.12, activeDimensions[1] - 0.02),
   );
   const resizeHandles =
-    isSelected && transformMode === 'resize'
+    isSelected
       ? [
           [-1, -1],
           [-1, 1],
@@ -770,15 +767,18 @@ const Furniture = ({
         {resizeHandles}
       </group>
 
-      {isSelected && transformMode !== 'resize' ? (
+      {isSelected ? (
         <TransformControls
           object={groupRef}
-          mode={transformMode}
-          space={transformMode === 'rotate' ? 'local' : 'world'}
-          showX={transformMode !== 'rotate'}
-          showY={transformMode === 'rotate'}
-          showZ={transformMode !== 'rotate'}
-          rotationSnap={transformMode === 'rotate' ? Math.PI / 24 : undefined}
+          mode={controlMode}
+          space={controlMode === 'rotate' ? 'local' : 'world'}
+          showX={controlMode !== 'rotate'}
+          showY={controlMode === 'rotate'}
+          showZ={controlMode !== 'rotate'}
+          rotationSnap={controlMode === 'rotate' ? Math.PI / 24 : undefined}
+          onDraggingChanged={(event) => {
+            setObjectTransforming(event.value);
+          }}
           onMouseUp={handleObjectChange}
           onTouchEnd={handleObjectChange}
         />

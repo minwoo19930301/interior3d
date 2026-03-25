@@ -14,6 +14,7 @@ const Scene = () => {
     const transformMode = useStore((state) => state.transformMode);
     const cameraMode = useStore((state) => state.cameraMode);
     const setCameraState = useStore((state) => state.setCameraState);
+    const isObjectTransforming = useStore((state) => state.isObjectTransforming);
     const toggleObjectOpen = useStore((state) => state.toggleObjectOpen);
     const controlsRef = React.useRef(null);
     const mouseButtons =
@@ -109,6 +110,7 @@ const Scene = () => {
             <OrbitControls
                 ref={controlsRef}
                 makeDefault
+                enabled={!isObjectTransforming}
                 enableDamping
                 mouseButtons={mouseButtons}
                 touches={touchControls}

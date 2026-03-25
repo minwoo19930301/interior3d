@@ -156,10 +156,16 @@ function createPreparedObject(rawObject) {
 const useStore = create((set, get) => ({
   objects: initialObjects,
   selectedId: null,
-  unitSystem: initialScene?.unitSystem === 'cm' ? 'cm' : 'm',
+  unitSystem:
+    initialScene?.unitSystem === 'cm'
+      ? 'cm'
+      : initialScene?.unitSystem === 'ft'
+        ? 'ft'
+        : 'm',
   transformMode: 'translate',
   cameraMode: 'orbit',
   cameraState: DEFAULT_CAMERA_STATE,
+  isObjectTransforming: false,
   clipboardObject: null,
   historyPast: [],
   historyFuture: [],
@@ -222,22 +228,23 @@ const useStore = create((set, get) => ({
   selectObject: (id) => set({ selectedId: id }),
 
   setUnitSystem: (unitSystem) =>
-    set({ unitSystem: unitSystem === 'cm' ? 'cm' : 'm' }),
+    set({
+      unitSystem:
+        unitSystem === 'cm' ? 'cm' : unitSystem === 'ft' ? 'ft' : 'm',
+    }),
 
   setTransformMode: (transformMode) =>
     set({
-      transformMode:
-        transformMode === 'rotate'
-          ? 'rotate'
-          : transformMode === 'resize'
-            ? 'resize'
-            : 'translate',
+      transformMode: transformMode === 'rotate' ? 'rotate' : 'translate',
     }),
 
   setCameraMode: (cameraMode) =>
     set({
       cameraMode: cameraMode === 'pan' ? 'pan' : 'orbit',
     }),
+
+  setObjectTransforming: (isObjectTransforming) =>
+    set({ isObjectTransforming: Boolean(isObjectTransforming) }),
 
   setCameraState: (cameraState) =>
     set((state) => {

@@ -5,6 +5,7 @@ const GENERIC_MIN_DIMENSIONS = [0.2, 0.2, 0.05];
 export const UNIT_SYSTEMS = {
   m: { label: 'm', factor: 1, step: 0.05, precision: 2 },
   cm: { label: 'cm', factor: 100, step: 5, precision: 0 },
+  ft: { label: 'ft', factor: 3.28084, step: 0.25, precision: 2 },
 };
 
 export const OBJECT_GROUPS = [

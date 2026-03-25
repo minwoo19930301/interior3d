@@ -332,18 +332,6 @@ function App() {
                 >
                   {t('ui_rotate', locale)}
                 </button>
-                <button
-                  onClick={() => setTransformMode('resize')}
-                  style={{
-                    border: 'none',
-                    padding: '0.35rem 0.7rem',
-                    background:
-                      transformMode === 'resize' ? '#e08a4f' : 'transparent',
-                    color: '#fff',
-                  }}
-                >
-                  {t('ui_resize', locale)}
-                </button>
               </div>
 
               <div style={{ display: 'flex', gap: '8px', ...badgeStyle }}>
@@ -395,6 +383,17 @@ function App() {
                   }}
                 >
                   cm
+                </button>
+                <button
+                  onClick={() => setUnitSystem('ft')}
+                  style={{
+                    border: 'none',
+                    padding: '0.35rem 0.7rem',
+                    background: unitSystem === 'ft' ? '#4b83ff' : 'transparent',
+                    color: '#fff',
+                  }}
+                >
+                  ft
                 </button>
               </div>
 
