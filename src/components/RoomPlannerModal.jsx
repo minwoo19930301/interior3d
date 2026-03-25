@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import {
   UNIT_SYSTEMS,
   fromDisplayValue,
@@ -6,6 +6,7 @@ import {
 } from '../lib/objectCatalog';
 import { getBrowserLocale, t } from '../lib/i18n';
 import {
+  createDefaultTileGrid,
   createEvenSegments,
   CUSTOM_TEMPLATE_ID,
   DEFAULT_CUSTOM_COLUMN_COUNT,
@@ -13,83 +14,19 @@ import {
   getCustomTemplatePreview,
   getDefaultHouseSize,
   getHouseTemplate,
+  getRoomTileLabel,
   getTemplateDescription,
   getTemplateLabel,
   getTemplateRooms,
+  HOUSE_TEMPLATES,
   MAX_CUSTOM_SECTIONS,
   normalizeCustomLayoutConfig,
-  HOUSE_TEMPLATES,
+  ROOM_TILE_TYPES,
 } from '../lib/roomBuilder';
 
 const PREVIEW_WIDTH = 280;
 const PREVIEW_HEIGHT = 220;
 const PREVIEW_INSET = 16;
-
-function sumValues(values) {
-  return values.reduce((sum, value) => sum + value, 0);
-}
-
-function roundValue(value) {
-  return Math.round(value * 100) / 100;
-}
-
-function scaleSegmentsToTotal(sizes, nextTotal) {
-  if (!Array.isArray(sizes) || sizes.length === 0) {
-    return createEvenSegments(nextTotal, 1);
-  }
-
-  const currentTotal = sumValues(sizes);
-
-  if (currentTotal <= 0) {
-    return createEvenSegments(nextTotal, sizes.length);
-  }
-
-  return sizes.map((value) => roundValue((value / currentTotal) * nextTotal));
-}
-
-function splitLargestSegment(sizes) {
-  if (sizes.length >= MAX_CUSTOM_SECTIONS) {
-    return sizes;
-  }
-
-  const largestIndex = sizes.reduce(
-    (bestIndex, value, index, list) =>
-      value > list[bestIndex] ? index : bestIndex,
-    0,
-  );
-  const nextSizes = [...sizes];
-  const target = nextSizes[largestIndex];
-  const firstHalf = roundValue(target / 2);
-  const secondHalf = roundValue(target - firstHalf);
-
-  nextSizes.splice(largestIndex, 1, firstHalf, secondHalf);
-  return nextSizes;
-}
-
-function mergeSmallestSegment(sizes) {
-  if (sizes.length <= 1) {
-    return sizes;
-  }
-
-  const smallestIndex = sizes.reduce(
-    (bestIndex, value, index, list) =>
-      value < list[bestIndex] ? index : bestIndex,
-    0,
-  );
-  const nextSizes = [...sizes];
-
-  if (smallestIndex === 0) {
-    nextSizes[1] = roundValue(nextSizes[0] + nextSizes[1]);
-    nextSizes.splice(0, 1);
-    return nextSizes;
-  }
-
-  nextSizes[smallestIndex - 1] = roundValue(
-    nextSizes[smallestIndex - 1] + nextSizes[smallestIndex],
-  );
-  nextSizes.splice(smallestIndex, 1);
-  return nextSizes;
-}
 
 function createPlannerState(templateId) {
   const suggestedSize = getDefaultHouseSize(templateId);
@@ -98,6 +35,10 @@ function createPlannerState(templateId) {
     depth: suggestedSize.depth,
     customColumns: DEFAULT_CUSTOM_COLUMN_COUNT,
     customRows: DEFAULT_CUSTOM_ROW_COUNT,
+    tileGrid: createDefaultTileGrid(
+      DEFAULT_CUSTOM_COLUMN_COUNT,
+      DEFAULT_CUSTOM_ROW_COUNT,
+    ),
   });
 
   return {
@@ -105,7 +46,7 @@ function createPlannerState(templateId) {
     width: suggestedSize.width,
     depth: suggestedSize.depth,
     wallHeight: 2.5,
-    wallThickness: 0.12,
+    wallThickness: 0.08,
     includeFloor: true,
     includeCeiling: false,
     includeDoors: true,
@@ -113,6 +54,7 @@ function createPlannerState(templateId) {
     replaceExisting: true,
     columnSizes: customLayout.columnSizes,
     rowSizes: customLayout.rowSizes,
+    tileGrid: customLayout.tileGrid,
   };
 }
 
@@ -191,7 +133,6 @@ function TemplatePreview({ preview, widthScale, depthScale }) {
               justifyContent: 'center',
               fontSize: '0.72rem',
               fontWeight: 600,
-              letterSpacing: '0.02em',
               textAlign: 'center',
               padding: '6px',
             }}
@@ -204,14 +145,7 @@ function TemplatePreview({ preview, widthScale, depthScale }) {
   );
 }
 
-function CustomTemplatePreview({
-  preview,
-  locale,
-  onAdjustColumnDivider,
-  onAdjustRowDivider,
-}) {
-  const dragRef = useRef(null);
-  const [activeDrag, setActiveDrag] = useState(null);
+function TilePlannerPreview({ preview, selectedTileType, onPaintTile, locale }) {
   const scale = Math.min(
     (PREVIEW_WIDTH - PREVIEW_INSET * 2) / preview.footprint.width,
     (PREVIEW_HEIGHT - PREVIEW_INSET * 2) / preview.footprint.depth,
@@ -220,81 +154,6 @@ function CustomTemplatePreview({
   const floorDepth = preview.footprint.depth * scale;
   const startX = (PREVIEW_WIDTH - floorWidth) / 2;
   const startY = (PREVIEW_HEIGHT - floorDepth) / 2;
-  const verticalLines = [];
-  const horizontalLines = [];
-  let xCursor = startX;
-  let yCursor = startY;
-
-  (preview.columnSizes ?? []).slice(0, -1).forEach((size) => {
-    xCursor += size * scale;
-    verticalLines.push(xCursor);
-  });
-
-  (preview.rowSizes ?? []).slice(0, -1).forEach((size) => {
-    yCursor += size * scale;
-    horizontalLines.push(yCursor);
-  });
-
-  useEffect(() => {
-    if (!activeDrag) {
-      return undefined;
-    }
-
-    const handlePointerMove = (event) => {
-      const dragState = dragRef.current;
-
-      if (!dragState) {
-        return;
-      }
-
-      const deltaPixels =
-        dragState.axis === 'column'
-          ? event.clientX - dragState.clientX
-          : event.clientY - dragState.clientY;
-      const deltaValue = deltaPixels / dragState.scale;
-
-      if (Math.abs(deltaValue) < 0.001) {
-        return;
-      }
-
-      if (dragState.axis === 'column') {
-        onAdjustColumnDivider(dragState.index, deltaValue);
-      } else {
-        onAdjustRowDivider(dragState.index, deltaValue);
-      }
-
-      dragState.clientX = event.clientX;
-      dragState.clientY = event.clientY;
-    };
-
-    const handlePointerEnd = () => {
-      dragRef.current = null;
-      setActiveDrag(null);
-    };
-
-    window.addEventListener('pointermove', handlePointerMove);
-    window.addEventListener('pointerup', handlePointerEnd);
-    window.addEventListener('pointercancel', handlePointerEnd);
-
-    return () => {
-      window.removeEventListener('pointermove', handlePointerMove);
-      window.removeEventListener('pointerup', handlePointerEnd);
-      window.removeEventListener('pointercancel', handlePointerEnd);
-    };
-  }, [activeDrag, onAdjustColumnDivider, onAdjustRowDivider]);
-
-  const startDrag = (axis, index, event) => {
-    event.preventDefault();
-    event.stopPropagation();
-    dragRef.current = {
-      axis,
-      index,
-      clientX: event.clientX,
-      clientY: event.clientY,
-      scale,
-    };
-    setActiveDrag({ axis, index });
-  };
 
   return (
     <div
@@ -307,7 +166,6 @@ function CustomTemplatePreview({
         border: '1px solid rgba(255,255,255,0.08)',
         position: 'relative',
         overflow: 'hidden',
-        touchAction: 'none',
       }}
     >
       <div
@@ -321,15 +179,18 @@ function CustomTemplatePreview({
         }}
       />
 
-      {preview.rooms.map((room) => {
-        const width = room.width * scale;
-        const height = room.depth * scale;
-        const left = startX + room.x * scale + floorWidth / 2 - width / 2;
-        const top = startY + room.z * scale + floorDepth / 2 - height / 2;
+      {preview.tiles.map((tile) => {
+        const width = tile.width * scale;
+        const height = tile.depth * scale;
+        const left = startX + tile.x * scale + floorWidth / 2 - width / 2;
+        const top = startY + tile.z * scale + floorDepth / 2 - height / 2;
+        const isEmpty = tile.type === 'empty';
 
         return (
-          <div
-            key={`${room.labelText}-${room.x}-${room.z}`}
+          <button
+            key={tile.id}
+            onClick={() => onPaintTile(tile.row, tile.column)}
+            title={`${getRoomTileLabel(selectedTileType, locale)} -> ${tile.labelText}`}
             style={{
               position: 'absolute',
               left,
@@ -337,100 +198,27 @@ function CustomTemplatePreview({
               width,
               height,
               borderRadius: '12px',
-              border: '1px solid rgba(255,255,255,0.14)',
-              background: 'linear-gradient(180deg, rgba(93,122,164,0.34) 0%, rgba(51,67,89,0.3) 100%)',
-              color: '#f7fafc',
+              border: isEmpty
+                ? '1px dashed rgba(255,255,255,0.14)'
+                : '1px solid rgba(255,255,255,0.14)',
+              background: isEmpty
+                ? 'rgba(255,255,255,0.035)'
+                : `${tile.accent}dd`,
+              color: isEmpty ? '#8896a9' : '#f7fafc',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              fontSize: '0.7rem',
+              fontSize: '0.68rem',
               fontWeight: 600,
               textAlign: 'center',
               padding: '6px',
+              cursor: 'pointer',
             }}
           >
-            {room.labelText}
-          </div>
+            {tile.labelText}
+          </button>
         );
       })}
-
-      {verticalLines.map((left, index) => (
-        <React.Fragment key={`column-${index}`}>
-          <div
-            style={{
-              position: 'absolute',
-              top: startY,
-              left: left - 1,
-              width: '2px',
-              height: floorDepth,
-              background:
-                activeDrag?.axis === 'column' && activeDrag.index === index
-                  ? '#7ccde4'
-                  : 'rgba(124,205,228,0.72)',
-              boxShadow: '0 0 0 1px rgba(124,205,228,0.15)',
-            }}
-          />
-          <button
-            onPointerDown={(event) => startDrag('column', index, event)}
-            style={{
-              position: 'absolute',
-              top: startY + floorDepth / 2 - 14,
-              left: left - 14,
-              width: '28px',
-              height: '28px',
-              borderRadius: '999px',
-              border: '1px solid rgba(124,205,228,0.85)',
-              background:
-                activeDrag?.axis === 'column' && activeDrag.index === index
-                  ? '#244c5b'
-                  : '#172733',
-              color: '#d9f6ff',
-              cursor: 'ew-resize',
-            }}
-          >
-            ↔
-          </button>
-        </React.Fragment>
-      ))}
-
-      {horizontalLines.map((top, index) => (
-        <React.Fragment key={`row-${index}`}>
-          <div
-            style={{
-              position: 'absolute',
-              left: startX,
-              top: top - 1,
-              height: '2px',
-              width: floorWidth,
-              background:
-                activeDrag?.axis === 'row' && activeDrag.index === index
-                  ? '#7ccde4'
-                  : 'rgba(124,205,228,0.72)',
-              boxShadow: '0 0 0 1px rgba(124,205,228,0.15)',
-            }}
-          />
-          <button
-            onPointerDown={(event) => startDrag('row', index, event)}
-            style={{
-              position: 'absolute',
-              top: top - 14,
-              left: startX + floorWidth / 2 - 14,
-              width: '28px',
-              height: '28px',
-              borderRadius: '999px',
-              border: '1px solid rgba(124,205,228,0.85)',
-              background:
-                activeDrag?.axis === 'row' && activeDrag.index === index
-                  ? '#244c5b'
-                  : '#172733',
-              color: '#d9f6ff',
-              cursor: 'ns-resize',
-            }}
-          >
-            ↕
-          </button>
-        </React.Fragment>
-      ))}
 
       <div
         style={{
@@ -457,6 +245,7 @@ const RoomPlannerModal = ({ isOpen, unitSystem, onClose, onCreate }) => {
   const [plannerState, setPlannerState] = useState(() =>
     createPlannerState(HOUSE_TEMPLATES[0].id),
   );
+  const [selectedTileType, setSelectedTileType] = useState('living');
   const unit = UNIT_SYSTEMS[unitSystem] ?? UNIT_SYSTEMS.m;
   const isCustomTemplate = plannerState.templateId === CUSTOM_TEMPLATE_ID;
   const selectedTemplate = useMemo(
@@ -469,6 +258,9 @@ const RoomPlannerModal = ({ isOpen, unitSystem, onClose, onCreate }) => {
   );
   const widthScale = plannerState.width / preview.footprint.width;
   const depthScale = plannerState.depth / preview.footprint.depth;
+  const filledTileCount = isCustomTemplate
+    ? preview.tiles.filter((tile) => tile.type !== 'empty').length
+    : preview.rooms.length;
 
   if (!isOpen) {
     return null;
@@ -493,38 +285,25 @@ const RoomPlannerModal = ({ isOpen, unitSystem, onClose, onCreate }) => {
         depth: normalized.depth,
         columnSizes: normalized.columnSizes,
         rowSizes: normalized.rowSizes,
+        tileGrid: normalized.tileGrid,
       };
     });
   };
 
   const updateMeasuredValue = (key, rawValue) => {
     const nextValue = fromDisplayValue(rawValue, unitSystem);
-    const minimums = isCustomTemplate
-      ? {
-          width: 3.5,
-          depth: 3.5,
-          wallHeight: 2.1,
-          wallThickness: 0.08,
-        }
-      : {
-          width: Math.max(3.5, selectedTemplate.footprint.width * 0.5),
-          depth: Math.max(3.5, selectedTemplate.footprint.depth * 0.5),
-          wallHeight: 2.1,
-          wallThickness: 0.08,
-        };
-    const maximums = isCustomTemplate
-      ? {
-          width: 24,
-          depth: 24,
-          wallHeight: 4.2,
-          wallThickness: 0.4,
-        }
-      : {
-          width: Math.min(24, selectedTemplate.footprint.width * 2.8),
-          depth: Math.min(24, selectedTemplate.footprint.depth * 2.8),
-          wallHeight: 4.2,
-          wallThickness: 0.4,
-        };
+    const minimums = {
+      width: isCustomTemplate ? 4.5 : Math.max(3.5, selectedTemplate.footprint.width * 0.5),
+      depth: isCustomTemplate ? 4.5 : Math.max(3.5, selectedTemplate.footprint.depth * 0.5),
+      wallHeight: 2.1,
+      wallThickness: 0.05,
+    };
+    const maximums = {
+      width: isCustomTemplate ? 24 : Math.min(24, selectedTemplate.footprint.width * 2.8),
+      depth: isCustomTemplate ? 24 : Math.min(24, selectedTemplate.footprint.depth * 2.8),
+      wallHeight: 4.2,
+      wallThickness: 0.25,
+    };
     const clampedValue = Math.min(
       maximums[key] ?? nextValue,
       Math.max(minimums[key] ?? 0.1, nextValue),
@@ -536,11 +315,11 @@ const RoomPlannerModal = ({ isOpen, unitSystem, onClose, onCreate }) => {
         [key]: clampedValue,
         columnSizes:
           key === 'width'
-            ? scaleSegmentsToTotal(current.columnSizes, clampedValue)
+            ? createEvenSegments(clampedValue, current.columnSizes.length)
             : current.columnSizes,
         rowSizes:
           key === 'depth'
-            ? scaleSegmentsToTotal(current.rowSizes, clampedValue)
+            ? createEvenSegments(clampedValue, current.rowSizes.length)
             : current.rowSizes,
       }));
       return;
@@ -553,11 +332,14 @@ const RoomPlannerModal = ({ isOpen, unitSystem, onClose, onCreate }) => {
     const suggestedSize = getDefaultHouseSize(templateId);
 
     if (templateId === CUSTOM_TEMPLATE_ID) {
+      const columns = DEFAULT_CUSTOM_COLUMN_COUNT;
+      const rows = DEFAULT_CUSTOM_ROW_COUNT;
       const customLayout = normalizeCustomLayoutConfig({
         width: suggestedSize.width,
         depth: suggestedSize.depth,
-        customColumns: DEFAULT_CUSTOM_COLUMN_COUNT,
-        customRows: DEFAULT_CUSTOM_ROW_COUNT,
+        columnSizes: createEvenSegments(suggestedSize.width, columns),
+        rowSizes: createEvenSegments(suggestedSize.depth, rows),
+        tileGrid: createDefaultTileGrid(columns, rows),
       });
 
       setPlannerState((current) => ({
@@ -567,6 +349,7 @@ const RoomPlannerModal = ({ isOpen, unitSystem, onClose, onCreate }) => {
         depth: customLayout.depth,
         columnSizes: customLayout.columnSizes,
         rowSizes: customLayout.rowSizes,
+        tileGrid: customLayout.tileGrid,
       }));
       return;
     }
@@ -579,95 +362,70 @@ const RoomPlannerModal = ({ isOpen, unitSystem, onClose, onCreate }) => {
     }));
   };
 
-  const updateCustomSizes = (axis, index, rawValue) => {
-    const parsed = Math.max(0.2, fromDisplayValue(rawValue, unitSystem));
-
+  const paintTile = (rowIndex, columnIndex) => {
     updatePlanner((current) => {
-      const currentSizes = axis === 'column' ? current.columnSizes : current.rowSizes;
-      const nextSizes = [...currentSizes];
-      nextSizes[index] = parsed;
-
-      return axis === 'column'
-        ? {
-            ...current,
-            width: sumValues(nextSizes),
-            columnSizes: nextSizes,
-          }
-        : {
-            ...current,
-            depth: sumValues(nextSizes),
-            rowSizes: nextSizes,
-          };
+      const nextTileGrid = current.tileGrid.map((row) => [...row]);
+      nextTileGrid[rowIndex][columnIndex] = selectedTileType;
+      return {
+        ...current,
+        tileGrid: nextTileGrid,
+      };
     });
   };
 
-  const adjustDivider = (axis, index, delta) => {
+  const addColumn = () => {
     updatePlanner((current) => {
-      const currentSizes = axis === 'column' ? [...current.columnSizes] : [...current.rowSizes];
-      const total = axis === 'column' ? current.width : current.depth;
-      const dynamicMinimum = Math.max(
-        0.45,
-        Math.min(1.2, (total / currentSizes.length) * 0.42),
-      );
-      const maxForward = currentSizes[index + 1] - dynamicMinimum;
-      const maxBackward = currentSizes[index] - dynamicMinimum;
-      const safeDelta = Math.max(-maxBackward, Math.min(maxForward, delta));
-
-      if (Math.abs(safeDelta) < 0.001) {
-        return current;
-      }
-
-      currentSizes[index] = roundValue(currentSizes[index] + safeDelta);
-      currentSizes[index + 1] = roundValue(currentSizes[index + 1] - safeDelta);
-
-      return axis === 'column'
-        ? {
-            ...current,
-            columnSizes: currentSizes,
-          }
-        : {
-            ...current,
-            rowSizes: currentSizes,
-          };
+      const nextCount = Math.min(MAX_CUSTOM_SECTIONS, current.columnSizes.length + 1);
+      return {
+        ...current,
+        columnSizes: createEvenSegments(current.width, nextCount),
+        tileGrid: current.tileGrid.map((row) => [...row, 'empty'].slice(0, nextCount)),
+      };
     });
   };
 
-  const addSection = (axis) => {
+  const removeColumn = () => {
     updatePlanner((current) => {
-      const nextSizes =
-        axis === 'column'
-          ? splitLargestSegment(current.columnSizes)
-          : splitLargestSegment(current.rowSizes);
-
-      return axis === 'column'
-        ? {
-            ...current,
-            columnSizes: nextSizes,
-          }
-        : {
-            ...current,
-            rowSizes: nextSizes,
-          };
+      const nextCount = Math.max(1, current.columnSizes.length - 1);
+      return {
+        ...current,
+        columnSizes: createEvenSegments(current.width, nextCount),
+        tileGrid: current.tileGrid.map((row) => row.slice(0, nextCount)),
+      };
     });
   };
 
-  const removeSection = (axis) => {
+  const addRow = () => {
     updatePlanner((current) => {
-      const nextSizes =
-        axis === 'column'
-          ? mergeSmallestSegment(current.columnSizes)
-          : mergeSmallestSegment(current.rowSizes);
-
-      return axis === 'column'
-        ? {
-            ...current,
-            columnSizes: nextSizes,
-          }
-        : {
-            ...current,
-            rowSizes: nextSizes,
-          };
+      const nextCount = Math.min(MAX_CUSTOM_SECTIONS, current.rowSizes.length + 1);
+      const nextRow = Array.from({ length: current.columnSizes.length }, () => 'empty');
+      return {
+        ...current,
+        rowSizes: createEvenSegments(current.depth, nextCount),
+        tileGrid: [...current.tileGrid, nextRow].slice(0, nextCount),
+      };
     });
+  };
+
+  const removeRow = () => {
+    updatePlanner((current) => {
+      const nextCount = Math.max(1, current.rowSizes.length - 1);
+      return {
+        ...current,
+        rowSizes: createEvenSegments(current.depth, nextCount),
+        tileGrid: current.tileGrid.slice(0, nextCount),
+      };
+    });
+  };
+
+  const resetTiles = () => {
+    updatePlanner((current) => ({
+      ...current,
+      tileGrid: createDefaultTileGrid(
+        current.columnSizes.length,
+        current.rowSizes.length,
+      ),
+    }));
   };
 
   return (
@@ -685,8 +443,8 @@ const RoomPlannerModal = ({ isOpen, unitSystem, onClose, onCreate }) => {
     >
       <div
         style={{
-          width: 'min(1040px, 100%)',
-          maxHeight: 'min(760px, calc(100vh - 48px))',
+          width: 'min(1080px, 100%)',
+          maxHeight: 'min(820px, calc(100vh - 48px))',
           overflowY: 'auto',
           background: '#11161f',
           border: '1px solid rgba(255,255,255,0.08)',
@@ -729,7 +487,7 @@ const RoomPlannerModal = ({ isOpen, unitSystem, onClose, onCreate }) => {
         <div
           style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
             gap: '20px',
           }}
         >
@@ -824,24 +582,22 @@ const RoomPlannerModal = ({ isOpen, unitSystem, onClose, onCreate }) => {
               <div>
                 <div style={{ fontSize: '1rem', fontWeight: 700 }}>
                   {isCustomTemplate
-                    ? t('ui_custom_template', locale)
+                    ? getTemplateLabel(selectedTemplate, locale)
                     : getTemplateLabel(selectedTemplate, locale)}
                 </div>
                 <div style={{ marginTop: '6px', color: '#8fa0b8', fontSize: '0.84rem' }}>
                   {isCustomTemplate
-                    ? t('ui_custom_template_help', locale)
+                    ? getTemplateDescription(selectedTemplate, locale)
                     : getTemplateDescription(selectedTemplate, locale)}
                 </div>
               </div>
 
               {isCustomTemplate ? (
-                <CustomTemplatePreview
+                <TilePlannerPreview
                   preview={preview}
+                  selectedTileType={selectedTileType}
+                  onPaintTile={paintTile}
                   locale={locale}
-                  onAdjustColumnDivider={(index, delta) =>
-                    adjustDivider('column', index, delta)
-                  }
-                  onAdjustRowDivider={(index, delta) => adjustDivider('row', index, delta)}
                 />
               ) : (
                 <TemplatePreview
@@ -867,7 +623,7 @@ const RoomPlannerModal = ({ isOpen, unitSystem, onClose, onCreate }) => {
                   {t('ui_depth', locale)} {toDisplayValue(plannerState.depth, unitSystem)} {unit.label}
                 </div>
                 <div>
-                  {t('ui_zones', locale)} {preview.rooms.length}
+                  {t('ui_filled_tiles', locale)} {filledTileCount}
                 </div>
               </div>
             </div>
@@ -930,156 +686,145 @@ const RoomPlannerModal = ({ isOpen, unitSystem, onClose, onCreate }) => {
                     style={{
                       display: 'flex',
                       flexWrap: 'wrap',
-                      gap: '10px',
+                      gap: '8px',
                       alignItems: 'center',
                       justifyContent: 'space-between',
                     }}
                   >
                     <div style={{ color: '#dce3ec', fontSize: '0.9rem', fontWeight: 600 }}>
-                      {t('ui_adjust_plan', locale)}
+                      {t('ui_room_palette', locale)}
                     </div>
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
-                      <button
-                        onClick={() => addSection('column')}
-                        disabled={plannerState.columnSizes.length >= MAX_CUSTOM_SECTIONS}
-                        style={{
-                          border: '1px solid rgba(255,255,255,0.08)',
-                          background: '#1d2430',
-                          color: '#fff',
-                          padding: '0.55rem 0.8rem',
-                          borderRadius: '10px',
-                          opacity: plannerState.columnSizes.length >= MAX_CUSTOM_SECTIONS ? 0.45 : 1,
-                        }}
-                      >
-                        {t('ui_add_column', locale)}
-                      </button>
-                      <button
-                        onClick={() => removeSection('column')}
-                        disabled={plannerState.columnSizes.length <= 1}
-                        style={{
-                          border: '1px solid rgba(255,255,255,0.08)',
-                          background: '#1d2430',
-                          color: '#fff',
-                          padding: '0.55rem 0.8rem',
-                          borderRadius: '10px',
-                          opacity: plannerState.columnSizes.length <= 1 ? 0.45 : 1,
-                        }}
-                      >
-                        {t('ui_remove_column', locale)}
-                      </button>
-                      <button
-                        onClick={() => addSection('row')}
-                        disabled={plannerState.rowSizes.length >= MAX_CUSTOM_SECTIONS}
-                        style={{
-                          border: '1px solid rgba(255,255,255,0.08)',
-                          background: '#1d2430',
-                          color: '#fff',
-                          padding: '0.55rem 0.8rem',
-                          borderRadius: '10px',
-                          opacity: plannerState.rowSizes.length >= MAX_CUSTOM_SECTIONS ? 0.45 : 1,
-                        }}
-                      >
-                        {t('ui_add_row', locale)}
-                      </button>
-                      <button
-                        onClick={() => removeSection('row')}
-                        disabled={plannerState.rowSizes.length <= 1}
-                        style={{
-                          border: '1px solid rgba(255,255,255,0.08)',
-                          background: '#1d2430',
-                          color: '#fff',
-                          padding: '0.55rem 0.8rem',
-                          borderRadius: '10px',
-                          opacity: plannerState.rowSizes.length <= 1 ? 0.45 : 1,
-                        }}
-                      >
-                        {t('ui_remove_row', locale)}
-                      </button>
-                    </div>
-                  </div>
-
-                  <div style={{ color: '#8fa0b8', fontSize: '0.78rem', lineHeight: 1.45 }}>
-                    {t('ui_drag_splits_hint', locale)}
+                    <button
+                      onClick={resetTiles}
+                      style={{
+                        border: '1px solid rgba(255,255,255,0.08)',
+                        background: '#1d2430',
+                        color: '#fff',
+                        padding: '0.55rem 0.8rem',
+                        borderRadius: '10px',
+                      }}
+                    >
+                      {t('ui_reset_tiles', locale)}
+                    </button>
                   </div>
 
                   <div
                     style={{
                       display: 'grid',
-                      gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))',
+                      gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))',
                       gap: '10px',
                     }}
                   >
-                    {plannerState.columnSizes.map((size, index) => (
-                      <label
-                        key={`column-size-${index}`}
+                    {ROOM_TILE_TYPES.map((tileType) => (
+                      <button
+                        key={tileType.id}
+                        onClick={() => setSelectedTileType(tileType.id)}
                         style={{
+                          border:
+                            selectedTileType === tileType.id
+                              ? '1px solid rgba(79,140,255,0.8)'
+                              : '1px solid rgba(255,255,255,0.08)',
+                          borderRadius: '12px',
+                          background:
+                            selectedTileType === tileType.id ? '#1d2f4a' : '#1b2230',
+                          color: '#fff',
+                          padding: '10px 12px',
                           display: 'flex',
-                          flexDirection: 'column',
-                          gap: '6px',
-                          color: '#aab5c4',
-                          fontSize: '0.82rem',
+                          alignItems: 'center',
+                          gap: '10px',
+                          justifyContent: 'flex-start',
+                          textAlign: 'left',
                         }}
                       >
-                        {t('ui_column_prefix', locale)} {index + 1} ({t('ui_width', locale)})
-                        <input
-                          type="number"
-                          min="0"
-                          step={unit.step}
-                          value={toDisplayValue(size, unitSystem)}
-                          onChange={(event) =>
-                            updateCustomSizes('column', index, event.target.value)
-                          }
+                        <span
                           style={{
-                            width: '100%',
-                            background: '#1d2430',
-                            border: '1px solid rgba(255,255,255,0.08)',
-                            color: '#fff',
-                            padding: '10px 12px',
-                            borderRadius: '10px',
+                            width: '14px',
+                            height: '14px',
+                            borderRadius: '999px',
+                            background: tileType.accent,
+                            border: '1px solid rgba(255,255,255,0.16)',
+                            flexShrink: 0,
                           }}
                         />
-                      </label>
+                        <span>{getRoomTileLabel(tileType.id, locale)}</span>
+                      </button>
                     ))}
                   </div>
 
                   <div
                     style={{
-                      display: 'grid',
-                      gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))',
-                      gap: '10px',
+                      display: 'flex',
+                      flexWrap: 'wrap',
+                      gap: '8px',
                     }}
                   >
-                    {plannerState.rowSizes.map((size, index) => (
-                      <label
-                        key={`row-size-${index}`}
-                        style={{
-                          display: 'flex',
-                          flexDirection: 'column',
-                          gap: '6px',
-                          color: '#aab5c4',
-                          fontSize: '0.82rem',
-                        }}
-                      >
-                        {t('ui_row_prefix', locale)} {index + 1} ({t('ui_depth', locale)})
-                        <input
-                          type="number"
-                          min="0"
-                          step={unit.step}
-                          value={toDisplayValue(size, unitSystem)}
-                          onChange={(event) =>
-                            updateCustomSizes('row', index, event.target.value)
-                          }
-                          style={{
-                            width: '100%',
-                            background: '#1d2430',
-                            border: '1px solid rgba(255,255,255,0.08)',
-                            color: '#fff',
-                            padding: '10px 12px',
-                            borderRadius: '10px',
-                          }}
-                        />
-                      </label>
-                    ))}
+                    <button
+                      onClick={addColumn}
+                      disabled={plannerState.columnSizes.length >= MAX_CUSTOM_SECTIONS}
+                      style={{
+                        border: '1px solid rgba(255,255,255,0.08)',
+                        background: '#1d2430',
+                        color: '#fff',
+                        padding: '0.55rem 0.8rem',
+                        borderRadius: '10px',
+                        opacity: plannerState.columnSizes.length >= MAX_CUSTOM_SECTIONS ? 0.45 : 1,
+                      }}
+                    >
+                      {t('ui_add_column', locale)}
+                    </button>
+                    <button
+                      onClick={removeColumn}
+                      disabled={plannerState.columnSizes.length <= 1}
+                      style={{
+                        border: '1px solid rgba(255,255,255,0.08)',
+                        background: '#1d2430',
+                        color: '#fff',
+                        padding: '0.55rem 0.8rem',
+                        borderRadius: '10px',
+                        opacity: plannerState.columnSizes.length <= 1 ? 0.45 : 1,
+                      }}
+                    >
+                      {t('ui_remove_column', locale)}
+                    </button>
+                    <button
+                      onClick={addRow}
+                      disabled={plannerState.rowSizes.length >= MAX_CUSTOM_SECTIONS}
+                      style={{
+                        border: '1px solid rgba(255,255,255,0.08)',
+                        background: '#1d2430',
+                        color: '#fff',
+                        padding: '0.55rem 0.8rem',
+                        borderRadius: '10px',
+                        opacity: plannerState.rowSizes.length >= MAX_CUSTOM_SECTIONS ? 0.45 : 1,
+                      }}
+                    >
+                      {t('ui_add_row', locale)}
+                    </button>
+                    <button
+                      onClick={removeRow}
+                      disabled={plannerState.rowSizes.length <= 1}
+                      style={{
+                        border: '1px solid rgba(255,255,255,0.08)',
+                        background: '#1d2430',
+                        color: '#fff',
+                        padding: '0.55rem 0.8rem',
+                        borderRadius: '10px',
+                        opacity: plannerState.rowSizes.length <= 1 ? 0.45 : 1,
+                      }}
+                    >
+                      {t('ui_remove_row', locale)}
+                    </button>
+                    <div
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        color: '#8fa0b8',
+                        fontSize: '0.8rem',
+                        paddingLeft: '6px',
+                      }}
+                    >
+                      {t('ui_columns', locale)} {plannerState.columnSizes.length} / {t('ui_rows', locale)} {plannerState.rowSizes.length}
+                    </div>
                   </div>
                 </div>
               ) : null}

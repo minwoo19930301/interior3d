@@ -1,3 +1,4 @@
+import { getObjectDefinition } from './objectCatalog';
 import { localizeText } from './i18n';
 
 const DEFAULT_WALL_COLOR = '#d7d1c7';
@@ -10,8 +11,24 @@ const DEFAULT_DEPTH_MULTIPLIER = 1.18;
 
 export const CUSTOM_TEMPLATE_ID = 'custom';
 export const MAX_CUSTOM_SECTIONS = 6;
-export const DEFAULT_CUSTOM_COLUMN_COUNT = 3;
-export const DEFAULT_CUSTOM_ROW_COUNT = 2;
+export const DEFAULT_CUSTOM_COLUMN_COUNT = 4;
+export const DEFAULT_CUSTOM_ROW_COUNT = 3;
+
+export const ROOM_TILE_TYPES = [
+  { id: 'empty', label: { en: 'Empty', ko: '비움' }, accent: 'rgba(255,255,255,0.03)' },
+  { id: 'entry', label: { en: 'Entry', ko: '현관' }, accent: '#8d6f54' },
+  { id: 'bath', label: { en: 'Bath', ko: '화장실' }, accent: '#6c8ea5' },
+  { id: 'bedroom', label: { en: 'Bedroom', ko: '방' }, accent: '#7e6f98' },
+  { id: 'kitchen', label: { en: 'Kitchen', ko: '부엌' }, accent: '#8e7a50' },
+  { id: 'living', label: { en: 'Living', ko: '거실' }, accent: '#6e8b61' },
+  { id: 'utility', label: { en: 'Utility', ko: '다용도실' }, accent: '#6f7d8d' },
+];
+
+const ROOM_TILE_TYPE_MAP = Object.fromEntries(
+  ROOM_TILE_TYPES.map((item) => [item.id, item]),
+);
+const OPEN_ROOM_PAIR_MAP = new Set(['kitchen|living']);
+const DOOR_ROOM_TYPES = new Set(['entry', 'bath', 'bedroom', 'utility']);
 
 function roundPlanValue(value) {
   return Math.round(value * 100) / 100;
@@ -23,6 +40,52 @@ function clampValue(value, min, max) {
 
 function getSurfaceThickness(wallThickness) {
   return Math.max(0.08, Math.min(0.18, wallThickness));
+}
+
+function getRoomPairKey(typeA, typeB) {
+  return [typeA, typeB].sort().join('|');
+}
+
+export function getRoomTileDefinition(type) {
+  return ROOM_TILE_TYPE_MAP[type] ?? ROOM_TILE_TYPE_MAP.empty;
+}
+
+export function getRoomTileLabel(type, locale) {
+  return localizeText(getRoomTileDefinition(type).label, locale);
+}
+
+export function createDefaultTileGrid(
+  columnCount = DEFAULT_CUSTOM_COLUMN_COUNT,
+  rowCount = DEFAULT_CUSTOM_ROW_COUNT,
+) {
+  const safeColumns = clampValue(Math.round(columnCount), 1, MAX_CUSTOM_SECTIONS);
+  const safeRows = clampValue(Math.round(rowCount), 1, MAX_CUSTOM_SECTIONS);
+  const grid = Array.from({ length: safeRows }, () =>
+    Array.from({ length: safeColumns }, () => 'empty'),
+  );
+  const seedLayout = [
+    ['bath', 'entry', 'bedroom', 'bedroom'],
+    ['kitchen', 'kitchen', 'living', 'living'],
+    ['utility', 'kitchen', 'living', 'living'],
+  ];
+
+  for (let rowIndex = 0; rowIndex < safeRows; rowIndex += 1) {
+    for (let columnIndex = 0; columnIndex < safeColumns; columnIndex += 1) {
+      grid[rowIndex][columnIndex] =
+        seedLayout[rowIndex]?.[columnIndex] ?? grid[rowIndex][columnIndex];
+    }
+  }
+
+  if (safeRows * safeColumns <= 2) {
+    grid[0][0] = 'entry';
+    if (safeColumns > 1) {
+      grid[0][1] = 'living';
+    } else if (safeRows > 1) {
+      grid[1][0] = 'living';
+    }
+  }
+
+  return grid;
 }
 
 function sumSegments(values) {
@@ -116,52 +179,44 @@ function normalizeSegmentArray(total, rawSizes, fallbackCount) {
   );
 }
 
-function getSegmentCenters(sizes) {
-  const total = sumSegments(sizes);
-  let cursor = -total / 2;
+function normalizeTileGrid(rawTileGrid, rowCount, columnCount) {
+  const safeRows = clampValue(Math.round(rowCount), 1, MAX_CUSTOM_SECTIONS);
+  const safeColumns = clampValue(Math.round(columnCount), 1, MAX_CUSTOM_SECTIONS);
+  const fallbackGrid = createDefaultTileGrid(safeColumns, safeRows);
 
-  return sizes.map((size) => {
-    const center = roundPlanValue(cursor + size / 2);
-    cursor += size;
-    return center;
-  });
+  return Array.from({ length: safeRows }, (_, rowIndex) =>
+    Array.from({ length: safeColumns }, (_, columnIndex) => {
+      const type = rawTileGrid?.[rowIndex]?.[columnIndex];
+      return ROOM_TILE_TYPE_MAP[type] ? type : fallbackGrid[rowIndex][columnIndex];
+    }),
+  );
 }
 
-function getDividerPositions(sizes) {
-  const total = sumSegments(sizes);
-  let cursor = -total / 2;
-  const positions = [];
-
-  sizes.slice(0, -1).forEach((size) => {
-    cursor += size;
-    positions.push(roundPlanValue(cursor));
-  });
-
-  return positions;
-}
-
-function buildCustomPreviewRoomsFromSegments(columnSizes, rowSizes, locale) {
+function buildCustomPreviewRoomsFromSegments(columnSizes, rowSizes, tileGrid, locale) {
   const totalWidth = sumSegments(columnSizes);
   const totalDepth = sumSegments(rowSizes);
   const rooms = [];
   let zCursor = -totalDepth / 2;
-  let roomIndex = 1;
 
-  rowSizes.forEach((rowDepth) => {
+  rowSizes.forEach((rowDepth, rowIndex) => {
     let xCursor = -totalWidth / 2;
 
-    columnSizes.forEach((columnWidth) => {
+    columnSizes.forEach((columnWidth, columnIndex) => {
+      const tileType = tileGrid[rowIndex]?.[columnIndex] ?? 'empty';
+      const definition = getRoomTileDefinition(tileType);
+
       rooms.push({
-        label: {
-          en: `Room ${roomIndex}`,
-          ko: `방 ${roomIndex}`,
-        },
+        id: `${rowIndex}-${columnIndex}`,
+        row: rowIndex,
+        column: columnIndex,
+        type: tileType,
+        label: definition.label,
         x: roundPlanValue(xCursor + columnWidth / 2),
         z: roundPlanValue(zCursor + rowDepth / 2),
         width: columnWidth,
         depth: rowDepth,
+        accent: definition.accent,
       });
-      roomIndex += 1;
       xCursor += columnWidth;
     });
 
@@ -172,13 +227,6 @@ function buildCustomPreviewRoomsFromSegments(columnSizes, rowSizes, locale) {
     ...room,
     labelText: localizeText(room.label, locale),
   }));
-}
-
-function getNearestCenter(values) {
-  return values.reduce(
-    (closest, value) => (Math.abs(value) < Math.abs(closest) ? value : closest),
-    values[0] ?? 0,
-  );
 }
 
 export function normalizeCustomLayoutConfig(config = {}) {
@@ -196,12 +244,18 @@ export function normalizeCustomLayoutConfig(config = {}) {
     config.rowSizes,
     fallbackRows,
   );
+  const tileGrid = normalizeTileGrid(
+    config.tileGrid,
+    rowSizes.length,
+    columnSizes.length,
+  );
 
   return {
     width: roundPlanValue(sumSegments(columnSizes)),
     depth: roundPlanValue(sumSegments(rowSizes)),
     columnSizes,
     rowSizes,
+    tileGrid,
   };
 }
 
@@ -440,78 +494,519 @@ function pushVerticalWall(objects, x, centerZ, depth, wallHeight, wallThickness)
   });
 }
 
-function pushHorizontalWallWithDoorGap(
-  objects,
-  z,
-  totalWidth,
-  wallHeight,
-  wallThickness,
-  doorCenterX,
-  doorWidth,
-) {
-  const halfWidth = totalWidth / 2;
-  const gapSize = Math.min(
-    totalWidth - 0.12,
-    doorWidth + Math.max(0.1, wallThickness * 0.8),
-  );
-  const gapStart = Math.max(-halfWidth, doorCenterX - gapSize / 2);
-  const gapEnd = Math.min(halfWidth, doorCenterX + gapSize / 2);
-  const leftWidth = gapStart + halfWidth;
-  const rightWidth = halfWidth - gapEnd;
+function getAxisEdges(sizes) {
+  const edges = [-sumSegments(sizes) / 2];
 
-  pushHorizontalWall(
-    objects,
-    -halfWidth + leftWidth / 2,
-    z,
-    leftWidth,
-    wallHeight,
-    wallThickness,
+  sizes.forEach((size) => {
+    edges.push(roundPlanValue(edges[edges.length - 1] + size));
+  });
+
+  return edges;
+}
+
+function getCellBounds(xEdges, zEdges, rowIndex, columnIndex) {
+  const x1 = xEdges[columnIndex];
+  const x2 = xEdges[columnIndex + 1];
+  const z1 = zEdges[rowIndex];
+  const z2 = zEdges[rowIndex + 1];
+
+  return {
+    x1,
+    x2,
+    z1,
+    z2,
+    width: roundPlanValue(x2 - x1),
+    depth: roundPlanValue(z2 - z1),
+    centerX: roundPlanValue((x1 + x2) / 2),
+    centerZ: roundPlanValue((z1 + z2) / 2),
+  };
+}
+
+function isFilledTile(type) {
+  return Boolean(type) && type !== 'empty';
+}
+
+function shouldCreatePartition(typeA, typeB) {
+  if (!isFilledTile(typeA) || !isFilledTile(typeB) || typeA === typeB) {
+    return false;
+  }
+
+  return !OPEN_ROOM_PAIR_MAP.has(getRoomPairKey(typeA, typeB));
+}
+
+function shouldCreateInteriorDoor(typeA, typeB) {
+  return (
+    shouldCreatePartition(typeA, typeB) &&
+    (DOOR_ROOM_TYPES.has(typeA) || DOOR_ROOM_TYPES.has(typeB))
   );
+}
+
+function collectLayoutEdges(tileGrid, columnSizes, rowSizes, includeOuterWalls) {
+  const rows = tileGrid.length;
+  const columns = tileGrid[0]?.length ?? 0;
+  const xEdges = getAxisEdges(columnSizes);
+  const zEdges = getAxisEdges(rowSizes);
+  const edges = [];
+
+  for (let rowIndex = 0; rowIndex < rows; rowIndex += 1) {
+    for (let columnIndex = 0; columnIndex < columns; columnIndex += 1) {
+      const roomType = tileGrid[rowIndex][columnIndex];
+
+      if (!isFilledTile(roomType)) {
+        continue;
+      }
+
+      const bounds = getCellBounds(xEdges, zEdges, rowIndex, columnIndex);
+      const rightType =
+        columnIndex + 1 < columns ? tileGrid[rowIndex][columnIndex + 1] : 'empty';
+      const bottomType =
+        rowIndex + 1 < rows ? tileGrid[rowIndex + 1][columnIndex] : 'empty';
+      const leftType = columnIndex > 0 ? tileGrid[rowIndex][columnIndex - 1] : 'empty';
+      const topType = rowIndex > 0 ? tileGrid[rowIndex - 1][columnIndex] : 'empty';
+
+      if (includeOuterWalls && !isFilledTile(leftType)) {
+        edges.push({
+          orientation: 'v',
+          line: bounds.x1,
+          start: bounds.z1,
+          end: bounds.z2,
+          outer: true,
+          roomType,
+          side: 'left',
+        });
+      }
+
+      if (includeOuterWalls && !isFilledTile(topType)) {
+        edges.push({
+          orientation: 'h',
+          line: bounds.z1,
+          start: bounds.x1,
+          end: bounds.x2,
+          outer: true,
+          roomType,
+          side: 'top',
+        });
+      }
+
+      if (!isFilledTile(rightType)) {
+        if (includeOuterWalls) {
+          edges.push({
+            orientation: 'v',
+            line: bounds.x2,
+            start: bounds.z1,
+            end: bounds.z2,
+            outer: true,
+            roomType,
+            side: 'right',
+          });
+        }
+      } else if (shouldCreatePartition(roomType, rightType)) {
+        edges.push({
+          orientation: 'v',
+          line: bounds.x2,
+          start: bounds.z1,
+          end: bounds.z2,
+          outer: false,
+          roomTypes: [roomType, rightType],
+        });
+      }
+
+      if (!isFilledTile(bottomType)) {
+        if (includeOuterWalls) {
+          edges.push({
+            orientation: 'h',
+            line: bounds.z2,
+            start: bounds.x1,
+            end: bounds.x2,
+            outer: true,
+            roomType,
+            side: 'bottom',
+          });
+        }
+      } else if (shouldCreatePartition(roomType, bottomType)) {
+        edges.push({
+          orientation: 'h',
+          line: bounds.z2,
+          start: bounds.x1,
+          end: bounds.x2,
+          outer: false,
+          roomTypes: [roomType, bottomType],
+        });
+      }
+    }
+  }
+
+  return edges;
+}
+
+function getEdgeMergeKey(edge) {
+  return edge.outer
+    ? `${edge.orientation}|${edge.line}|outer|${edge.roomType}|${edge.side}`
+    : `${edge.orientation}|${edge.line}|inner|${getRoomPairKey(
+        edge.roomTypes[0],
+        edge.roomTypes[1],
+      )}`;
+}
+
+function mergeLayoutEdges(edges) {
+  const sorted = [...edges].sort((left, right) => {
+    if (left.orientation !== right.orientation) {
+      return left.orientation.localeCompare(right.orientation);
+    }
+
+    if (left.line !== right.line) {
+      return left.line - right.line;
+    }
+
+    return left.start - right.start;
+  });
+
+  return sorted.reduce((merged, edge) => {
+    const previous = merged[merged.length - 1];
+
+    if (
+      previous &&
+      getEdgeMergeKey(previous) === getEdgeMergeKey(edge) &&
+      Math.abs(previous.end - edge.start) < 0.01
+    ) {
+      previous.end = edge.end;
+      return merged;
+    }
+
+    merged.push({ ...edge });
+    return merged;
+  }, []);
+}
+
+function pushHorizontalWallRange(objects, x1, x2, z, wallHeight, wallThickness) {
   pushHorizontalWall(
     objects,
-    gapEnd + rightWidth / 2,
+    roundPlanValue((x1 + x2) / 2),
     z,
-    rightWidth,
+    roundPlanValue(x2 - x1),
     wallHeight,
     wallThickness,
   );
 }
 
-function pushVerticalWallWithDoorGap(
+function pushVerticalWallRange(objects, x, z1, z2, wallHeight, wallThickness) {
+  pushVerticalWall(
+    objects,
+    x,
+    roundPlanValue((z1 + z2) / 2),
+    roundPlanValue(z2 - z1),
+    wallHeight,
+    wallThickness,
+  );
+}
+
+function pushHorizontalWallGapRange(
+  objects,
+  x1,
+  x2,
+  z,
+  wallHeight,
+  wallThickness,
+  doorCenterX,
+  doorWidth,
+) {
+  const gapStart = Math.max(x1, doorCenterX - doorWidth / 2);
+  const gapEnd = Math.min(x2, doorCenterX + doorWidth / 2);
+
+  if (gapStart - x1 > 0.06) {
+    pushHorizontalWallRange(objects, x1, gapStart, z, wallHeight, wallThickness);
+  }
+
+  if (x2 - gapEnd > 0.06) {
+    pushHorizontalWallRange(objects, gapEnd, x2, z, wallHeight, wallThickness);
+  }
+}
+
+function pushVerticalWallGapRange(
   objects,
   x,
-  totalDepth,
+  z1,
+  z2,
   wallHeight,
   wallThickness,
   doorCenterZ,
   doorWidth,
 ) {
-  const halfDepth = totalDepth / 2;
-  const gapSize = Math.min(
-    totalDepth - 0.12,
-    doorWidth + Math.max(0.1, wallThickness * 0.8),
-  );
-  const gapStart = Math.max(-halfDepth, doorCenterZ - gapSize / 2);
-  const gapEnd = Math.min(halfDepth, doorCenterZ + gapSize / 2);
-  const lowerDepth = gapStart + halfDepth;
-  const upperDepth = halfDepth - gapEnd;
+  const gapStart = Math.max(z1, doorCenterZ - doorWidth / 2);
+  const gapEnd = Math.min(z2, doorCenterZ + doorWidth / 2);
 
-  pushVerticalWall(
-    objects,
-    x,
-    -halfDepth + lowerDepth / 2,
-    lowerDepth,
-    wallHeight,
-    wallThickness,
+  if (gapStart - z1 > 0.06) {
+    pushVerticalWallRange(objects, x, z1, gapStart, wallHeight, wallThickness);
+  }
+
+  if (z2 - gapEnd > 0.06) {
+    pushVerticalWallRange(objects, x, gapEnd, z2, wallHeight, wallThickness);
+  }
+}
+
+function getDoorWidthForEdge(edge, outer = false) {
+  const edgeLength = roundPlanValue(edge.end - edge.start);
+  const targetWidth = outer ? 0.95 : 0.9;
+  return roundPlanValue(Math.min(targetWidth, edgeLength - 0.16));
+}
+
+function createEdgeDoorObject(edge, wallHeight, wallThickness, outer = false) {
+  const doorWidth = getDoorWidthForEdge(edge, outer);
+
+  if (!Number.isFinite(doorWidth) || doorWidth < 0.55) {
+    return null;
+  }
+
+  return {
+    type: 'door',
+    dimensions: [
+      doorWidth,
+      Math.max(1.95, wallHeight - 0.18),
+      Math.max(0.08, Math.min(0.12, wallThickness)),
+    ],
+    position:
+      edge.orientation === 'h'
+        ? [roundPlanValue((edge.start + edge.end) / 2), 0, edge.line]
+        : [edge.line, 0, roundPlanValue((edge.start + edge.end) / 2)],
+    rotation: [0, edge.orientation === 'v' ? Math.PI / 2 : 0, 0],
+    color: DEFAULT_DOOR_COLOR,
+    isOpen: true,
+    swing: outer ? 'left' : 'right',
+  };
+}
+
+function appendEdgeGeometry(objects, edge, wallHeight, wallThickness, withDoor = false) {
+  const door = withDoor ? createEdgeDoorObject(edge, wallHeight, wallThickness, edge.outer) : null;
+
+  if (!door) {
+    if (edge.orientation === 'h') {
+      pushHorizontalWallRange(
+        objects,
+        edge.start,
+        edge.end,
+        edge.line,
+        wallHeight,
+        wallThickness,
+      );
+    } else {
+      pushVerticalWallRange(
+        objects,
+        edge.line,
+        edge.start,
+        edge.end,
+        wallHeight,
+        wallThickness,
+      );
+    }
+    return;
+  }
+
+  if (edge.orientation === 'h') {
+    pushHorizontalWallGapRange(
+      objects,
+      edge.start,
+      edge.end,
+      edge.line,
+      wallHeight,
+      wallThickness,
+      door.position[0],
+      door.dimensions[0],
+    );
+  } else {
+    pushVerticalWallGapRange(
+      objects,
+      edge.line,
+      edge.start,
+      edge.end,
+      wallHeight,
+      wallThickness,
+      door.position[2],
+      door.dimensions[0],
+    );
+  }
+
+  objects.push(door);
+}
+
+function chooseEntryOuterDoorEdge(edges) {
+  const priority = {
+    bottom: 0,
+    right: 1,
+    left: 2,
+    top: 3,
+  };
+
+  return edges
+    .filter((edge) => edge.outer && edge.roomType === 'entry')
+    .sort((left, right) => {
+      const sideGap = (priority[left.side] ?? 99) - (priority[right.side] ?? 99);
+
+      if (sideGap !== 0) {
+        return sideGap;
+      }
+
+      return (right.end - right.start) - (left.end - left.start);
+    })[0];
+}
+
+function buildTileRegions(tileGrid, columnSizes, rowSizes) {
+  const rows = tileGrid.length;
+  const columns = tileGrid[0]?.length ?? 0;
+  const xEdges = getAxisEdges(columnSizes);
+  const zEdges = getAxisEdges(rowSizes);
+  const visited = Array.from({ length: rows }, () =>
+    Array.from({ length: columns }, () => false),
   );
-  pushVerticalWall(
-    objects,
-    x,
-    gapEnd + upperDepth / 2,
-    upperDepth,
-    wallHeight,
-    wallThickness,
+  const regions = [];
+
+  for (let rowIndex = 0; rowIndex < rows; rowIndex += 1) {
+    for (let columnIndex = 0; columnIndex < columns; columnIndex += 1) {
+      const roomType = tileGrid[rowIndex][columnIndex];
+
+      if (!isFilledTile(roomType) || visited[rowIndex][columnIndex]) {
+        continue;
+      }
+
+      const queue = [[rowIndex, columnIndex]];
+      const cells = [];
+      let minX = Infinity;
+      let maxX = -Infinity;
+      let minZ = Infinity;
+      let maxZ = -Infinity;
+
+      visited[rowIndex][columnIndex] = true;
+
+      while (queue.length > 0) {
+        const [currentRow, currentColumn] = queue.shift();
+        const bounds = getCellBounds(xEdges, zEdges, currentRow, currentColumn);
+        const neighbors = [
+          [currentRow - 1, currentColumn],
+          [currentRow + 1, currentColumn],
+          [currentRow, currentColumn - 1],
+          [currentRow, currentColumn + 1],
+        ];
+
+        cells.push([currentRow, currentColumn]);
+        minX = Math.min(minX, bounds.x1);
+        maxX = Math.max(maxX, bounds.x2);
+        minZ = Math.min(minZ, bounds.z1);
+        maxZ = Math.max(maxZ, bounds.z2);
+
+        neighbors.forEach(([nextRow, nextColumn]) => {
+          if (
+            nextRow < 0 ||
+            nextColumn < 0 ||
+            nextRow >= rows ||
+            nextColumn >= columns ||
+            visited[nextRow][nextColumn] ||
+            tileGrid[nextRow][nextColumn] !== roomType
+          ) {
+            return;
+          }
+
+          visited[nextRow][nextColumn] = true;
+          queue.push([nextRow, nextColumn]);
+        });
+      }
+
+      regions.push({
+        type: roomType,
+        cells,
+        x1: roundPlanValue(minX),
+        x2: roundPlanValue(maxX),
+        z1: roundPlanValue(minZ),
+        z2: roundPlanValue(maxZ),
+        width: roundPlanValue(maxX - minX),
+        depth: roundPlanValue(maxZ - minZ),
+        centerX: roundPlanValue((minX + maxX) / 2),
+        centerZ: roundPlanValue((minZ + maxZ) / 2),
+      });
+    }
+  }
+
+  return regions;
+}
+
+function clampObjectCoordinate(value, minEdge, maxEdge, size) {
+  return roundPlanValue(
+    Math.min(maxEdge - size / 2 - 0.1, Math.max(minEdge + size / 2 + 0.1, value)),
   );
+}
+
+function createPlacedRoomObject(type, bounds, options = {}) {
+  const definition = getObjectDefinition(type);
+  const dimensions = (options.dimensions ?? definition.dimensions).map(roundPlanValue);
+  const desiredX = options.x ?? bounds.centerX;
+  const desiredZ = options.z ?? bounds.centerZ;
+
+  return {
+    type,
+    dimensions,
+    position: [
+      clampObjectCoordinate(desiredX, bounds.x1, bounds.x2, dimensions[0]),
+      0,
+      clampObjectCoordinate(desiredZ, bounds.z1, bounds.z2, dimensions[2]),
+    ],
+    rotation: [0, options.rotationY ?? 0, 0],
+    color: options.color ?? definition.color,
+    isOpen: definition.openable ? options.isOpen ?? false : undefined,
+    swing: type === 'door' ? options.swing ?? 'left' : undefined,
+  };
+}
+
+function buildDefaultRoomObjects(tileGrid, columnSizes, rowSizes) {
+  const regions = buildTileRegions(tileGrid, columnSizes, rowSizes);
+  const objects = [];
+
+  regions.forEach((region) => {
+    if (region.type === 'entry') {
+      objects.push(
+        createPlacedRoomObject('cabinet', region, {
+          dimensions: [
+            Math.min(0.95, Math.max(0.7, region.width * 0.48)),
+            1.15,
+            0.38,
+          ],
+          z: region.z1 + 0.28,
+        }),
+      );
+    }
+
+    if (region.type === 'bath') {
+      objects.push(
+        createPlacedRoomObject('sink', region, {
+          dimensions: [
+            Math.min(1, Math.max(0.75, region.width * 0.55)),
+            0.92,
+            0.58,
+          ],
+          z: region.z1 + 0.34,
+        }),
+      );
+      objects.push(
+        createPlacedRoomObject('toilet', region, {
+          x: region.x1 + Math.min(0.38, region.width * 0.28),
+          z: region.centerZ,
+        }),
+      );
+
+      if (region.width > 1.25 && region.depth > 1.25) {
+        objects.push(
+          createPlacedRoomObject('shower', region, {
+            dimensions: [
+              Math.min(0.9, Math.max(0.7, region.width * 0.36)),
+              2.1,
+              Math.min(0.9, Math.max(0.7, region.depth * 0.36)),
+            ],
+            x: region.x2 - 0.42,
+            z: region.z2 - 0.42,
+          }),
+        );
+      }
+    }
+  });
+
+  return objects;
 }
 
 function buildCustomHouseObjects({
@@ -519,10 +1014,11 @@ function buildCustomHouseObjects({
   depth = 8,
   columnSizes,
   rowSizes,
+  tileGrid,
   customColumns = DEFAULT_CUSTOM_COLUMN_COUNT,
   customRows = DEFAULT_CUSTOM_ROW_COUNT,
   wallHeight = 2.5,
-  wallThickness = 0.12,
+  wallThickness = 0.08,
   includeFloor = true,
   includeCeiling = false,
   includeDoors = true,
@@ -533,172 +1029,81 @@ function buildCustomHouseObjects({
     depth,
     columnSizes,
     rowSizes,
+    tileGrid,
     customColumns,
     customRows,
   });
-  const safeWidth = customLayout.width;
-  const safeDepth = customLayout.depth;
   const safeWallHeight = clampValue(wallHeight, 2.1, 4.2);
   const safeWallThickness = clampValue(wallThickness, 0.08, 0.4);
   const surfaceThickness = getSurfaceThickness(safeWallThickness);
-  const verticalDividers = getDividerPositions(customLayout.columnSizes);
-  const horizontalDividers = getDividerPositions(customLayout.rowSizes);
-  const columnCenters = getSegmentCenters(customLayout.columnSizes);
-  const rowCenters = getSegmentCenters(customLayout.rowSizes);
-  const verticalDoorZ = getNearestCenter(rowCenters);
-  const horizontalDoorX = getNearestCenter(columnCenters);
-  const interiorDoorWidth = 0.9;
-  const entranceDoorWidth = 0.95;
+  const xEdges = getAxisEdges(customLayout.columnSizes);
+  const zEdges = getAxisEdges(customLayout.rowSizes);
   const objects = [];
 
   if (includeFloor) {
-    objects.push({
-      type: 'floorPanel',
-      dimensions: [safeWidth, surfaceThickness, safeDepth],
-      position: [0, 0, 0],
-      rotation: [0, 0, 0],
-      color: DEFAULT_FLOOR_COLOR,
+    customLayout.tileGrid.forEach((row, rowIndex) => {
+      row.forEach((roomType, columnIndex) => {
+        if (!isFilledTile(roomType)) {
+          return;
+        }
+
+        const bounds = getCellBounds(xEdges, zEdges, rowIndex, columnIndex);
+        objects.push({
+          type: 'floorPanel',
+          dimensions: [bounds.width, surfaceThickness, bounds.depth],
+          position: [bounds.centerX, 0, bounds.centerZ],
+          rotation: [0, 0, 0],
+          color: DEFAULT_FLOOR_COLOR,
+        });
+      });
     });
   }
 
   if (includeCeiling) {
-    objects.push({
-      type: 'ceilingPanel',
-      dimensions: [safeWidth, surfaceThickness, safeDepth],
-      position: [0, safeWallHeight - surfaceThickness, 0],
-      rotation: [0, 0, 0],
-      color: DEFAULT_CEILING_COLOR,
+    customLayout.tileGrid.forEach((row, rowIndex) => {
+      row.forEach((roomType, columnIndex) => {
+        if (!isFilledTile(roomType)) {
+          return;
+        }
+
+        const bounds = getCellBounds(xEdges, zEdges, rowIndex, columnIndex);
+        objects.push({
+          type: 'ceilingPanel',
+          dimensions: [bounds.width, surfaceThickness, bounds.depth],
+          position: [bounds.centerX, safeWallHeight - surfaceThickness, bounds.centerZ],
+          rotation: [0, 0, 0],
+          color: DEFAULT_CEILING_COLOR,
+        });
+      });
     });
   }
 
-  if (includeOuterWalls) {
-    pushHorizontalWall(
-      objects,
-      0,
-      -(safeDepth / 2 - safeWallThickness / 2),
-      safeWidth,
-      safeWallHeight,
-      safeWallThickness,
-    );
-    if (includeDoors) {
-      pushHorizontalWallWithDoorGap(
-        objects,
-        safeDepth / 2 - safeWallThickness / 2,
-        safeWidth,
-        safeWallHeight,
-        safeWallThickness,
-        0,
-        entranceDoorWidth,
-      );
-    } else {
-      pushHorizontalWall(
-        objects,
-        0,
-        safeDepth / 2 - safeWallThickness / 2,
-        safeWidth,
-        safeWallHeight,
-        safeWallThickness,
-      );
-    }
-    pushVerticalWall(
-      objects,
-      -(safeWidth / 2 - safeWallThickness / 2),
-      0,
-      safeDepth,
-      safeWallHeight,
-      safeWallThickness,
-    );
-    pushVerticalWall(
-      objects,
-      safeWidth / 2 - safeWallThickness / 2,
-      0,
-      safeDepth,
-      safeWallHeight,
-      safeWallThickness,
-    );
-  }
+  const layoutEdges = mergeLayoutEdges(
+    collectLayoutEdges(
+      customLayout.tileGrid,
+      customLayout.columnSizes,
+      customLayout.rowSizes,
+      includeOuterWalls,
+    ),
+  );
+  const entranceEdge =
+    includeOuterWalls && includeDoors ? chooseEntryOuterDoorEdge(layoutEdges) : null;
 
-  verticalDividers.forEach((xPosition, columnIndex) => {
-    if (includeDoors) {
-      pushVerticalWallWithDoorGap(
-        objects,
-        xPosition,
-        safeDepth,
-        safeWallHeight,
-        safeWallThickness,
-        verticalDoorZ,
-        interiorDoorWidth,
-      );
-    } else {
-      pushVerticalWall(
-        objects,
-        xPosition,
-        0,
-        safeDepth,
-        safeWallHeight,
-        safeWallThickness,
-      );
-    }
-
-    if (includeDoors) {
-      objects.push({
-        type: 'door',
-        dimensions: [interiorDoorWidth, Math.max(1.95, safeWallHeight - 0.18), safeWallThickness],
-        position: [xPosition, 0, verticalDoorZ],
-        rotation: [0, Math.PI / 2, 0],
-        color: DEFAULT_DOOR_COLOR,
-        isOpen: true,
-        swing: columnIndex % 2 === 0 ? 'right' : 'left',
-      });
-    }
+  layoutEdges.forEach((edge) => {
+    const withDoor = edge.outer
+      ? edge === entranceEdge
+      : includeDoors &&
+        shouldCreateInteriorDoor(edge.roomTypes[0], edge.roomTypes[1]);
+    appendEdgeGeometry(objects, edge, safeWallHeight, safeWallThickness, withDoor);
   });
 
-  horizontalDividers.forEach((zPosition, rowIndex) => {
-    if (includeDoors) {
-      pushHorizontalWallWithDoorGap(
-        objects,
-        zPosition,
-        safeWidth,
-        safeWallHeight,
-        safeWallThickness,
-        horizontalDoorX,
-        interiorDoorWidth,
-      );
-    } else {
-      pushHorizontalWall(
-        objects,
-        0,
-        zPosition,
-        safeWidth,
-        safeWallHeight,
-        safeWallThickness,
-      );
-    }
-
-    if (includeDoors) {
-      objects.push({
-        type: 'door',
-        dimensions: [interiorDoorWidth, Math.max(1.95, safeWallHeight - 0.18), safeWallThickness],
-        position: [horizontalDoorX, 0, zPosition],
-        rotation: [0, 0, 0],
-        color: DEFAULT_DOOR_COLOR,
-        isOpen: true,
-        swing: rowIndex % 2 === 0 ? 'right' : 'left',
-      });
-    }
-  });
-
-  if (includeOuterWalls && includeDoors) {
-    objects.push({
-      type: 'door',
-      dimensions: [entranceDoorWidth, Math.max(1.95, safeWallHeight - 0.18), safeWallThickness],
-      position: [0, 0, safeDepth / 2 - safeWallThickness / 2],
-      rotation: [0, 0, 0],
-      color: DEFAULT_DOOR_COLOR,
-      isOpen: true,
-      swing: 'left',
-    });
-  }
+  objects.push(
+    ...buildDefaultRoomObjects(
+      customLayout.tileGrid,
+      customLayout.columnSizes,
+      customLayout.rowSizes,
+    ),
+  );
 
   return objects;
 }
@@ -709,8 +1114,8 @@ export function getHouseTemplate(templateId) {
       id: CUSTOM_TEMPLATE_ID,
       label: { en: 'Custom template', ko: '사용자 템플릿' },
       description: {
-        en: 'Build your own shell with a simple room grid.',
-        ko: '방 격자를 정해서 직접 집 틀을 만듭니다.',
+        en: 'Paint the plan by assigning entry, bath, bedroom, kitchen, and living tiles.',
+        ko: '현관, 화장실, 방, 부엌, 거실 타일을 배치해서 평면을 만듭니다.',
       },
       footprint: { width: 10, depth: 8 },
       rooms: [],
@@ -740,6 +1145,12 @@ export function getTemplateRooms(template, locale) {
 
 export function getCustomTemplatePreview(config, locale) {
   const customLayout = normalizeCustomLayoutConfig(config);
+  const tiles = buildCustomPreviewRoomsFromSegments(
+    customLayout.columnSizes,
+    customLayout.rowSizes,
+    customLayout.tileGrid,
+    locale,
+  );
 
   return {
     footprint: {
@@ -748,19 +1159,17 @@ export function getCustomTemplatePreview(config, locale) {
     },
     columnSizes: customLayout.columnSizes,
     rowSizes: customLayout.rowSizes,
-    rooms: buildCustomPreviewRoomsFromSegments(
-      customLayout.columnSizes,
-      customLayout.rowSizes,
-      locale,
-    ),
+    tileGrid: customLayout.tileGrid,
+    tiles,
+    rooms: tiles.filter((tile) => isFilledTile(tile.type)),
   };
 }
 
 export function getDefaultHouseSize(templateId) {
   if (templateId === CUSTOM_TEMPLATE_ID) {
     return {
-      width: 11,
-      depth: 8.5,
+      width: 12,
+      depth: 9,
     };
   }
 
@@ -782,7 +1191,7 @@ export function buildHouseObjects(config) {
     width,
     depth,
     wallHeight = 2.5,
-    wallThickness = 0.12,
+    wallThickness = 0.08,
     includeFloor = true,
     includeCeiling = false,
     includeDoors = true,
