@@ -9,6 +9,9 @@ const DEFAULT_WIDTH_MULTIPLIER = 1.25;
 const DEFAULT_DEPTH_MULTIPLIER = 1.18;
 
 export const CUSTOM_TEMPLATE_ID = 'custom';
+export const MAX_CUSTOM_SECTIONS = 6;
+export const DEFAULT_CUSTOM_COLUMN_COUNT = 3;
+export const DEFAULT_CUSTOM_ROW_COUNT = 2;
 
 function roundPlanValue(value) {
   return Math.round(value * 100) / 100;
@@ -20,6 +23,186 @@ function clampValue(value, min, max) {
 
 function getSurfaceThickness(wallThickness) {
   return Math.max(0.08, Math.min(0.18, wallThickness));
+}
+
+function sumSegments(values) {
+  return values.reduce((sum, value) => sum + value, 0);
+}
+
+function finalizeSegments(values, total) {
+  if (!values.length) {
+    return [roundPlanValue(total)];
+  }
+
+  const rounded = values.map((value) => roundPlanValue(value));
+  const difference = roundPlanValue(total - sumSegments(rounded));
+  rounded[rounded.length - 1] = roundPlanValue(
+    (rounded[rounded.length - 1] ?? 0) + difference,
+  );
+  return rounded;
+}
+
+function distributeSegments(weights, total, minimum) {
+  if (!weights.length) {
+    return [];
+  }
+
+  const safeWeights = weights.map((value) => Math.max(0.01, value));
+  const totalWeight = sumSegments(safeWeights) || safeWeights.length;
+  const scaled = safeWeights.map((value) => (value / totalWeight) * total);
+  const belowMinimum = scaled
+    .map((value, index) => ({ value, index }))
+    .filter((item) => item.value < minimum);
+
+  if (!belowMinimum.length) {
+    return scaled;
+  }
+
+  if (belowMinimum.length === safeWeights.length) {
+    return Array.from({ length: safeWeights.length }, () => total / safeWeights.length);
+  }
+
+  const fixedIndexes = new Set(belowMinimum.map((item) => item.index));
+  const remainingWeights = safeWeights.filter((_, index) => !fixedIndexes.has(index));
+  const remainingTotal = total - minimum * fixedIndexes.size;
+  const distributedRemainder = distributeSegments(
+    remainingWeights,
+    remainingTotal,
+    minimum,
+  );
+  let remainderIndex = 0;
+
+  return safeWeights.map((_, index) => {
+    if (fixedIndexes.has(index)) {
+      return minimum;
+    }
+
+    const value = distributedRemainder[remainderIndex] ?? minimum;
+    remainderIndex += 1;
+    return value;
+  });
+}
+
+export function createEvenSegments(total, count) {
+  const safeTotal = clampValue(total, 3.5, 24);
+  const safeCount = clampValue(Math.round(count), 1, MAX_CUSTOM_SECTIONS);
+  return finalizeSegments(
+    Array.from({ length: safeCount }, () => safeTotal / safeCount),
+    safeTotal,
+  );
+}
+
+function normalizeSegmentArray(total, rawSizes, fallbackCount) {
+  const safeTotal = clampValue(total, 3.5, 24);
+  const safeCount = clampValue(
+    Math.round(
+      Array.isArray(rawSizes) && rawSizes.length > 0 ? rawSizes.length : fallbackCount,
+    ),
+    1,
+    MAX_CUSTOM_SECTIONS,
+  );
+  const baseValues = Array.isArray(rawSizes)
+    ? rawSizes.slice(0, safeCount).map((value) => clampValue(Number(value) || 0, 0.01, 24))
+    : [];
+  const weights =
+    baseValues.length === safeCount && baseValues.some((value) => value > 0)
+      ? baseValues
+      : createEvenSegments(safeTotal, safeCount);
+  const minimumSize = Math.max(0.45, Math.min(1.2, (safeTotal / safeCount) * 0.42));
+
+  return finalizeSegments(
+    distributeSegments(weights, safeTotal, minimumSize),
+    safeTotal,
+  );
+}
+
+function getSegmentCenters(sizes) {
+  const total = sumSegments(sizes);
+  let cursor = -total / 2;
+
+  return sizes.map((size) => {
+    const center = roundPlanValue(cursor + size / 2);
+    cursor += size;
+    return center;
+  });
+}
+
+function getDividerPositions(sizes) {
+  const total = sumSegments(sizes);
+  let cursor = -total / 2;
+  const positions = [];
+
+  sizes.slice(0, -1).forEach((size) => {
+    cursor += size;
+    positions.push(roundPlanValue(cursor));
+  });
+
+  return positions;
+}
+
+function buildCustomPreviewRoomsFromSegments(columnSizes, rowSizes, locale) {
+  const totalWidth = sumSegments(columnSizes);
+  const totalDepth = sumSegments(rowSizes);
+  const rooms = [];
+  let zCursor = -totalDepth / 2;
+  let roomIndex = 1;
+
+  rowSizes.forEach((rowDepth) => {
+    let xCursor = -totalWidth / 2;
+
+    columnSizes.forEach((columnWidth) => {
+      rooms.push({
+        label: {
+          en: `Room ${roomIndex}`,
+          ko: `방 ${roomIndex}`,
+        },
+        x: roundPlanValue(xCursor + columnWidth / 2),
+        z: roundPlanValue(zCursor + rowDepth / 2),
+        width: columnWidth,
+        depth: rowDepth,
+      });
+      roomIndex += 1;
+      xCursor += columnWidth;
+    });
+
+    zCursor += rowDepth;
+  });
+
+  return rooms.map((room) => ({
+    ...room,
+    labelText: localizeText(room.label, locale),
+  }));
+}
+
+function getNearestCenter(values) {
+  return values.reduce(
+    (closest, value) => (Math.abs(value) < Math.abs(closest) ? value : closest),
+    values[0] ?? 0,
+  );
+}
+
+export function normalizeCustomLayoutConfig(config = {}) {
+  const safeWidth = clampValue(config.width ?? 10, 3.5, 24);
+  const safeDepth = clampValue(config.depth ?? 8, 3.5, 24);
+  const fallbackColumns = config.customColumns ?? DEFAULT_CUSTOM_COLUMN_COUNT;
+  const fallbackRows = config.customRows ?? DEFAULT_CUSTOM_ROW_COUNT;
+  const columnSizes = normalizeSegmentArray(
+    safeWidth,
+    config.columnSizes,
+    fallbackColumns,
+  );
+  const rowSizes = normalizeSegmentArray(
+    safeDepth,
+    config.rowSizes,
+    fallbackRows,
+  );
+
+  return {
+    width: roundPlanValue(sumSegments(columnSizes)),
+    depth: roundPlanValue(sumSegments(rowSizes)),
+    columnSizes,
+    rowSizes,
+  };
 }
 
 export const HOUSE_TEMPLATES = [
@@ -229,54 +412,13 @@ function createDoorObject(door, scaleX, scaleZ, wallHeight, wallThickness) {
   };
 }
 
-function getCustomSegments(total, count) {
-  const safeTotal = clampValue(total, 3.5, 24);
-  const safeCount = clampValue(Math.round(count), 1, 6);
-  const segment = roundPlanValue(safeTotal / safeCount);
-  return Array.from({ length: safeCount }, () => segment);
-}
-
-function buildCustomPreviewRooms(width, depth, columns, rows, locale) {
-  const columnSizes = getCustomSegments(width, columns);
-  const rowSizes = getCustomSegments(depth, rows);
-  const totalWidth = columnSizes.reduce((sum, item) => sum + item, 0);
-  const totalDepth = rowSizes.reduce((sum, item) => sum + item, 0);
-  const rooms = [];
-  let zCursor = -totalDepth / 2;
-  let roomIndex = 1;
-
-  rowSizes.forEach((rowDepth) => {
-    let xCursor = -totalWidth / 2;
-
-    columnSizes.forEach((columnWidth) => {
-      rooms.push({
-        label: {
-          en: `Room ${roomIndex}`,
-          ko: `방 ${roomIndex}`,
-        },
-        x: roundPlanValue(xCursor + columnWidth / 2),
-        z: roundPlanValue(zCursor + rowDepth / 2),
-        width: columnWidth,
-        depth: rowDepth,
-      });
-      roomIndex += 1;
-      xCursor += columnWidth;
-    });
-
-    zCursor += rowDepth;
-  });
-
-  return rooms.map((room) => ({
-    ...room,
-    labelText: localizeText(room.label, locale),
-  }));
-}
-
 function buildCustomHouseObjects({
   width = 10,
   depth = 8,
-  customColumns = 3,
-  customRows = 2,
+  columnSizes,
+  rowSizes,
+  customColumns = DEFAULT_CUSTOM_COLUMN_COUNT,
+  customRows = DEFAULT_CUSTOM_ROW_COUNT,
   wallHeight = 2.5,
   wallThickness = 0.12,
   includeFloor = true,
@@ -284,15 +426,25 @@ function buildCustomHouseObjects({
   includeDoors = true,
   includeOuterWalls = false,
 }) {
-  const safeWidth = clampValue(width, 3.5, 24);
-  const safeDepth = clampValue(depth, 3.5, 24);
-  const safeColumns = clampValue(Math.round(customColumns), 1, 6);
-  const safeRows = clampValue(Math.round(customRows), 1, 6);
+  const customLayout = normalizeCustomLayoutConfig({
+    width,
+    depth,
+    columnSizes,
+    rowSizes,
+    customColumns,
+    customRows,
+  });
+  const safeWidth = customLayout.width;
+  const safeDepth = customLayout.depth;
   const safeWallHeight = clampValue(wallHeight, 2.1, 4.2);
   const safeWallThickness = clampValue(wallThickness, 0.08, 0.4);
   const surfaceThickness = getSurfaceThickness(safeWallThickness);
-  const columnWidth = safeWidth / safeColumns;
-  const rowDepth = safeDepth / safeRows;
+  const verticalDividers = getDividerPositions(customLayout.columnSizes);
+  const horizontalDividers = getDividerPositions(customLayout.rowSizes);
+  const columnCenters = getSegmentCenters(customLayout.columnSizes);
+  const rowCenters = getSegmentCenters(customLayout.rowSizes);
+  const verticalDoorZ = getNearestCenter(rowCenters);
+  const horizontalDoorX = getNearestCenter(columnCenters);
   const objects = [];
 
   if (includeFloor) {
@@ -348,15 +500,11 @@ function buildCustomHouseObjects({
     );
   }
 
-  for (let columnIndex = 1; columnIndex < safeColumns; columnIndex += 1) {
+  verticalDividers.forEach((xPosition, columnIndex) => {
     objects.push({
       type: 'wall',
       dimensions: [safeWallThickness, safeWallHeight, safeDepth],
-      position: [
-        roundPlanValue(-safeWidth / 2 + columnWidth * columnIndex),
-        0,
-        0,
-      ],
+      position: [xPosition, 0, 0],
       rotation: [0, 0, 0],
       color: DEFAULT_WALL_COLOR,
     });
@@ -365,28 +513,20 @@ function buildCustomHouseObjects({
       objects.push({
         type: 'door',
         dimensions: [0.9, Math.max(1.95, safeWallHeight - 0.18), safeWallThickness],
-        position: [
-          roundPlanValue(-safeWidth / 2 + columnWidth * columnIndex),
-          0,
-          roundPlanValue((columnIndex % 2 === 0 ? 1 : -1) * rowDepth * 0.24),
-        ],
+        position: [xPosition, 0, verticalDoorZ],
         rotation: [0, Math.PI / 2, 0],
         color: DEFAULT_DOOR_COLOR,
         isOpen: false,
         swing: columnIndex % 2 === 0 ? 'right' : 'left',
       });
     }
-  }
+  });
 
-  for (let rowIndex = 1; rowIndex < safeRows; rowIndex += 1) {
+  horizontalDividers.forEach((zPosition, rowIndex) => {
     objects.push({
       type: 'wall',
       dimensions: [safeWidth, safeWallHeight, safeWallThickness],
-      position: [
-        0,
-        0,
-        roundPlanValue(-safeDepth / 2 + rowDepth * rowIndex),
-      ],
+      position: [0, 0, zPosition],
       rotation: [0, 0, 0],
       color: DEFAULT_WALL_COLOR,
     });
@@ -395,18 +535,14 @@ function buildCustomHouseObjects({
       objects.push({
         type: 'door',
         dimensions: [0.9, Math.max(1.95, safeWallHeight - 0.18), safeWallThickness],
-        position: [
-          roundPlanValue((rowIndex % 2 === 0 ? -1 : 1) * columnWidth * 0.24),
-          0,
-          roundPlanValue(-safeDepth / 2 + rowDepth * rowIndex),
-        ],
+        position: [horizontalDoorX, 0, zPosition],
         rotation: [0, 0, 0],
         color: DEFAULT_DOOR_COLOR,
         isOpen: false,
         swing: rowIndex % 2 === 0 ? 'right' : 'left',
       });
     }
-  }
+  });
 
   if (includeOuterWalls && includeDoors) {
     objects.push({
@@ -459,16 +595,18 @@ export function getTemplateRooms(template, locale) {
 }
 
 export function getCustomTemplatePreview(config, locale) {
+  const customLayout = normalizeCustomLayoutConfig(config);
+
   return {
     footprint: {
-      width: clampValue(config.width ?? 10, 3.5, 24),
-      depth: clampValue(config.depth ?? 8, 3.5, 24),
+      width: customLayout.width,
+      depth: customLayout.depth,
     },
-    rooms: buildCustomPreviewRooms(
-      config.width ?? 10,
-      config.depth ?? 8,
-      config.customColumns ?? 3,
-      config.customRows ?? 2,
+    columnSizes: customLayout.columnSizes,
+    rowSizes: customLayout.rowSizes,
+    rooms: buildCustomPreviewRoomsFromSegments(
+      customLayout.columnSizes,
+      customLayout.rowSizes,
       locale,
     ),
   };
