@@ -13,7 +13,9 @@ const Scene = () => {
     const selectedId = useStore((state) => state.selectedId);
     const transformMode = useStore((state) => state.transformMode);
     const cameraMode = useStore((state) => state.cameraMode);
+    const setCameraState = useStore((state) => state.setCameraState);
     const toggleObjectOpen = useStore((state) => state.toggleObjectOpen);
+    const controlsRef = React.useRef(null);
     const mouseButtons =
         cameraMode === 'pan'
             ? { LEFT: MOUSE.PAN, MIDDLE: MOUSE.DOLLY, RIGHT: MOUSE.ROTATE }
@@ -22,6 +24,33 @@ const Scene = () => {
         cameraMode === 'pan'
             ? { ONE: TOUCH.PAN, TWO: TOUCH.DOLLY_PAN }
             : { ONE: TOUCH.ROTATE, TWO: TOUCH.DOLLY_PAN };
+    const syncCameraState = () => {
+        const controls = controlsRef.current;
+
+        if (!controls) {
+            return;
+        }
+
+        setCameraState({
+            position: controls.object.position.toArray(),
+            target: controls.target.toArray(),
+        });
+    };
+
+    React.useEffect(() => {
+        const controls = controlsRef.current;
+
+        if (!controls) {
+            return undefined;
+        }
+
+        setCameraState({
+            position: controls.object.position.toArray(),
+            target: controls.target.toArray(),
+        });
+
+        return undefined;
+    }, [setCameraState]);
 
     return (
         <Canvas
@@ -78,6 +107,7 @@ const Scene = () => {
             ))}
 
             <OrbitControls
+                ref={controlsRef}
                 makeDefault
                 enableDamping
                 mouseButtons={mouseButtons}
@@ -85,6 +115,7 @@ const Scene = () => {
                 minDistance={4}
                 maxDistance={32}
                 maxPolarAngle={Math.PI / 2.03}
+                onChange={syncCameraState}
             />
         </Canvas>
     );

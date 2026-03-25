@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { v4 as uuidv4 } from 'uuid';
 import {
+  DEFAULT_CAMERA_STATE,
   getObjectDefinition,
   getSpawnPosition,
   normalizeColor,
@@ -15,13 +16,22 @@ const initialScene = loadSceneFromUrl();
 const HISTORY_LIMIT = 60;
 const PASTE_OFFSET = [0.45, 0, 0.45];
 
-function createSceneObject(type, index) {
+function createSceneObject(type, state) {
   const definition = getObjectDefinition(type);
+  const selectedObject = state.objects.find(
+    (object) => object.id === state.selectedId,
+  );
 
   return {
     id: uuidv4(),
     type: definition.id,
-    position: getSpawnPosition(index),
+    position: getSpawnPosition({
+      type: definition.id,
+      dimensions: definition.dimensions,
+      objects: state.objects,
+      selectedObject,
+      cameraState: state.cameraState,
+    }),
     rotation: [0, 0, 0],
     dimensions: [...definition.dimensions],
     color: definition.color,
@@ -53,6 +63,12 @@ function cloneClipboardObject(object) {
     isOpen: object.isOpen,
     swing: object.swing,
   };
+}
+
+function areVectorsEqual(current = [], next = []) {
+  return current.every(
+    (value, index) => Math.abs(value - (next[index] ?? 0)) < 0.001,
+  );
 }
 
 function createHistoryEntry(state) {
@@ -121,9 +137,7 @@ function createPastedObject(clipboardObject) {
   return {
     id: uuidv4(),
     type: clipboardObject.type,
-    position: clipboardObject.position.map(
-      (value, index) => value + (PASTE_OFFSET[index] ?? 0),
-    ),
+    position: [...clipboardObject.position],
     rotation: [...clipboardObject.rotation],
     dimensions: [...clipboardObject.dimensions],
     color: clipboardObject.color,
@@ -145,13 +159,14 @@ const useStore = create((set, get) => ({
   unitSystem: initialScene?.unitSystem === 'cm' ? 'cm' : 'm',
   transformMode: 'translate',
   cameraMode: 'orbit',
+  cameraState: DEFAULT_CAMERA_STATE,
   clipboardObject: null,
   historyPast: [],
   historyFuture: [],
 
   addObject: (type) =>
     set((state) => {
-      const newObject = createSceneObject(type, state.objects.length);
+      const newObject = createSceneObject(type, state);
       return {
         historyPast: pushHistoryEntry(state.historyPast, state),
         historyFuture: [],
@@ -224,6 +239,32 @@ const useStore = create((set, get) => ({
       cameraMode: cameraMode === 'pan' ? 'pan' : 'orbit',
     }),
 
+  setCameraState: (cameraState) =>
+    set((state) => {
+      const nextPosition = normalizeVector(
+        cameraState?.position,
+        DEFAULT_CAMERA_STATE.position,
+      );
+      const nextTarget = normalizeVector(
+        cameraState?.target,
+        DEFAULT_CAMERA_STATE.target,
+      );
+
+      if (
+        areVectorsEqual(state.cameraState.position, nextPosition) &&
+        areVectorsEqual(state.cameraState.target, nextTarget)
+      ) {
+        return state;
+      }
+
+      return {
+        cameraState: {
+          position: nextPosition,
+          target: nextTarget,
+        },
+      };
+    }),
+
   updateObject: (id, newData) =>
     set((state) => {
       const hasTarget = state.objects.some((object) => object.id === id);
@@ -280,7 +321,25 @@ const useStore = create((set, get) => ({
         return state;
       }
 
-      const newObject = createPastedObject(state.clipboardObject);
+      const selectedObject = state.objects.find(
+        (object) => object.id === state.selectedId,
+      );
+      const pastedObject = createPastedObject(state.clipboardObject);
+      const preferredPosition = pastedObject.position.map(
+        (value, index) => value + (PASTE_OFFSET[index] ?? 0),
+      );
+      const newObject = {
+        ...pastedObject,
+        position: getSpawnPosition({
+          type: pastedObject.type,
+          dimensions: pastedObject.dimensions,
+          rotation: pastedObject.rotation,
+          objects: state.objects,
+          selectedObject,
+          cameraState: state.cameraState,
+          preferredPosition,
+        }),
+      };
 
       return {
         historyPast: pushHistoryEntry(state.historyPast, state),

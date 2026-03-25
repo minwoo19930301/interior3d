@@ -196,6 +196,14 @@ const OBJECT_CATALOG_BY_ID = Object.fromEntries(
 
 const COLOR_PATTERN = /^#[0-9a-f]{6}$/i;
 const FREE_Y_POSITION_TYPES = new Set(['ceilingPanel', 'floorPanel']);
+const NON_BLOCKING_SPAWN_TYPES = new Set(['floorPanel', 'ceilingPanel']);
+const DEFAULT_FORWARD = [0.707, 0, 0.707];
+const SPAWN_CLEARANCE = 0.2;
+
+export const DEFAULT_CAMERA_STATE = {
+  position: [9, 7.5, 9],
+  target: [0, 0, 0],
+};
 
 export function getObjectDefinition(type) {
   return OBJECT_CATALOG_BY_ID[type] ?? OBJECT_CATALOG_BY_ID.cube;
@@ -287,17 +295,153 @@ export function normalizeObject(rawObject) {
   };
 }
 
-export function getSpawnPosition(index) {
-  const columns = 4;
-  const spacing = 2.8;
-  const column = index % columns;
-  const row = Math.floor(index / columns);
+function getHorizontalFootprint(dimensions, rotation = [0, 0, 0]) {
+  const [width, , depth] = dimensions;
+  const yaw = normalizeNumber(rotation?.[1], 0);
+  const cos = Math.abs(Math.cos(yaw));
+  const sin = Math.abs(Math.sin(yaw));
 
-  return [
-    roundNumber((column - (columns - 1) / 2) * spacing, 2),
+  return {
+    width: roundNumber(width * cos + depth * sin, 3),
+    depth: roundNumber(width * sin + depth * cos, 3),
+  };
+}
+
+function normalizeHorizontalDirection(vector, fallback = DEFAULT_FORWARD) {
+  const x = normalizeNumber(vector?.[0], fallback[0]);
+  const z = normalizeNumber(vector?.[2], fallback[2]);
+  const length = Math.hypot(x, z);
+
+  if (length < 0.001) {
+    return [...fallback];
+  }
+
+  return [roundNumber(x / length, 4), 0, roundNumber(z / length, 4)];
+}
+
+function getSpawnBasis(cameraState = DEFAULT_CAMERA_STATE) {
+  const position = normalizeVector(
+    cameraState?.position,
+    DEFAULT_CAMERA_STATE.position,
+  );
+  const target = normalizeVector(cameraState?.target, DEFAULT_CAMERA_STATE.target);
+  const forward = normalizeHorizontalDirection([
+    target[0] - position[0],
     0,
-    roundNumber((row - 0.5) * spacing, 2),
-  ];
+    target[2] - position[2],
+  ]);
+
+  return {
+    target: [roundNumber(target[0], 3), 0, roundNumber(target[2], 3)],
+    forward,
+    right: [-forward[2], 0, forward[0]],
+  };
+}
+
+function isSpawnBlockingType(type) {
+  return !NON_BLOCKING_SPAWN_TYPES.has(type);
+}
+
+function getObjectFootprint(object) {
+  return getHorizontalFootprint(
+    clampDimensions(
+      object.type,
+      normalizeVector(
+        object.dimensions,
+        getObjectDefinition(object.type).dimensions,
+      ),
+    ),
+    normalizeVector(object.rotation, [0, 0, 0]),
+  );
+}
+
+function hasSpawnCollision(candidate, footprint, objects) {
+  return objects.some((object) => {
+    if (!isSpawnBlockingType(object.type)) {
+      return false;
+    }
+
+    const objectFootprint = getObjectFootprint(object);
+    const minGapX = footprint.width / 2 + objectFootprint.width / 2 + SPAWN_CLEARANCE;
+    const minGapZ = footprint.depth / 2 + objectFootprint.depth / 2 + SPAWN_CLEARANCE;
+
+    return (
+      Math.abs(candidate[0] - object.position[0]) < minGapX &&
+      Math.abs(candidate[2] - object.position[2]) < minGapZ
+    );
+  });
+}
+
+function createSpawnOffsets(maxRadius = 6) {
+  const offsets = [[0, 0]];
+
+  for (let radius = 1; radius <= maxRadius; radius += 1) {
+    for (let column = -radius; column <= radius; column += 1) {
+      offsets.push([column, -radius]);
+      offsets.push([column, radius]);
+    }
+
+    for (let row = -radius + 1; row <= radius - 1; row += 1) {
+      offsets.push([-radius, row]);
+      offsets.push([radius, row]);
+    }
+  }
+
+  return offsets;
+}
+
+export function getSpawnPosition(options = 0) {
+  if (typeof options === 'number') {
+    const columns = 4;
+    const spacing = 2.8;
+    const column = options % columns;
+    const row = Math.floor(options / columns);
+
+    return [
+      roundNumber((column - (columns - 1) / 2) * spacing, 2),
+      0,
+      roundNumber((row - 0.5) * spacing, 2),
+    ];
+  }
+
+  const {
+    type = 'cube',
+    dimensions = getObjectDefinition(type).dimensions,
+    rotation = [0, 0, 0],
+    objects = [],
+    selectedObject = null,
+    cameraState = DEFAULT_CAMERA_STATE,
+    preferredPosition = null,
+  } = options ?? {};
+  const footprint = getHorizontalFootprint(
+    clampDimensions(type, normalizeVector(dimensions, getObjectDefinition(type).dimensions)),
+    normalizeVector(rotation, [0, 0, 0]),
+  );
+  const { target, forward, right } = getSpawnBasis(cameraState);
+  const anchorSource = preferredPosition ?? selectedObject?.position ?? target;
+  const anchorPosition = normalizePositionForType(type, anchorSource, target);
+  const anchor = [anchorPosition[0], anchorPosition[1], anchorPosition[2]];
+  const stepX = Math.max(footprint.width + SPAWN_CLEARANCE * 1.5, 0.7);
+  const stepZ = Math.max(footprint.depth + SPAWN_CLEARANCE * 1.5, 0.7);
+  const candidateOffsets = createSpawnOffsets(6);
+
+  for (const [column, row] of candidateOffsets) {
+    const candidate = normalizePositionForType(
+      type,
+      [
+        anchor[0] + right[0] * column * stepX + forward[0] * row * stepZ,
+        anchor[1],
+        anchor[2] + right[2] * column * stepX + forward[2] * row * stepZ,
+      ],
+      anchor,
+    );
+
+    if (!hasSpawnCollision(candidate, footprint, objects)) {
+      return candidate;
+    }
+  }
+
+  return normalizePositionForType(type, anchor, anchor);
 }
 
 export function toDisplayValue(value, unitSystem) {
