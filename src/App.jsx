@@ -80,6 +80,8 @@ function App() {
   const setUnitSystem = useStore((state) => state.setUnitSystem);
   const transformMode = useStore((state) => state.transformMode);
   const setTransformMode = useStore((state) => state.setTransformMode);
+  const cameraMode = useStore((state) => state.cameraMode);
+  const setCameraMode = useStore((state) => state.setCameraMode);
   const clipboardObject = useStore((state) => state.clipboardObject);
   const historyPastLength = useStore((state) => state.historyPast.length);
   const copySelectedObject = useStore((state) => state.copySelectedObject);
@@ -328,6 +330,32 @@ function App() {
                   }}
                 >
                   {t('ui_rotate', locale)}
+                </button>
+              </div>
+
+              <div style={{ display: 'flex', gap: '8px', ...badgeStyle }}>
+                <span style={{ color: '#8fa2bd' }}>{t('ui_camera', locale)}</span>
+                <button
+                  onClick={() => setCameraMode('orbit')}
+                  style={{
+                    border: 'none',
+                    padding: '0.35rem 0.7rem',
+                    background: cameraMode === 'orbit' ? '#4b83ff' : 'transparent',
+                    color: '#fff',
+                  }}
+                >
+                  {t('ui_camera_orbit', locale)}
+                </button>
+                <button
+                  onClick={() => setCameraMode('pan')}
+                  style={{
+                    border: 'none',
+                    padding: '0.35rem 0.7rem',
+                    background: cameraMode === 'pan' ? '#4b83ff' : 'transparent',
+                    color: '#fff',
+                  }}
+                >
+                  {t('ui_camera_pan', locale)}
                 </button>
               </div>
 

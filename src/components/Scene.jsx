@@ -1,6 +1,7 @@
 import React from 'react';
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
+import { MOUSE, TOUCH } from 'three';
 import Floor from './Floor';
 import Furniture from './Furniture';
 import useStore from '../store/useStore';
@@ -11,7 +12,16 @@ const Scene = () => {
     const selectObject = useStore((state) => state.selectObject);
     const selectedId = useStore((state) => state.selectedId);
     const transformMode = useStore((state) => state.transformMode);
+    const cameraMode = useStore((state) => state.cameraMode);
     const toggleObjectOpen = useStore((state) => state.toggleObjectOpen);
+    const mouseButtons =
+        cameraMode === 'pan'
+            ? { LEFT: MOUSE.PAN, MIDDLE: MOUSE.DOLLY, RIGHT: MOUSE.ROTATE }
+            : { LEFT: MOUSE.ROTATE, MIDDLE: MOUSE.DOLLY, RIGHT: MOUSE.PAN };
+    const touchControls =
+        cameraMode === 'pan'
+            ? { ONE: TOUCH.PAN, TWO: TOUCH.DOLLY_ROTATE }
+            : { ONE: TOUCH.ROTATE, TWO: TOUCH.DOLLY_PAN };
 
     return (
         <Canvas
@@ -64,6 +74,8 @@ const Scene = () => {
             <OrbitControls
                 makeDefault
                 enableDamping
+                mouseButtons={mouseButtons}
+                touches={touchControls}
                 minDistance={4}
                 maxDistance={32}
                 maxPolarAngle={Math.PI / 2.03}

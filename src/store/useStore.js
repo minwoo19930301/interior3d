@@ -139,6 +139,7 @@ const useStore = create((set, get) => ({
   selectedId: null,
   unitSystem: initialScene?.unitSystem === 'cm' ? 'cm' : 'm',
   transformMode: 'translate',
+  cameraMode: 'orbit',
   clipboardObject: null,
   historyPast: [],
   historyFuture: [],
@@ -206,6 +207,11 @@ const useStore = create((set, get) => ({
   setTransformMode: (transformMode) =>
     set({
       transformMode: transformMode === 'rotate' ? 'rotate' : 'translate',
+    }),
+
+  setCameraMode: (cameraMode) =>
+    set({
+      cameraMode: cameraMode === 'pan' ? 'pan' : 'orbit',
     }),
 
   updateObject: (id, newData) =>

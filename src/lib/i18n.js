@@ -2,6 +2,9 @@ const MESSAGES = {
   en: {
     app_title: 'interior3d House Planner',
     ui_mode: 'Mode',
+    ui_camera: 'Camera',
+    ui_camera_orbit: 'Orbit',
+    ui_camera_pan: 'Pan',
     ui_move: 'Move',
     ui_rotate: 'Rotate',
     ui_units: 'Units',
@@ -71,6 +74,9 @@ const MESSAGES = {
   ko: {
     app_title: 'interior3d 집 플래너',
     ui_mode: '모드',
+    ui_camera: '카메라',
+    ui_camera_orbit: '회전',
+    ui_camera_pan: '이동',
     ui_move: '이동',
     ui_rotate: '회전',
     ui_units: '단위',
