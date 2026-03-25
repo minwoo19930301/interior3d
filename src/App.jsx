@@ -9,6 +9,8 @@ import { buildSceneUrl, syncSceneToUrl } from './lib/sceneUrl';
 import { buildHouseObjects } from './lib/roomBuilder';
 import { getObjectLabel, toDisplayValue } from './lib/objectCatalog';
 
+const MOBILE_BREAKPOINT = 960;
+
 const badgeStyle = {
   padding: '0.55rem 0.85rem',
   borderRadius: '999px',
@@ -17,6 +19,15 @@ const badgeStyle = {
   color: '#f5f7fa',
   fontSize: '0.82rem',
 };
+
+const mobileButtonStyle = (active) => ({
+  border: '1px solid rgba(255,255,255,0.12)',
+  borderRadius: '999px',
+  padding: '0.7rem 0.95rem',
+  background: active ? '#4b83ff' : 'rgba(15,18,24,0.94)',
+  color: '#fff',
+  boxShadow: '0 16px 32px rgba(0,0,0,0.25)',
+});
 
 function copyText(text) {
   if (navigator.clipboard?.writeText) {
@@ -73,10 +84,16 @@ function App() {
   const pasteClipboardObject = useStore((state) => state.pasteClipboardObject);
   const addObjects = useStore((state) => state.addObjects);
   const replaceObjects = useStore((state) => state.replaceObjects);
+  const removeObject = useStore((state) => state.removeObject);
   const undo = useStore((state) => state.undo);
   const redo = useStore((state) => state.redo);
   const [shareStatus, setShareStatus] = useState('idle');
-  const [isRoomPlannerOpen, setIsRoomPlannerOpen] = useState(false);
+  const [isRoomPlannerOpen, setIsRoomPlannerOpen] = useState(() => objects.length === 0);
+  const [isMobileLayout, setIsMobileLayout] = useState(() =>
+    typeof window !== 'undefined' ? window.innerWidth <= MOBILE_BREAKPOINT : false,
+  );
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isPropertiesOpen, setIsPropertiesOpen] = useState(false);
   const selectedObject = objects.find((object) => object.id === selectedId);
 
   useEffect(() => {
@@ -93,8 +110,38 @@ function App() {
   }, [shareStatus]);
 
   useEffect(() => {
+    const handleResize = () => {
+      const nextIsMobile = window.innerWidth <= MOBILE_BREAKPOINT;
+
+      setIsMobileLayout(nextIsMobile);
+
+      if (!nextIsMobile) {
+        setIsSidebarOpen(false);
+        setIsPropertiesOpen(false);
+      }
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  useEffect(() => {
     const handleKeyDown = (event) => {
       if (isEditableTarget(event.target)) {
+        return;
+      }
+
+      const key = event.key.toLowerCase();
+
+      if (key === 'escape') {
+        setIsSidebarOpen(false);
+        setIsPropertiesOpen(false);
+        return;
+      }
+
+      if ((key === 'backspace' || key === 'delete') && selectedId) {
+        event.preventDefault();
+        removeObject(selectedId);
         return;
       }
 
@@ -103,8 +150,6 @@ function App() {
       if (!hasModifier) {
         return;
       }
-
-      const key = event.key.toLowerCase();
 
       if (key === 'c') {
         event.preventDefault();
@@ -132,7 +177,7 @@ function App() {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [copySelectedObject, pasteClipboardObject, redo, undo]);
+  }, [copySelectedObject, pasteClipboardObject, redo, removeObject, selectedId, undo]);
 
   const handleCopyShareLink = async () => {
     try {
@@ -153,6 +198,24 @@ function App() {
     }
 
     setIsRoomPlannerOpen(false);
+    setIsSidebarOpen(false);
+    setIsPropertiesOpen(false);
+  };
+
+  const openPlanner = () => {
+    setIsRoomPlannerOpen(true);
+    setIsSidebarOpen(false);
+    setIsPropertiesOpen(false);
+  };
+
+  const toggleSidebar = () => {
+    setIsSidebarOpen((current) => !current);
+    setIsPropertiesOpen(false);
+  };
+
+  const toggleProperties = () => {
+    setIsPropertiesOpen((current) => !current);
+    setIsSidebarOpen(false);
   };
 
   return (
@@ -167,10 +230,11 @@ function App() {
           overflow: 'hidden',
         }}
       >
-        <Sidebar onOpenRoomPlanner={() => setIsRoomPlannerOpen(true)} />
+        {!isMobileLayout ? <Sidebar onOpenRoomPlanner={openPlanner} /> : null}
 
         <div style={{ flex: 1, position: 'relative', minWidth: 0 }}>
           <Scene />
+
           {isRoomPlannerOpen ? (
             <RoomPlannerModal
               isOpen={isRoomPlannerOpen}
@@ -183,13 +247,14 @@ function App() {
           <div
             style={{
               position: 'absolute',
-              top: 18,
-              left: 18,
-              right: 18,
+              top: isMobileLayout ? 12 : 18,
+              left: isMobileLayout ? 12 : 18,
+              right: isMobileLayout ? 12 : 18,
               display: 'flex',
+              flexDirection: isMobileLayout ? 'column' : 'row',
               justifyContent: 'space-between',
-              gap: '16px',
-              alignItems: 'flex-start',
+              gap: '12px',
+              alignItems: isMobileLayout ? 'stretch' : 'flex-start',
               pointerEvents: 'none',
             }}
           >
@@ -205,10 +270,12 @@ function App() {
               <div style={{ ...badgeStyle, color: '#9cb0c9' }}>
                 Grid {toDisplayValue(1, unitSystem)} {unitSystem}
               </div>
-              <div style={{ ...badgeStyle, color: '#9cb0c9' }}>
-                Scene {toDisplayValue(40, unitSystem)} x {toDisplayValue(40, unitSystem)} {unitSystem}
-              </div>
-              {selectedObject ? (
+              {!isMobileLayout ? (
+                <div style={{ ...badgeStyle, color: '#9cb0c9' }}>
+                  Scene {toDisplayValue(40, unitSystem)} x {toDisplayValue(40, unitSystem)} {unitSystem}
+                </div>
+              ) : null}
+              {!isMobileLayout && selectedObject ? (
                 <div style={{ ...badgeStyle, color: '#f5f7fa' }}>
                   {getObjectLabel(selectedObject.type)}{' '}
                   {toDisplayValue(selectedObject.dimensions[0], unitSystem)} x{' '}
@@ -224,9 +291,9 @@ function App() {
                 gap: '10px',
                 alignItems: 'center',
                 flexWrap: 'wrap',
-                justifyContent: 'flex-end',
+                justifyContent: isMobileLayout ? 'flex-start' : 'flex-end',
                 pointerEvents: 'auto',
-                marginLeft: 'auto',
+                marginLeft: isMobileLayout ? 0 : 'auto',
               }}
             >
               <div style={{ display: 'flex', gap: '8px', ...badgeStyle }}>
@@ -322,14 +389,104 @@ function App() {
                     : 'Copy share link'}
               </button>
 
-              <div style={{ ...badgeStyle, color: '#8fa2bd' }}>
-                {objects.length} items
-              </div>
+              {!isMobileLayout ? (
+                <div style={{ ...badgeStyle, color: '#8fa2bd' }}>
+                  {objects.length} items
+                </div>
+              ) : null}
             </div>
           </div>
+
+          {isMobileLayout ? (
+            <div
+              style={{
+                position: 'absolute',
+                left: 12,
+                bottom: 12,
+                display: 'flex',
+                gap: '10px',
+                pointerEvents: 'auto',
+                zIndex: 12,
+                flexWrap: 'wrap',
+              }}
+            >
+              <button onClick={toggleSidebar} style={mobileButtonStyle(isSidebarOpen)}>
+                Structure
+              </button>
+              <button
+                onClick={toggleProperties}
+                style={mobileButtonStyle(isPropertiesOpen)}
+              >
+                Properties
+              </button>
+              <button onClick={openPlanner} style={mobileButtonStyle(false)}>
+                House
+              </button>
+            </div>
+          ) : null}
+
+          {isMobileLayout && isSidebarOpen ? (
+            <>
+              <div
+                onClick={() => setIsSidebarOpen(false)}
+                style={{
+                  position: 'absolute',
+                  inset: 0,
+                  background: 'rgba(5, 8, 12, 0.52)',
+                  zIndex: 18,
+                }}
+              />
+              <div
+                style={{
+                  position: 'absolute',
+                  top: 12,
+                  left: 12,
+                  bottom: 12,
+                  zIndex: 19,
+                  pointerEvents: 'auto',
+                }}
+              >
+                <Sidebar
+                  isMobile
+                  onOpenRoomPlanner={openPlanner}
+                  onClose={() => setIsSidebarOpen(false)}
+                />
+              </div>
+            </>
+          ) : null}
+
+          {isMobileLayout && isPropertiesOpen ? (
+            <>
+              <div
+                onClick={() => setIsPropertiesOpen(false)}
+                style={{
+                  position: 'absolute',
+                  inset: 0,
+                  background: 'rgba(5, 8, 12, 0.52)',
+                  zIndex: 18,
+                }}
+              />
+              <div
+                style={{
+                  position: 'absolute',
+                  left: 12,
+                  right: 12,
+                  bottom: 12,
+                  maxHeight: 'min(68vh, 620px)',
+                  zIndex: 19,
+                  pointerEvents: 'auto',
+                }}
+              >
+                <PropertiesPanel
+                  isMobile
+                  onClose={() => setIsPropertiesOpen(false)}
+                />
+              </div>
+            </>
+          ) : null}
         </div>
 
-        <PropertiesPanel />
+        {!isMobileLayout ? <PropertiesPanel /> : null}
       </div>
     </ErrorBoundary>
   );
