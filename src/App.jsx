@@ -92,7 +92,7 @@ function App() {
   const undo = useStore((state) => state.undo);
   const redo = useStore((state) => state.redo);
   const [shareStatus, setShareStatus] = useState('idle');
-  const [isRoomPlannerOpen, setIsRoomPlannerOpen] = useState(() => objects.length === 0);
+  const [isRoomPlannerOpen, setIsRoomPlannerOpen] = useState(false);
   const [isMobileLayout, setIsMobileLayout] = useState(() =>
     typeof window !== 'undefined' ? window.innerWidth <= MOBILE_BREAKPOINT : false,
   );

@@ -18,7 +18,7 @@ export const OBJECT_GROUPS = [
 export const OBJECT_CATALOG = [
   {
     id: 'room',
-    label: { en: 'House', ko: '집' },
+    label: { en: 'House templates', ko: '집 템플릿' },
     group: 'structure',
     dimensions: [4, 2.4, 4],
     minDimensions: [2, 2, 2],
