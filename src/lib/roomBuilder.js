@@ -264,6 +264,7 @@ export const HOUSE_TEMPLATES = [
   {
     id: 'korean-59a',
     label: { en: '59A', ko: '59A' },
+    bay: 3,
     description: {
       en: 'Common Korean 59㎡ layout with three bedrooms, two baths, and a compact living-dining core.',
       ko: '한국식 59㎡에서 자주 보이는 방 3개, 욕실 2개, 거실·주방 중심 구성입니다.',
@@ -313,6 +314,7 @@ export const HOUSE_TEMPLATES = [
   {
     id: 'korean-84a',
     label: { en: '84A', ko: '84A' },
+    bay: 4,
     description: {
       en: 'Popular 84㎡ four-bay family layout with three bedrooms, two baths, pantry, and a wide living room.',
       ko: '대표적인 84㎡ 판상형으로 방 3개, 욕실 2개, 팬트리, 넓은 거실을 갖춘 구성입니다.',
@@ -365,6 +367,7 @@ export const HOUSE_TEMPLATES = [
   {
     id: 'korean-84b',
     label: { en: '84B', ko: '84B' },
+    bay: 2,
     description: {
       en: 'Representative 84㎡ tower-style layout with a central entry, open living-kitchen core, utility room, and two baths.',
       ko: '대표적인 84㎡ 타워형으로 중앙 현관, 오픈 거실·주방, 다용도실, 욕실 2개를 가진 구성입니다.',
@@ -1199,6 +1202,14 @@ export function getTemplateLabel(template, locale) {
 
 export function getTemplateDescription(template, locale) {
   return localizeText(template?.description ?? '', locale);
+}
+
+export function getTemplateBayLabel(template, locale) {
+  if (!template?.bay) {
+    return '';
+  }
+
+  return locale === 'ko' ? `${template.bay}베이` : `${template.bay}-Bay`;
 }
 
 export function getTemplateRooms(template, locale) {

@@ -14,6 +14,7 @@ import {
   getCustomTemplatePreview,
   getDefaultHouseSize,
   getHouseTemplate,
+  getTemplateBayLabel,
   getRoomTileLabel,
   getTemplateDescription,
   getTemplateLabel,
@@ -252,11 +253,26 @@ const RoomPlannerModal = ({
     createPlannerState(HOUSE_TEMPLATES[0].id),
   );
   const [selectedTileType, setSelectedTileType] = useState('living');
+  const [bayFilter, setBayFilter] = useState('all');
   const unit = UNIT_SYSTEMS[unitSystem] ?? UNIT_SYSTEMS.m;
   const isCustomTemplate = plannerState.templateId === CUSTOM_TEMPLATE_ID;
   const selectedTemplate = useMemo(
     () => getHouseTemplate(plannerState.templateId),
     [plannerState.templateId],
+  );
+  const templateBayValues = useMemo(
+    () =>
+      [...new Set(HOUSE_TEMPLATES.map((template) => template.bay).filter(Boolean))].sort(
+        (left, right) => left - right,
+      ),
+    [],
+  );
+  const visibleTemplates = useMemo(
+    () =>
+      HOUSE_TEMPLATES.filter(
+        (template) => bayFilter === 'all' || String(template.bay) === bayFilter,
+      ),
+    [bayFilter],
   );
   const preview = useMemo(
     () => getPreviewData(plannerState, locale),
@@ -508,7 +524,58 @@ const RoomPlannerModal = ({
               gap: '12px',
             }}
           >
-            {HOUSE_TEMPLATES.map((template) => {
+            <div
+              style={{
+                display: 'flex',
+                flexWrap: 'wrap',
+                gap: '8px',
+                marginBottom: '4px',
+              }}
+            >
+              <span
+                style={{
+                  color: '#8fa0b8',
+                  fontSize: '0.78rem',
+                  display: 'flex',
+                  alignItems: 'center',
+                  paddingRight: '2px',
+                }}
+              >
+                {t('ui_bay', locale)}
+              </span>
+              <button
+                onClick={() => setBayFilter('all')}
+                style={{
+                  border: '1px solid rgba(255,255,255,0.08)',
+                  borderRadius: '999px',
+                  background: bayFilter === 'all' ? '#28426e' : '#1a212c',
+                  color: '#fff',
+                  padding: '0.4rem 0.8rem',
+                  fontSize: '0.78rem',
+                }}
+              >
+                {t('ui_all', locale)}
+              </button>
+              {templateBayValues.map((bayValue) => (
+                <button
+                  key={bayValue}
+                  onClick={() => setBayFilter(String(bayValue))}
+                  style={{
+                    border: '1px solid rgba(255,255,255,0.08)',
+                    borderRadius: '999px',
+                    background:
+                      bayFilter === String(bayValue) ? '#28426e' : '#1a212c',
+                    color: '#fff',
+                    padding: '0.4rem 0.8rem',
+                    fontSize: '0.78rem',
+                  }}
+                >
+                  {locale === 'ko' ? `${bayValue}베이` : `${bayValue}-Bay`}
+                </button>
+              ))}
+            </div>
+
+            {visibleTemplates.map((template) => {
               const isSelected = template.id === plannerState.templateId;
 
               return (
@@ -530,9 +597,30 @@ const RoomPlannerModal = ({
                     gap: '6px',
                   }}
                 >
-                  <span style={{ fontSize: '0.95rem', fontWeight: 700 }}>
-                    {getTemplateLabel(template, locale)}
-                  </span>
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                      flexWrap: 'wrap',
+                    }}
+                  >
+                    <span style={{ fontSize: '0.95rem', fontWeight: 700 }}>
+                      {getTemplateLabel(template, locale)}
+                    </span>
+                    <span
+                      style={{
+                        borderRadius: '999px',
+                        background: 'rgba(79,140,255,0.18)',
+                        color: '#bcd5ff',
+                        padding: '0.18rem 0.55rem',
+                        fontSize: '0.72rem',
+                        fontWeight: 600,
+                      }}
+                    >
+                      {getTemplateBayLabel(template, locale)}
+                    </span>
+                  </div>
                   <span style={{ color: '#8fa0b8', fontSize: '0.8rem', lineHeight: 1.45 }}>
                     {getTemplateDescription(template, locale)}
                   </span>
@@ -590,10 +678,33 @@ const RoomPlannerModal = ({
               }}
             >
               <div>
-                <div style={{ fontSize: '1rem', fontWeight: 700 }}>
-                  {isCustomTemplate
-                    ? getTemplateLabel(selectedTemplate, locale)
-                    : getTemplateLabel(selectedTemplate, locale)}
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    flexWrap: 'wrap',
+                  }}
+                >
+                  <div style={{ fontSize: '1rem', fontWeight: 700 }}>
+                    {isCustomTemplate
+                      ? getTemplateLabel(selectedTemplate, locale)
+                      : getTemplateLabel(selectedTemplate, locale)}
+                  </div>
+                  {!isCustomTemplate ? (
+                    <span
+                      style={{
+                        borderRadius: '999px',
+                        background: 'rgba(79,140,255,0.18)',
+                        color: '#bcd5ff',
+                        padding: '0.18rem 0.55rem',
+                        fontSize: '0.72rem',
+                        fontWeight: 600,
+                      }}
+                    >
+                      {getTemplateBayLabel(selectedTemplate, locale)}
+                    </span>
+                  ) : null}
                 </div>
                 <div style={{ marginTop: '6px', color: '#8fa0b8', fontSize: '0.84rem' }}>
                   {isCustomTemplate
@@ -632,6 +743,9 @@ const RoomPlannerModal = ({
                 <div>
                   {t('ui_depth', locale)} {toDisplayValue(plannerState.depth, unitSystem)} {unit.label}
                 </div>
+                {!isCustomTemplate ? (
+                  <div>{getTemplateBayLabel(selectedTemplate, locale)}</div>
+                ) : null}
                 <div>
                   {t('ui_filled_tiles', locale)} {filledTileCount}
                 </div>
