@@ -17,9 +17,9 @@ const Sidebar = ({ onOpenRoomPlanner, isMobile = false, onClose }) => {
   return (
     <div
       style={{
-        width: isMobile ? 'min(340px, calc(100vw - 32px))' : '290px',
-        height: isMobile ? '100%' : 'auto',
-        maxHeight: isMobile ? 'calc(100vh - 24px)' : 'none',
+        width: isMobile ? '100%' : '290px',
+        height: isMobile ? 'auto' : 'auto',
+        maxHeight: isMobile ? 'min(68vh, 620px)' : 'none',
         background: 'rgba(13,17,23,0.96)',
         color: '#fff',
         padding: '22px',

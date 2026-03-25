@@ -1,7 +1,8 @@
-import React, { useMemo, useRef } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { TransformControls } from '@react-three/drei';
 import useStore from '../store/useStore';
+import { clampDimensions, roundNumber } from '../lib/objectCatalog';
 
 const commonMaterial = (color, extra = {}) => ({
   color,
@@ -10,6 +11,15 @@ const commonMaterial = (color, extra = {}) => ({
   transparent: extra.transparent ?? false,
   opacity: extra.opacity ?? 1,
 });
+
+function mixHexColors(baseColor, targetColor, amount) {
+  const base = new THREE.Color(baseColor);
+  return `#${base.lerp(new THREE.Color(targetColor), amount).getHexString()}`;
+}
+
+function areDimensionsEqual(current, next) {
+  return current.every((value, index) => Math.abs(value - next[index]) < 0.001);
+}
 
 const BoxPart = ({ size, position, color, rotation, material }) => (
   <mesh position={position} rotation={rotation} castShadow receiveShadow>
@@ -224,19 +234,31 @@ function renderFurniture(type, dimensions, color, isOpen, swing) {
   }
 
   if (type === 'floorPanel') {
+    const baseColor = mixHexColors(color, '#a39a8f', 0.18);
+
     return (
       <group>
-        <BoxPart size={[width, height, depth]} position={[0, -height / 2, 0]} color={color} />
-        <BoxPart size={[width * 0.98, 0.02, depth * 0.98]} position={[0, 0.01, 0]} color="#a48769" />
+        <BoxPart size={[width, height, depth]} position={[0, -height / 2, 0]} color={baseColor} />
+        <BoxPart
+          size={[width * 0.98, 0.02, depth * 0.98]}
+          position={[0, 0.01, 0]}
+          color={color}
+        />
       </group>
     );
   }
 
   if (type === 'ceilingPanel') {
+    const edgeColor = mixHexColors(color, '#c8d0d9', 0.18);
+
     return (
       <group>
-        <BoxPart size={[width, height, depth]} position={[0, height / 2, 0]} color={color} />
-        <BoxPart size={[width * 0.96, 0.015, depth * 0.96]} position={[0, 0.01, 0]} color="#f2f5f8" />
+        <BoxPart size={[width, height, depth]} position={[0, height / 2, 0]} color={edgeColor} />
+        <BoxPart
+          size={[width * 0.96, 0.015, depth * 0.96]}
+          position={[0, 0.01, 0]}
+          color={color}
+        />
       </group>
     );
   }
@@ -508,14 +530,26 @@ const Furniture = ({
 }) => {
   const updateObject = useStore((state) => state.updateObject);
   const groupRef = useRef(null);
+  const resizeStateRef = useRef(null);
+  const draftDimensionsRef = useRef(dimensions);
+  const [draftDimensions, setDraftDimensions] = useState(null);
+  const activeDimensions =
+    transformMode === 'resize' && isSelected && draftDimensions
+      ? draftDimensions
+      : dimensions;
+
+  useEffect(() => {
+    draftDimensionsRef.current = activeDimensions;
+  }, [activeDimensions]);
+
   const content = useMemo(
-    () => renderFurniture(type, dimensions, color, isOpen, swing),
-    [type, dimensions, color, isOpen, swing],
+    () => renderFurniture(type, activeDimensions, color, isOpen, swing),
+    [type, activeDimensions, color, isOpen, swing],
   );
 
   const outline = isSelected ? (
-    <mesh position={[0, dimensions[1] / 2, 0]} renderOrder={3}>
-      <boxGeometry args={dimensions.map((value) => value * 1.02)} />
+    <mesh position={[0, activeDimensions[1] / 2, 0]} renderOrder={3}>
+      <boxGeometry args={activeDimensions.map((value) => value * 1.02)} />
       <meshBasicMaterial color="#ff8ab5" transparent opacity={0.65} wireframe />
     </mesh>
   ) : null;
@@ -533,6 +567,130 @@ const Furniture = ({
     });
   };
 
+  const handleResizeStart = (signX, signZ) => (event) => {
+    if (transformMode !== 'resize') {
+      return;
+    }
+
+    event.stopPropagation();
+    event.target.setPointerCapture?.(event.pointerId);
+    const object = groupRef.current;
+
+    if (!object) {
+      return;
+    }
+
+    const worldPosition = new THREE.Vector3();
+    object.getWorldPosition(worldPosition);
+    resizeStateRef.current = {
+      pointerId: event.pointerId,
+      plane: new THREE.Plane().setFromNormalAndCoplanarPoint(
+        new THREE.Vector3(0, 1, 0),
+        worldPosition,
+      ),
+      signX,
+      signZ,
+    };
+    setDraftDimensions(dimensions);
+  };
+
+  const handleResizeMove = (event) => {
+    const resizeState = resizeStateRef.current;
+
+    if (!resizeState || resizeState.pointerId !== event.pointerId) {
+      return;
+    }
+
+    event.stopPropagation();
+    const object = groupRef.current;
+
+    if (!object) {
+      return;
+    }
+
+    const intersectionPoint = new THREE.Vector3();
+
+    if (!event.ray.intersectPlane(resizeState.plane, intersectionPoint)) {
+      return;
+    }
+
+    const localPoint = object.worldToLocal(intersectionPoint.clone());
+    const nextDimensions = clampDimensions(type, [
+      roundNumber(Math.abs(localPoint.x) * 2),
+      activeDimensions[1],
+      roundNumber(Math.abs(localPoint.z) * 2),
+    ]);
+
+    setDraftDimensions((current) => [
+      nextDimensions[0],
+      current?.[1] ?? dimensions[1],
+      nextDimensions[2],
+    ]);
+  };
+
+  const finishResize = (event) => {
+    const resizeState = resizeStateRef.current;
+
+    if (!resizeState || resizeState.pointerId !== event.pointerId) {
+      return;
+    }
+
+    event.stopPropagation();
+    event.target.releasePointerCapture?.(event.pointerId);
+    resizeStateRef.current = null;
+
+    if (!areDimensionsEqual(dimensions, draftDimensionsRef.current)) {
+      updateObject(id, { dimensions: draftDimensionsRef.current });
+      setDraftDimensions(null);
+      return;
+    }
+
+    setDraftDimensions(null);
+  };
+
+  const resizeHandleSize = Math.min(
+    0.22,
+    Math.max(0.12, Math.min(activeDimensions[0], activeDimensions[2]) * 0.18),
+  );
+  const resizeHandleY = Math.min(
+    Math.max(0.06, activeDimensions[1] * 0.18),
+    Math.max(0.12, activeDimensions[1] - 0.02),
+  );
+  const resizeHandles =
+    isSelected && transformMode === 'resize'
+      ? [
+          [-1, -1],
+          [-1, 1],
+          [1, -1],
+          [1, 1],
+        ].map(([signX, signZ]) => (
+          <mesh
+            key={`${signX}-${signZ}`}
+            position={[
+              signX * activeDimensions[0] / 2,
+              resizeHandleY,
+              signZ * activeDimensions[2] / 2,
+            ]}
+            renderOrder={4}
+            onClick={(event) => event.stopPropagation()}
+            onPointerDown={handleResizeStart(signX, signZ)}
+            onPointerMove={handleResizeMove}
+            onPointerUp={finishResize}
+            onPointerCancel={finishResize}
+          >
+            <sphereGeometry args={[resizeHandleSize / 2, 18, 18]} />
+            <meshStandardMaterial
+              color="#4b83ff"
+              emissive="#1f4fb3"
+              emissiveIntensity={0.35}
+              metalness={0.15}
+              roughness={0.22}
+              depthTest={false}
+            />
+          </mesh>
+        ))
+      : null;
+
   return (
     <>
       <group
@@ -544,9 +702,10 @@ const Furniture = ({
       >
         {content}
         {outline}
+        {resizeHandles}
       </group>
 
-      {isSelected ? (
+      {isSelected && transformMode !== 'resize' ? (
         <TransformControls
           object={groupRef}
           mode={transformMode}

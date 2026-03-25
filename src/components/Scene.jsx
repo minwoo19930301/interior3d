@@ -20,7 +20,7 @@ const Scene = () => {
             : { LEFT: MOUSE.ROTATE, MIDDLE: MOUSE.DOLLY, RIGHT: MOUSE.PAN };
     const touchControls =
         cameraMode === 'pan'
-            ? { ONE: TOUCH.PAN, TWO: TOUCH.DOLLY_ROTATE }
+            ? { ONE: TOUCH.PAN, TWO: TOUCH.DOLLY_PAN }
             : { ONE: TOUCH.ROTATE, TWO: TOUCH.DOLLY_PAN };
 
     return (
@@ -28,8 +28,13 @@ const Scene = () => {
             shadows
             dpr={[1, 1.5]}
             camera={{ position: [9, 7.5, 9], fov: 44 }}
-            style={{ width: '100%', height: '100%' }}
+            style={{ width: '100%', height: '100%', touchAction: 'none' }}
+            onCreated={({ gl }) => {
+                gl.domElement.style.touchAction = 'none';
+                gl.domElement.style.webkitTapHighlightColor = 'transparent';
+            }}
             onPointerMissed={() => selectObject(null)}
+            onDoubleClick={(event) => event.preventDefault()}
         >
             <color attach="background" args={['#11151d']} />
             <ambientLight intensity={0.6} />
@@ -62,6 +67,7 @@ const Scene = () => {
                     }}
                     onDoubleClick={(e) => {
                         e.stopPropagation();
+                        e.preventDefault?.();
                         selectObject(obj.id);
 
                         if (isObjectOpenable(obj.type)) {

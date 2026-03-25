@@ -2,7 +2,8 @@ import { getObjectDefinition } from './objectCatalog';
 import { localizeText } from './i18n';
 
 const DEFAULT_WALL_COLOR = '#d7d1c7';
-const DEFAULT_FLOOR_COLOR = '#8b6f57';
+const DEFAULT_FLOOR_COLOR = '#ece8df';
+const DEFAULT_BATH_FLOOR_COLOR = '#ffffff';
 const DEFAULT_CEILING_COLOR = '#e4e8ed';
 const DEFAULT_DOOR_COLOR = '#9f7b59';
 const DEFAULT_DECK_COLOR = '#9d8163';
@@ -422,6 +423,49 @@ function createSurfaceObject(surface, scaleX, scaleZ, y, thickness, type) {
     rotation: [0, 0, 0],
     color: surface.color,
   };
+}
+
+function isBathLabel(label) {
+  if (!label) {
+    return false;
+  }
+
+  if (typeof label === 'string') {
+    const normalized = label.toLowerCase();
+    return normalized.includes('bath') || normalized.includes('bathroom') || label.includes('욕실');
+  }
+
+  const values = Object.values(label)
+    .filter((value) => typeof value === 'string')
+    .map((value) => value.toLowerCase());
+
+  return (
+    values.some((value) => value.includes('bath') || value.includes('bathroom')) ||
+    Object.values(label).some(
+      (value) => typeof value === 'string' && value.includes('욕실'),
+    )
+  );
+}
+
+function createTemplateBathFloorSurfaces(template, scaleX, scaleZ, thickness) {
+  return (template.rooms ?? [])
+    .filter((room) => isBathLabel(room.label))
+    .map((room) =>
+      createSurfaceObject(
+        {
+          x: room.x,
+          z: room.z,
+          width: Math.max(0.8, room.width - 0.08),
+          depth: Math.max(0.8, room.depth - 0.08),
+          color: DEFAULT_BATH_FLOOR_COLOR,
+        },
+        scaleX,
+        scaleZ,
+        Math.min(0.012, thickness * 0.14),
+        Math.max(0.05, thickness * 0.72),
+        'floorPanel',
+      ),
+    );
 }
 
 function createWallObject(segment, scaleX, scaleZ, wallHeight, wallThickness) {
@@ -1053,7 +1097,8 @@ function buildCustomHouseObjects({
           dimensions: [bounds.width, surfaceThickness, bounds.depth],
           position: [bounds.centerX, 0, bounds.centerZ],
           rotation: [0, 0, 0],
-          color: DEFAULT_FLOOR_COLOR,
+          color:
+            roomType === 'bath' ? DEFAULT_BATH_FLOOR_COLOR : DEFAULT_FLOOR_COLOR,
         });
       });
     });
@@ -1213,6 +1258,15 @@ export function buildHouseObjects(config) {
         createSurfaceObject(surface, scaleX, scaleZ, 0, surfaceThickness, 'floorPanel'),
       );
     });
+
+    objects.push(
+      ...createTemplateBathFloorSurfaces(
+        template,
+        scaleX,
+        scaleZ,
+        surfaceThickness,
+      ),
+    );
   }
 
   if (includeCeiling) {

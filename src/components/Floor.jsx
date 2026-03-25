@@ -16,9 +16,9 @@ const Floor = () => {
                 }}
             >
                 <planeGeometry args={[40, 40]} />
-                <meshStandardMaterial color="#232832" />
+                <meshStandardMaterial color="#ddd8d0" />
             </mesh>
-            <gridHelper args={[40, 40, 0x4d5a70, 0x2f3948]} />
+            <gridHelper args={[40, 40, 0xb0a79a, 0xcac2b5]} />
         </group>
     );
 };

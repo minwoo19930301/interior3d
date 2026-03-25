@@ -240,7 +240,13 @@ function TilePlannerPreview({ preview, selectedTileType, onPaintTile, locale }) 
   );
 }
 
-const RoomPlannerModal = ({ isOpen, unitSystem, onClose, onCreate }) => {
+const RoomPlannerModal = ({
+  isOpen,
+  isMobile = false,
+  unitSystem,
+  onClose,
+  onCreate,
+}) => {
   const locale = getBrowserLocale();
   const [plannerState, setPlannerState] = useState(() =>
     createPlannerState(HOUSE_TEMPLATES[0].id),
@@ -435,22 +441,24 @@ const RoomPlannerModal = ({ isOpen, unitSystem, onClose, onCreate }) => {
         inset: 0,
         background: 'rgba(5, 8, 12, 0.7)',
         display: 'flex',
-        alignItems: 'center',
+        alignItems: isMobile ? 'flex-end' : 'center',
         justifyContent: 'center',
         zIndex: 30,
-        padding: '24px',
+        padding: isMobile ? '12px 12px 0' : '24px',
       }}
     >
       <div
         style={{
-          width: 'min(1080px, 100%)',
-          maxHeight: 'min(820px, calc(100vh - 48px))',
+          width: isMobile ? '100%' : 'min(1080px, 100%)',
+          maxHeight: isMobile
+            ? 'min(78vh, calc(100vh - 12px))'
+            : 'min(820px, calc(100vh - 48px))',
           overflowY: 'auto',
           background: '#11161f',
           border: '1px solid rgba(255,255,255,0.08)',
-          borderRadius: '24px',
+          borderRadius: isMobile ? '24px 24px 0 0' : '24px',
           boxShadow: '0 32px 80px rgba(0,0,0,0.35)',
-          padding: '24px',
+          padding: isMobile ? '18px' : '24px',
           color: '#fff',
         }}
       >
@@ -487,7 +495,9 @@ const RoomPlannerModal = ({ isOpen, unitSystem, onClose, onCreate }) => {
         <div
           style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
+            gridTemplateColumns: isMobile
+              ? '1fr'
+              : 'repeat(auto-fit, minmax(300px, 1fr))',
             gap: '20px',
           }}
         >
@@ -635,7 +645,9 @@ const RoomPlannerModal = ({ isOpen, unitSystem, onClose, onCreate }) => {
                 background: '#161d27',
                 border: '1px solid rgba(255,255,255,0.06)',
                 display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
+                gridTemplateColumns: isMobile
+                  ? '1fr'
+                  : 'repeat(auto-fit, minmax(180px, 1fr))',
                 gap: '14px',
               }}
             >

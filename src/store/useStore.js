@@ -211,7 +211,12 @@ const useStore = create((set, get) => ({
 
   setTransformMode: (transformMode) =>
     set({
-      transformMode: transformMode === 'rotate' ? 'rotate' : 'translate',
+      transformMode:
+        transformMode === 'rotate'
+          ? 'rotate'
+          : transformMode === 'resize'
+            ? 'resize'
+            : 'translate',
     }),
 
   setCameraMode: (cameraMode) =>

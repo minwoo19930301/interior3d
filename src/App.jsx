@@ -247,6 +247,7 @@ function App() {
           {isRoomPlannerOpen ? (
             <RoomPlannerModal
               isOpen={isRoomPlannerOpen}
+              isMobile={isMobileLayout}
               unitSystem={unitSystem}
               onClose={() => setIsRoomPlannerOpen(false)}
               onCreate={handleCreateRoom}
@@ -330,6 +331,18 @@ function App() {
                   }}
                 >
                   {t('ui_rotate', locale)}
+                </button>
+                <button
+                  onClick={() => setTransformMode('resize')}
+                  style={{
+                    border: 'none',
+                    padding: '0.35rem 0.7rem',
+                    background:
+                      transformMode === 'resize' ? '#e08a4f' : 'transparent',
+                    color: '#fff',
+                  }}
+                >
+                  {t('ui_resize', locale)}
                 </button>
               </div>
 
@@ -474,9 +487,10 @@ function App() {
               <div
                 style={{
                   position: 'absolute',
-                  top: 12,
                   left: 12,
+                  right: 12,
                   bottom: 12,
+                  maxHeight: 'min(68vh, 620px)',
                   zIndex: 19,
                   pointerEvents: 'auto',
                 }}
@@ -505,8 +519,8 @@ function App() {
                 style={{
                   position: 'absolute',
                   left: 12,
-                  right: 12,
                   bottom: 12,
+                  right: 12,
                   maxHeight: 'min(68vh, 620px)',
                   zIndex: 19,
                   pointerEvents: 'auto',

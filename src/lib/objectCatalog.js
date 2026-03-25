@@ -39,7 +39,7 @@ export const OBJECT_CATALOG = [
     group: 'structure',
     dimensions: [3.2, 0.12, 3.2],
     minDimensions: [1, 0.05, 1],
-    color: '#8b6f57',
+    color: '#ece8df',
   },
   {
     id: 'ceilingPanel',
@@ -195,6 +195,7 @@ const OBJECT_CATALOG_BY_ID = Object.fromEntries(
 );
 
 const COLOR_PATTERN = /^#[0-9a-f]{6}$/i;
+const FREE_Y_POSITION_TYPES = new Set(['ceilingPanel', 'floorPanel']);
 
 export function getObjectDefinition(type) {
   return OBJECT_CATALOG_BY_ID[type] ?? OBJECT_CATALOG_BY_ID.cube;
@@ -234,7 +235,7 @@ export function normalizeVector(value, fallback) {
 export function normalizePositionForType(type, value, fallback = [0, 0, 0]) {
   const nextPosition = normalizeVector(value, fallback);
 
-  if (type !== 'ceilingPanel') {
+  if (!FREE_Y_POSITION_TYPES.has(type)) {
     nextPosition[1] = 0;
   }
 
