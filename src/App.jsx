@@ -8,6 +8,7 @@ import useStore from './store/useStore';
 import { buildSceneUrl, syncSceneToUrl } from './lib/sceneUrl';
 import { buildHouseObjects } from './lib/roomBuilder';
 import { getObjectLabel, toDisplayValue } from './lib/objectCatalog';
+import { getBrowserLocale, t } from './lib/i18n';
 
 const MOBILE_BREAKPOINT = 960;
 
@@ -72,6 +73,7 @@ function actionButtonStyle(enabled) {
 }
 
 function App() {
+  const locale = getBrowserLocale();
   const objects = useStore((state) => state.objects);
   const selectedId = useStore((state) => state.selectedId);
   const unitSystem = useStore((state) => state.unitSystem);
@@ -99,6 +101,11 @@ function App() {
   useEffect(() => {
     syncSceneToUrl({ objects, unitSystem });
   }, [objects, unitSystem]);
+
+  useEffect(() => {
+    document.documentElement.lang = locale;
+    document.title = t('app_title', locale);
+  }, [locale]);
 
   useEffect(() => {
     if (shareStatus !== 'copied') {
@@ -268,16 +275,16 @@ function App() {
               }}
             >
               <div style={{ ...badgeStyle, color: '#9cb0c9' }}>
-                Grid {toDisplayValue(1, unitSystem)} {unitSystem}
+                {t('ui_grid', locale)} {toDisplayValue(1, unitSystem)} {unitSystem}
               </div>
               {!isMobileLayout ? (
                 <div style={{ ...badgeStyle, color: '#9cb0c9' }}>
-                  Scene {toDisplayValue(40, unitSystem)} x {toDisplayValue(40, unitSystem)} {unitSystem}
+                  {t('ui_scene', locale)} {toDisplayValue(40, unitSystem)} x {toDisplayValue(40, unitSystem)} {unitSystem}
                 </div>
               ) : null}
               {!isMobileLayout && selectedObject ? (
                 <div style={{ ...badgeStyle, color: '#f5f7fa' }}>
-                  {getObjectLabel(selectedObject.type)}{' '}
+                  {getObjectLabel(selectedObject.type, locale)}{' '}
                   {toDisplayValue(selectedObject.dimensions[0], unitSystem)} x{' '}
                   {toDisplayValue(selectedObject.dimensions[1], unitSystem)} x{' '}
                   {toDisplayValue(selectedObject.dimensions[2], unitSystem)} {unitSystem}
@@ -297,7 +304,7 @@ function App() {
               }}
             >
               <div style={{ display: 'flex', gap: '8px', ...badgeStyle }}>
-                <span style={{ color: '#8fa2bd' }}>Mode</span>
+                <span style={{ color: '#8fa2bd' }}>{t('ui_mode', locale)}</span>
                 <button
                   onClick={() => setTransformMode('translate')}
                   style={{
@@ -308,7 +315,7 @@ function App() {
                     color: '#fff',
                   }}
                 >
-                  Move
+                  {t('ui_move', locale)}
                 </button>
                 <button
                   onClick={() => setTransformMode('rotate')}
@@ -320,12 +327,12 @@ function App() {
                     color: '#fff',
                   }}
                 >
-                  Rotate
+                  {t('ui_rotate', locale)}
                 </button>
               </div>
 
               <div style={{ display: 'flex', gap: '8px', ...badgeStyle }}>
-                <span style={{ color: '#8fa2bd' }}>Units</span>
+                <span style={{ color: '#8fa2bd' }}>{t('ui_units', locale)}</span>
                 <button
                   onClick={() => setUnitSystem('m')}
                   style={{
@@ -356,21 +363,21 @@ function App() {
                   disabled={!selectedId}
                   style={actionButtonStyle(Boolean(selectedId))}
                 >
-                  Copy
+                  {t('ui_copy', locale)}
                 </button>
                 <button
                   onClick={() => pasteClipboardObject()}
                   disabled={!clipboardObject}
                   style={actionButtonStyle(Boolean(clipboardObject))}
                 >
-                  Paste
+                  {t('ui_paste', locale)}
                 </button>
                 <button
                   onClick={() => undo()}
                   disabled={historyPastLength === 0}
                   style={actionButtonStyle(historyPastLength > 0)}
                 >
-                  Undo
+                  {t('ui_undo', locale)}
                 </button>
               </div>
 
@@ -383,15 +390,15 @@ function App() {
                 }}
               >
                 {shareStatus === 'copied'
-                  ? 'Link copied'
+                  ? t('ui_link_copied', locale)
                   : shareStatus === 'error'
-                    ? 'Copy failed'
-                    : 'Copy share link'}
+                    ? t('ui_copy_failed', locale)
+                    : t('ui_copy_share_link', locale)}
               </button>
 
               {!isMobileLayout ? (
                 <div style={{ ...badgeStyle, color: '#8fa2bd' }}>
-                  {objects.length} items
+                  {objects.length} {t('ui_items', locale)}
                 </div>
               ) : null}
             </div>
@@ -411,16 +418,16 @@ function App() {
               }}
             >
               <button onClick={toggleSidebar} style={mobileButtonStyle(isSidebarOpen)}>
-                Structure
+                {t('ui_structure_panel', locale)}
               </button>
               <button
                 onClick={toggleProperties}
                 style={mobileButtonStyle(isPropertiesOpen)}
               >
-                Properties
+                {t('ui_properties_panel', locale)}
               </button>
               <button onClick={openPlanner} style={mobileButtonStyle(false)}>
-                House
+                {t('ui_house_panel', locale)}
               </button>
             </div>
           ) : null}

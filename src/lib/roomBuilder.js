@@ -1,3 +1,5 @@
+import { localizeText } from './i18n';
+
 const DEFAULT_WALL_COLOR = '#d7d1c7';
 const DEFAULT_FLOOR_COLOR = '#8b6f57';
 const DEFAULT_CEILING_COLOR = '#e4e8ed';
@@ -6,8 +8,14 @@ const DEFAULT_DECK_COLOR = '#9d8163';
 const DEFAULT_WIDTH_MULTIPLIER = 1.25;
 const DEFAULT_DEPTH_MULTIPLIER = 1.18;
 
+export const CUSTOM_TEMPLATE_ID = 'custom';
+
 function roundPlanValue(value) {
   return Math.round(value * 100) / 100;
+}
+
+function clampValue(value, min, max) {
+  return Math.min(max, Math.max(min, value));
 }
 
 function getSurfaceThickness(wallThickness) {
@@ -17,14 +25,17 @@ function getSurfaceThickness(wallThickness) {
 export const HOUSE_TEMPLATES = [
   {
     id: 'compact-one-bedroom',
-    label: 'Compact 1BR',
-    description: 'Bedroom, living room, kitchen, and bath in one compact shell.',
+    label: { en: 'Compact 1BR', ko: '컴팩트 1베드' },
+    description: {
+      en: 'Bedroom, living room, kitchen, and bath in one compact shell.',
+      ko: '침실, 거실, 주방, 욕실이 한 번에 들어가는 컴팩트한 구성입니다.',
+    },
     footprint: { width: 6.4, depth: 4.2 },
     rooms: [
-      { label: 'Bedroom', x: -1.95, z: -1.2, width: 2.5, depth: 1.8 },
-      { label: 'Living', x: -1.5, z: 1.0, width: 3.4, depth: 1.9 },
-      { label: 'Kitchen', x: 2.05, z: -1.0, width: 2.2, depth: 1.8 },
-      { label: 'Bath', x: 2.05, z: 1.15, width: 2.2, depth: 1.7 },
+      { label: { en: 'Bedroom', ko: '침실' }, x: -1.95, z: -1.2, width: 2.5, depth: 1.8 },
+      { label: { en: 'Living', ko: '거실' }, x: -1.5, z: 1.0, width: 3.4, depth: 1.9 },
+      { label: { en: 'Kitchen', ko: '주방' }, x: 2.05, z: -1.0, width: 2.2, depth: 1.8 },
+      { label: { en: 'Bath', ko: '욕실' }, x: 2.05, z: 1.15, width: 2.2, depth: 1.7 },
     ],
     surfaces: [
       { x: 0, z: 0, width: 6.4, depth: 4.2, color: DEFAULT_FLOOR_COLOR },
@@ -44,25 +55,28 @@ export const HOUSE_TEMPLATES = [
       { from: [0.9, 0.3], to: [3.2, 0.3] },
     ],
     doors: [
-      { x: -3.2, z: 0.25, width: 0.9, axis: 'v', outer: true },
-      { x: -1.7, z: -0.3, width: 0.9, axis: 'h' },
-      { x: 0.9, z: -0.8, width: 0.82, axis: 'v' },
-      { x: 0.9, z: 1.0, width: 0.82, axis: 'v' },
+      { x: -3.2, z: 0.25, width: 0.9, axis: 'v', outer: true, swing: 'right' },
+      { x: -1.7, z: -0.3, width: 0.9, axis: 'h', swing: 'left' },
+      { x: 0.9, z: -0.8, width: 0.82, axis: 'v', swing: 'left' },
+      { x: 0.9, z: 1.0, width: 0.82, axis: 'v', swing: 'right' },
     ],
   },
   {
     id: 'hallway-family',
-    label: 'Hallway Family',
-    description: 'Wide corridor plan with separated bedroom, bath, kitchen, and living zones.',
+    label: { en: 'Hallway Family', ko: '복도형 패밀리' },
+    description: {
+      en: 'Wide corridor plan with separated bedroom, bath, kitchen, and living zones.',
+      ko: '복도를 중심으로 침실, 욕실, 주방, 거실이 분리된 구성입니다.',
+    },
     footprint: { width: 9.6, depth: 6.8 },
     rooms: [
-      { label: 'Dress', x: -3.9, z: -2.35, width: 1.6, depth: 2.1 },
-      { label: 'Bath', x: -2.1, z: -2.35, width: 1.8, depth: 2.1 },
-      { label: 'Hall', x: -0.1, z: -2.35, width: 2.2, depth: 2.1 },
-      { label: 'Kitchen', x: 2.2, z: -2.2, width: 2.4, depth: 2.4 },
-      { label: 'Laundry', x: 4.1, z: -2.2, width: 1.4, depth: 2.4 },
-      { label: 'Bedroom', x: -3.1, z: 2.1, width: 3.4, depth: 2.6 },
-      { label: 'Living', x: 2.6, z: 2.1, width: 4.4, depth: 2.6 },
+      { label: { en: 'Dress', ko: '드레스룸' }, x: -3.9, z: -2.35, width: 1.6, depth: 2.1 },
+      { label: { en: 'Bath', ko: '욕실' }, x: -2.1, z: -2.35, width: 1.8, depth: 2.1 },
+      { label: { en: 'Hall', ko: '복도' }, x: -0.1, z: -2.35, width: 2.2, depth: 2.1 },
+      { label: { en: 'Kitchen', ko: '주방' }, x: 2.2, z: -2.2, width: 2.4, depth: 2.4 },
+      { label: { en: 'Laundry', ko: '다용도실' }, x: 4.1, z: -2.2, width: 1.4, depth: 2.4 },
+      { label: { en: 'Bedroom', ko: '안방' }, x: -3.1, z: 2.1, width: 3.4, depth: 2.6 },
+      { label: { en: 'Living', ko: '거실' }, x: 2.6, z: 2.1, width: 4.4, depth: 2.6 },
     ],
     surfaces: [
       { x: 0, z: 0, width: 9.6, depth: 6.8, color: DEFAULT_FLOOR_COLOR },
@@ -90,28 +104,31 @@ export const HOUSE_TEMPLATES = [
       { from: [-1.4, 0.8], to: [-1.4, 3.4] },
     ],
     doors: [
-      { x: 4.8, z: 0, width: 1.0, axis: 'v', outer: true },
-      { x: -2.1, z: -1.3, width: 0.9, axis: 'h' },
-      { x: 2.2, z: -1.0, width: 1.0, axis: 'h' },
-      { x: 4.1, z: -1.0, width: 0.8, axis: 'h' },
-      { x: -2.3, z: 0.8, width: 0.9, axis: 'h' },
-      { x: 1.1, z: 0.8, width: 1.0, axis: 'h' },
+      { x: 4.8, z: 0, width: 1.0, axis: 'v', outer: true, swing: 'left' },
+      { x: -2.1, z: -1.3, width: 0.9, axis: 'h', swing: 'right' },
+      { x: 2.2, z: -1.0, width: 1.0, axis: 'h', swing: 'left' },
+      { x: 4.1, z: -1.0, width: 0.8, axis: 'h', swing: 'left' },
+      { x: -2.3, z: 0.8, width: 0.9, axis: 'h', swing: 'right' },
+      { x: 1.1, z: 0.8, width: 1.0, axis: 'h', swing: 'left' },
     ],
   },
   {
     id: 'deck-house',
-    label: 'Deck House',
-    description: 'Service rooms up front, open living space, and wraparound deck surfaces.',
+    label: { en: 'Deck House', ko: '데크형 하우스' },
+    description: {
+      en: 'Service rooms up front, open living space, and wraparound deck surfaces.',
+      ko: '서비스 공간과 오픈 거실, 데크가 함께 들어가는 구성입니다.',
+    },
     footprint: { width: 7.8, depth: 6.5 },
     rooms: [
-      { label: 'Bath', x: -2.35, z: -1.8, width: 1.3, depth: 1.2 },
-      { label: 'Laundry', x: -2.35, z: -0.5, width: 1.3, depth: 1.2 },
-      { label: 'Kitchen', x: -1.5, z: 1.15, width: 2.4, depth: 2.2 },
-      { label: 'Entry', x: -0.7, z: -1.7, width: 1.4, depth: 1.3 },
-      { label: 'Bedroom', x: 1.8, z: -1.4, width: 2.4, depth: 1.7 },
-      { label: 'Living', x: 1.6, z: 1.0, width: 2.8, depth: 2.2 },
-      { label: 'Deck', x: -0.7, z: 3.15, width: 3.4, depth: 1.8, accent: '#83674f' },
-      { label: 'Deck', x: 3.7, z: 0.55, width: 1.2, depth: 4.2, accent: '#83674f' },
+      { label: { en: 'Bath', ko: '욕실' }, x: -2.35, z: -1.8, width: 1.3, depth: 1.2 },
+      { label: { en: 'Laundry', ko: '세탁실' }, x: -2.35, z: -0.5, width: 1.3, depth: 1.2 },
+      { label: { en: 'Kitchen', ko: '주방' }, x: -1.5, z: 1.15, width: 2.4, depth: 2.2 },
+      { label: { en: 'Entry', ko: '현관' }, x: -0.7, z: -1.7, width: 1.4, depth: 1.3 },
+      { label: { en: 'Bedroom', ko: '침실' }, x: 1.8, z: -1.4, width: 2.4, depth: 1.7 },
+      { label: { en: 'Living', ko: '거실' }, x: 1.6, z: 1.0, width: 2.8, depth: 2.2 },
+      { label: { en: 'Deck', ko: '데크' }, x: -0.7, z: 3.15, width: 3.4, depth: 1.8, accent: '#83674f' },
+      { label: { en: 'Deck', ko: '데크' }, x: 3.7, z: 0.55, width: 1.2, depth: 4.2, accent: '#83674f' },
     ],
     surfaces: [
       { x: 0, z: 0, width: 6.2, depth: 4.8, color: DEFAULT_FLOOR_COLOR },
@@ -135,11 +152,11 @@ export const HOUSE_TEMPLATES = [
       { from: [0.3, -0.4], to: [3.1, -0.4] },
     ],
     doors: [
-      { x: -0.62, z: -2.4, width: 0.95, axis: 'h', outer: true },
-      { x: -1.8, z: -1.15, width: 0.8, axis: 'v' },
-      { x: -1.8, z: -0.25, width: 0.8, axis: 'v' },
-      { x: 0.3, z: -1.1, width: 0.9, axis: 'v' },
-      { x: 0.3, z: 0.55, width: 0.9, axis: 'v' },
+      { x: -0.62, z: -2.4, width: 0.95, axis: 'h', outer: true, swing: 'right' },
+      { x: -1.8, z: -1.15, width: 0.8, axis: 'v', swing: 'left' },
+      { x: -1.8, z: -0.25, width: 0.8, axis: 'v', swing: 'left' },
+      { x: 0.3, z: -1.1, width: 0.9, axis: 'v', swing: 'right' },
+      { x: 0.3, z: 0.55, width: 0.9, axis: 'v', swing: 'left' },
     ],
   },
 ];
@@ -208,14 +225,263 @@ function createDoorObject(door, scaleX, scaleZ, wallHeight, wallThickness) {
     rotation: [0, door.axis === 'v' ? Math.PI / 2 : 0, 0],
     color: door.color ?? DEFAULT_DOOR_COLOR,
     isOpen: false,
+    swing: door.swing === 'right' ? 'right' : 'left',
   };
 }
 
+function getCustomSegments(total, count) {
+  const safeTotal = clampValue(total, 3.5, 24);
+  const safeCount = clampValue(Math.round(count), 1, 6);
+  const segment = roundPlanValue(safeTotal / safeCount);
+  return Array.from({ length: safeCount }, () => segment);
+}
+
+function buildCustomPreviewRooms(width, depth, columns, rows, locale) {
+  const columnSizes = getCustomSegments(width, columns);
+  const rowSizes = getCustomSegments(depth, rows);
+  const totalWidth = columnSizes.reduce((sum, item) => sum + item, 0);
+  const totalDepth = rowSizes.reduce((sum, item) => sum + item, 0);
+  const rooms = [];
+  let zCursor = -totalDepth / 2;
+  let roomIndex = 1;
+
+  rowSizes.forEach((rowDepth) => {
+    let xCursor = -totalWidth / 2;
+
+    columnSizes.forEach((columnWidth) => {
+      rooms.push({
+        label: {
+          en: `Room ${roomIndex}`,
+          ko: `방 ${roomIndex}`,
+        },
+        x: roundPlanValue(xCursor + columnWidth / 2),
+        z: roundPlanValue(zCursor + rowDepth / 2),
+        width: columnWidth,
+        depth: rowDepth,
+      });
+      roomIndex += 1;
+      xCursor += columnWidth;
+    });
+
+    zCursor += rowDepth;
+  });
+
+  return rooms.map((room) => ({
+    ...room,
+    labelText: localizeText(room.label, locale),
+  }));
+}
+
+function buildCustomHouseObjects({
+  width = 10,
+  depth = 8,
+  customColumns = 3,
+  customRows = 2,
+  wallHeight = 2.5,
+  wallThickness = 0.12,
+  includeFloor = true,
+  includeCeiling = false,
+  includeDoors = true,
+  includeOuterWalls = false,
+}) {
+  const safeWidth = clampValue(width, 3.5, 24);
+  const safeDepth = clampValue(depth, 3.5, 24);
+  const safeColumns = clampValue(Math.round(customColumns), 1, 6);
+  const safeRows = clampValue(Math.round(customRows), 1, 6);
+  const safeWallHeight = clampValue(wallHeight, 2.1, 4.2);
+  const safeWallThickness = clampValue(wallThickness, 0.08, 0.4);
+  const surfaceThickness = getSurfaceThickness(safeWallThickness);
+  const columnWidth = safeWidth / safeColumns;
+  const rowDepth = safeDepth / safeRows;
+  const objects = [];
+
+  if (includeFloor) {
+    objects.push({
+      type: 'floorPanel',
+      dimensions: [safeWidth, surfaceThickness, safeDepth],
+      position: [0, 0, 0],
+      rotation: [0, 0, 0],
+      color: DEFAULT_FLOOR_COLOR,
+    });
+  }
+
+  if (includeCeiling) {
+    objects.push({
+      type: 'ceilingPanel',
+      dimensions: [safeWidth, surfaceThickness, safeDepth],
+      position: [0, safeWallHeight - surfaceThickness, 0],
+      rotation: [0, 0, 0],
+      color: DEFAULT_CEILING_COLOR,
+    });
+  }
+
+  if (includeOuterWalls) {
+    objects.push(
+      {
+        type: 'wall',
+        dimensions: [safeWidth, safeWallHeight, safeWallThickness],
+        position: [0, 0, -(safeDepth / 2 - safeWallThickness / 2)],
+        rotation: [0, 0, 0],
+        color: DEFAULT_WALL_COLOR,
+      },
+      {
+        type: 'wall',
+        dimensions: [safeWidth, safeWallHeight, safeWallThickness],
+        position: [0, 0, safeDepth / 2 - safeWallThickness / 2],
+        rotation: [0, 0, 0],
+        color: DEFAULT_WALL_COLOR,
+      },
+      {
+        type: 'wall',
+        dimensions: [safeWallThickness, safeWallHeight, safeDepth],
+        position: [-(safeWidth / 2 - safeWallThickness / 2), 0, 0],
+        rotation: [0, 0, 0],
+        color: DEFAULT_WALL_COLOR,
+      },
+      {
+        type: 'wall',
+        dimensions: [safeWallThickness, safeWallHeight, safeDepth],
+        position: [safeWidth / 2 - safeWallThickness / 2, 0, 0],
+        rotation: [0, 0, 0],
+        color: DEFAULT_WALL_COLOR,
+      },
+    );
+  }
+
+  for (let columnIndex = 1; columnIndex < safeColumns; columnIndex += 1) {
+    objects.push({
+      type: 'wall',
+      dimensions: [safeWallThickness, safeWallHeight, safeDepth],
+      position: [
+        roundPlanValue(-safeWidth / 2 + columnWidth * columnIndex),
+        0,
+        0,
+      ],
+      rotation: [0, 0, 0],
+      color: DEFAULT_WALL_COLOR,
+    });
+
+    if (includeDoors) {
+      objects.push({
+        type: 'door',
+        dimensions: [0.9, Math.max(1.95, safeWallHeight - 0.18), safeWallThickness],
+        position: [
+          roundPlanValue(-safeWidth / 2 + columnWidth * columnIndex),
+          0,
+          roundPlanValue((columnIndex % 2 === 0 ? 1 : -1) * rowDepth * 0.24),
+        ],
+        rotation: [0, Math.PI / 2, 0],
+        color: DEFAULT_DOOR_COLOR,
+        isOpen: false,
+        swing: columnIndex % 2 === 0 ? 'right' : 'left',
+      });
+    }
+  }
+
+  for (let rowIndex = 1; rowIndex < safeRows; rowIndex += 1) {
+    objects.push({
+      type: 'wall',
+      dimensions: [safeWidth, safeWallHeight, safeWallThickness],
+      position: [
+        0,
+        0,
+        roundPlanValue(-safeDepth / 2 + rowDepth * rowIndex),
+      ],
+      rotation: [0, 0, 0],
+      color: DEFAULT_WALL_COLOR,
+    });
+
+    if (includeDoors) {
+      objects.push({
+        type: 'door',
+        dimensions: [0.9, Math.max(1.95, safeWallHeight - 0.18), safeWallThickness],
+        position: [
+          roundPlanValue((rowIndex % 2 === 0 ? -1 : 1) * columnWidth * 0.24),
+          0,
+          roundPlanValue(-safeDepth / 2 + rowDepth * rowIndex),
+        ],
+        rotation: [0, 0, 0],
+        color: DEFAULT_DOOR_COLOR,
+        isOpen: false,
+        swing: rowIndex % 2 === 0 ? 'right' : 'left',
+      });
+    }
+  }
+
+  if (includeOuterWalls && includeDoors) {
+    objects.push({
+      type: 'door',
+      dimensions: [0.95, Math.max(1.95, safeWallHeight - 0.18), safeWallThickness],
+      position: [0, 0, safeDepth / 2 - safeWallThickness / 2],
+      rotation: [0, 0, 0],
+      color: DEFAULT_DOOR_COLOR,
+      isOpen: false,
+      swing: 'left',
+    });
+  }
+
+  return objects;
+}
+
 export function getHouseTemplate(templateId) {
+  if (templateId === CUSTOM_TEMPLATE_ID) {
+    return {
+      id: CUSTOM_TEMPLATE_ID,
+      label: { en: 'Custom template', ko: '사용자 템플릿' },
+      description: {
+        en: 'Build your own shell with a simple room grid.',
+        ko: '방 격자를 정해서 직접 집 틀을 만듭니다.',
+      },
+      footprint: { width: 10, depth: 8 },
+      rooms: [],
+      surfaces: [],
+      walls: [],
+      doors: [],
+    };
+  }
+
   return HOUSE_TEMPLATE_MAP[templateId] ?? HOUSE_TEMPLATES[0];
 }
 
+export function getTemplateLabel(template, locale) {
+  return localizeText(template?.label ?? '', locale);
+}
+
+export function getTemplateDescription(template, locale) {
+  return localizeText(template?.description ?? '', locale);
+}
+
+export function getTemplateRooms(template, locale) {
+  return (template?.rooms ?? []).map((room) => ({
+    ...room,
+    labelText: localizeText(room.label, locale),
+  }));
+}
+
+export function getCustomTemplatePreview(config, locale) {
+  return {
+    footprint: {
+      width: clampValue(config.width ?? 10, 3.5, 24),
+      depth: clampValue(config.depth ?? 8, 3.5, 24),
+    },
+    rooms: buildCustomPreviewRooms(
+      config.width ?? 10,
+      config.depth ?? 8,
+      config.customColumns ?? 3,
+      config.customRows ?? 2,
+      locale,
+    ),
+  };
+}
+
 export function getDefaultHouseSize(templateId) {
+  if (templateId === CUSTOM_TEMPLATE_ID) {
+    return {
+      width: 11,
+      depth: 8.5,
+    };
+  }
+
   const template = getHouseTemplate(templateId);
 
   return {
@@ -224,24 +490,29 @@ export function getDefaultHouseSize(templateId) {
   };
 }
 
-export function buildHouseObjects({
-  templateId,
-  width,
-  depth,
-  wallHeight = 2.5,
-  wallThickness = 0.12,
-  includeFloor = true,
-  includeCeiling = false,
-  includeDoors = true,
-  includeOuterWalls = true,
-}) {
+export function buildHouseObjects(config) {
+  if (config.templateId === CUSTOM_TEMPLATE_ID) {
+    return buildCustomHouseObjects(config);
+  }
+
+  const {
+    templateId,
+    width,
+    depth,
+    wallHeight = 2.5,
+    wallThickness = 0.12,
+    includeFloor = true,
+    includeCeiling = false,
+    includeDoors = true,
+    includeOuterWalls = false,
+  } = config;
   const template = getHouseTemplate(templateId);
   const requestedWidth = Number.isFinite(width) ? width : template.footprint.width;
   const requestedDepth = Number.isFinite(depth) ? depth : template.footprint.depth;
-  const scaleX = Math.max(0.7, Math.min(2.2, requestedWidth / template.footprint.width));
-  const scaleZ = Math.max(0.7, Math.min(2.2, requestedDepth / template.footprint.depth));
-  const safeWallHeight = Math.max(2.1, wallHeight);
-  const safeWallThickness = Math.max(0.08, wallThickness);
+  const scaleX = clampValue(requestedWidth / template.footprint.width, 0.7, 2.2);
+  const scaleZ = clampValue(requestedDepth / template.footprint.depth, 0.7, 2.2);
+  const safeWallHeight = clampValue(wallHeight, 2.1, 4.2);
+  const safeWallThickness = clampValue(wallThickness, 0.08, 0.4);
   const surfaceThickness = getSurfaceThickness(safeWallThickness);
   const objects = [];
 

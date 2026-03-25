@@ -25,6 +25,7 @@ function createSceneObject(type, index) {
     dimensions: [...definition.dimensions],
     color: definition.color,
     isOpen: definition.openable ? false : undefined,
+    swing: definition.id === 'door' ? 'left' : undefined,
   };
 }
 
@@ -37,6 +38,7 @@ function cloneSceneObject(object) {
     dimensions: [...object.dimensions],
     color: object.color,
     isOpen: object.isOpen,
+    swing: object.swing,
   };
 }
 
@@ -48,6 +50,7 @@ function cloneClipboardObject(object) {
     dimensions: [...object.dimensions],
     color: object.color,
     isOpen: object.isOpen,
+    swing: object.swing,
   };
 }
 
@@ -89,6 +92,14 @@ function patchObject(currentObject, newData) {
         : definition.openable
           ? Boolean(currentObject.isOpen)
           : undefined,
+    swing:
+      definition.id === 'door'
+        ? newData.swing === 'right'
+          ? 'right'
+          : newData.swing === 'left'
+            ? 'left'
+            : currentObject.swing ?? 'left'
+        : undefined,
     color:
       newData.color !== undefined
         ? normalizeColor(newData.color, currentObject.color)
@@ -112,6 +123,7 @@ function createPastedObject(clipboardObject) {
     dimensions: [...clipboardObject.dimensions],
     color: clipboardObject.color,
     isOpen: clipboardObject.isOpen,
+    swing: clipboardObject.swing,
   };
 }
 

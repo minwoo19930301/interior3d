@@ -4,10 +4,16 @@ import {
   fromDisplayValue,
   toDisplayValue,
 } from '../lib/objectCatalog';
+import { getBrowserLocale, t } from '../lib/i18n';
 import {
+  CUSTOM_TEMPLATE_ID,
   HOUSE_TEMPLATES,
+  getCustomTemplatePreview,
   getDefaultHouseSize,
   getHouseTemplate,
+  getTemplateDescription,
+  getTemplateLabel,
+  getTemplateRooms,
 } from '../lib/roomBuilder';
 
 function createPlannerState(templateId) {
@@ -22,18 +28,36 @@ function createPlannerState(templateId) {
     includeFloor: true,
     includeCeiling: false,
     includeDoors: true,
-    includeOuterWalls: true,
+    includeOuterWalls: false,
     replaceExisting: true,
+    customColumns: 3,
+    customRows: 2,
   };
 }
 
-function TemplatePreview({ template, widthScale, depthScale }) {
+function getPreviewData(plannerState, locale) {
+  if (plannerState.templateId === CUSTOM_TEMPLATE_ID) {
+    return getCustomTemplatePreview(plannerState, locale);
+  }
+
+  const selectedTemplate = getHouseTemplate(plannerState.templateId);
+
+  return {
+    footprint: {
+      width: selectedTemplate.footprint.width,
+      depth: selectedTemplate.footprint.depth,
+    },
+    rooms: getTemplateRooms(selectedTemplate, locale),
+  };
+}
+
+function TemplatePreview({ preview, widthScale, depthScale }) {
   const previewWidth = 280;
   const previewHeight = 220;
   const inset = 16;
   const scale = Math.min(
-    (previewWidth - inset * 2) / (template.footprint.width * widthScale),
-    (previewHeight - inset * 2) / (template.footprint.depth * depthScale),
+    (previewWidth - inset * 2) / (preview.footprint.width * widthScale),
+    (previewHeight - inset * 2) / (preview.footprint.depth * depthScale),
   );
   const originX = previewWidth / 2;
   const originY = previewHeight / 2;
@@ -62,7 +86,7 @@ function TemplatePreview({ template, widthScale, depthScale }) {
         }}
       />
 
-      {template.rooms.map((room) => {
+      {preview.rooms.map((room) => {
         const width = room.width * widthScale * scale;
         const height = room.depth * depthScale * scale;
         const left = originX + room.x * widthScale * scale - width / 2;
@@ -70,7 +94,7 @@ function TemplatePreview({ template, widthScale, depthScale }) {
 
         return (
           <div
-            key={`${template.id}-${room.label}-${room.x}-${room.z}`}
+            key={`${room.labelText}-${room.x}-${room.z}`}
             style={{
               position: 'absolute',
               left,
@@ -94,7 +118,7 @@ function TemplatePreview({ template, widthScale, depthScale }) {
               padding: '6px',
             }}
           >
-            {room.label}
+            {room.labelText}
           </div>
         );
       })}
@@ -103,6 +127,7 @@ function TemplatePreview({ template, widthScale, depthScale }) {
 }
 
 const RoomPlannerModal = ({ isOpen, unitSystem, onClose, onCreate }) => {
+  const locale = getBrowserLocale();
   const [plannerState, setPlannerState] = useState(() =>
     createPlannerState(HOUSE_TEMPLATES[0].id),
   );
@@ -111,8 +136,13 @@ const RoomPlannerModal = ({ isOpen, unitSystem, onClose, onCreate }) => {
     () => getHouseTemplate(plannerState.templateId),
     [plannerState.templateId],
   );
-  const widthScale = plannerState.width / selectedTemplate.footprint.width;
-  const depthScale = plannerState.depth / selectedTemplate.footprint.depth;
+  const preview = useMemo(
+    () => getPreviewData(plannerState, locale),
+    [locale, plannerState],
+  );
+  const widthScale = plannerState.width / preview.footprint.width;
+  const depthScale = plannerState.depth / preview.footprint.depth;
+  const isCustomTemplate = plannerState.templateId === CUSTOM_TEMPLATE_ID;
 
   if (!isOpen) {
     return null;
@@ -127,18 +157,32 @@ const RoomPlannerModal = ({ isOpen, unitSystem, onClose, onCreate }) => {
 
   const updateMeasuredValue = (key, rawValue) => {
     const nextValue = fromDisplayValue(rawValue, unitSystem);
-    const minimums = {
-      width: selectedTemplate.footprint.width * 0.7,
-      depth: selectedTemplate.footprint.depth * 0.7,
-      wallHeight: 2.1,
-      wallThickness: 0.08,
-    };
-    const maximums = {
-      width: selectedTemplate.footprint.width * 2.2,
-      depth: selectedTemplate.footprint.depth * 2.2,
-      wallHeight: 4,
-      wallThickness: 0.4,
-    };
+    const minimums = isCustomTemplate
+      ? {
+          width: 3.5,
+          depth: 3.5,
+          wallHeight: 2.1,
+          wallThickness: 0.08,
+        }
+      : {
+          width: Math.max(3.5, selectedTemplate.footprint.width * 0.5),
+          depth: Math.max(3.5, selectedTemplate.footprint.depth * 0.5),
+          wallHeight: 2.1,
+          wallThickness: 0.08,
+        };
+    const maximums = isCustomTemplate
+      ? {
+          width: 24,
+          depth: 24,
+          wallHeight: 4.2,
+          wallThickness: 0.4,
+        }
+      : {
+          width: Math.min(24, selectedTemplate.footprint.width * 2.8),
+          depth: Math.min(24, selectedTemplate.footprint.depth * 2.8),
+          wallHeight: 4.2,
+          wallThickness: 0.4,
+        };
 
     updatePlanner({
       [key]: Math.min(
@@ -174,7 +218,7 @@ const RoomPlannerModal = ({ isOpen, unitSystem, onClose, onCreate }) => {
     >
       <div
         style={{
-          width: 'min(980px, 100%)',
+          width: 'min(1040px, 100%)',
           maxHeight: 'min(760px, calc(100vh - 48px))',
           overflowY: 'auto',
           background: '#11161f',
@@ -195,9 +239,9 @@ const RoomPlannerModal = ({ isOpen, unitSystem, onClose, onCreate }) => {
           }}
         >
           <div>
-            <h2 style={{ margin: 0, fontSize: '1.25rem' }}>House Planner</h2>
+            <h2 style={{ margin: 0, fontSize: '1.25rem' }}>{t('ui_template_house', locale)}</h2>
             <p style={{ margin: '8px 0 0 0', color: '#8c99ad', fontSize: '0.9rem' }}>
-              Start with a full-house template, then tune the footprint before placing furniture.
+              {t('ui_start_with_template', locale)}
             </p>
           </div>
 
@@ -211,7 +255,7 @@ const RoomPlannerModal = ({ isOpen, unitSystem, onClose, onCreate }) => {
               padding: '0.45rem 0.9rem',
             }}
           >
-            Close
+            {t('ui_close', locale)}
           </button>
         </div>
 
@@ -252,18 +296,44 @@ const RoomPlannerModal = ({ isOpen, unitSystem, onClose, onCreate }) => {
                   }}
                 >
                   <span style={{ fontSize: '0.95rem', fontWeight: 700 }}>
-                    {template.label}
+                    {getTemplateLabel(template, locale)}
                   </span>
                   <span style={{ color: '#8fa0b8', fontSize: '0.8rem', lineHeight: 1.45 }}>
-                    {template.description}
+                    {getTemplateDescription(template, locale)}
                   </span>
                   <span style={{ color: '#677489', fontSize: '0.72rem' }}>
-                    Base {toDisplayValue(template.footprint.width, unitSystem)} x{' '}
+                    {t('ui_base', locale)} {toDisplayValue(template.footprint.width, unitSystem)} x{' '}
                     {toDisplayValue(template.footprint.depth, unitSystem)} {unit.label}
                   </span>
                 </button>
               );
             })}
+
+            <button
+              onClick={() => applyTemplate(CUSTOM_TEMPLATE_ID)}
+              style={{
+                width: '100%',
+                textAlign: 'left',
+                padding: '16px',
+                borderRadius: '16px',
+                border: plannerState.templateId === CUSTOM_TEMPLATE_ID
+                  ? '1px solid rgba(79,140,255,0.7)'
+                  : '1px dashed rgba(255,255,255,0.18)',
+                background: plannerState.templateId === CUSTOM_TEMPLATE_ID ? '#192538' : '#141b24',
+                color: '#fff',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '8px',
+                marginTop: '8px',
+              }}
+            >
+              <span style={{ fontSize: '0.95rem', fontWeight: 700 }}>
+                {t('ui_create_template', locale)}
+              </span>
+              <span style={{ color: '#8fa0b8', fontSize: '0.8rem', lineHeight: 1.45 }}>
+                {t('ui_template_make', locale)}
+              </span>
+            </button>
           </div>
 
           <div
@@ -286,15 +356,19 @@ const RoomPlannerModal = ({ isOpen, unitSystem, onClose, onCreate }) => {
             >
               <div>
                 <div style={{ fontSize: '1rem', fontWeight: 700 }}>
-                  {selectedTemplate.label}
+                  {isCustomTemplate
+                    ? t('ui_custom_template', locale)
+                    : getTemplateLabel(selectedTemplate, locale)}
                 </div>
                 <div style={{ marginTop: '6px', color: '#8fa0b8', fontSize: '0.84rem' }}>
-                  {selectedTemplate.description}
+                  {isCustomTemplate
+                    ? t('ui_custom_template_help', locale)
+                    : getTemplateDescription(selectedTemplate, locale)}
                 </div>
               </div>
 
               <TemplatePreview
-                template={selectedTemplate}
+                preview={preview}
                 widthScale={widthScale}
                 depthScale={depthScale}
               />
@@ -309,12 +383,14 @@ const RoomPlannerModal = ({ isOpen, unitSystem, onClose, onCreate }) => {
                 }}
               >
                 <div>
-                  Width {toDisplayValue(plannerState.width, unitSystem)} {unit.label}
+                  {t('ui_width', locale)} {toDisplayValue(plannerState.width, unitSystem)} {unit.label}
                 </div>
                 <div>
-                  Depth {toDisplayValue(plannerState.depth, unitSystem)} {unit.label}
+                  {t('ui_depth', locale)} {toDisplayValue(plannerState.depth, unitSystem)} {unit.label}
                 </div>
-                <div>Zones {selectedTemplate.rooms.length}</div>
+                <div>
+                  {t('ui_zones', locale)} {preview.rooms.length}
+                </div>
               </div>
             </div>
 
@@ -329,115 +405,108 @@ const RoomPlannerModal = ({ isOpen, unitSystem, onClose, onCreate }) => {
                 gap: '14px',
               }}
             >
-              <label
-                style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: '6px',
-                  color: '#aab5c4',
-                  fontSize: '0.82rem',
-                }}
-              >
-                Width ({unit.label})
-                <input
-                  type="number"
-                  min="0"
-                  step={unit.step}
-                  value={toDisplayValue(plannerState.width, unitSystem)}
-                  onChange={(event) => updateMeasuredValue('width', event.target.value)}
+              {[
+                ['width', t('ui_width', locale)],
+                ['depth', t('ui_depth', locale)],
+                ['wallHeight', t('ui_wall_height', locale)],
+                ['wallThickness', t('ui_wall_thickness', locale)],
+              ].map(([key, label]) => (
+                <label
+                  key={key}
                   style={{
-                    width: '100%',
-                    background: '#1d2430',
-                    border: '1px solid rgba(255,255,255,0.08)',
-                    color: '#fff',
-                    padding: '10px 12px',
-                    borderRadius: '10px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '6px',
+                    color: '#aab5c4',
+                    fontSize: '0.82rem',
                   }}
-                />
-              </label>
+                >
+                  {label} ({unit.label})
+                  <input
+                    type="number"
+                    min="0"
+                    step={unit.step}
+                    value={toDisplayValue(plannerState[key], unitSystem)}
+                    onChange={(event) => updateMeasuredValue(key, event.target.value)}
+                    style={{
+                      width: '100%',
+                      background: '#1d2430',
+                      border: '1px solid rgba(255,255,255,0.08)',
+                      color: '#fff',
+                      padding: '10px 12px',
+                      borderRadius: '10px',
+                    }}
+                  />
+                </label>
+              ))}
 
-              <label
-                style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: '6px',
-                  color: '#aab5c4',
-                  fontSize: '0.82rem',
-                }}
-              >
-                Depth ({unit.label})
-                <input
-                  type="number"
-                  min="0"
-                  step={unit.step}
-                  value={toDisplayValue(plannerState.depth, unitSystem)}
-                  onChange={(event) => updateMeasuredValue('depth', event.target.value)}
-                  style={{
-                    width: '100%',
-                    background: '#1d2430',
-                    border: '1px solid rgba(255,255,255,0.08)',
-                    color: '#fff',
-                    padding: '10px 12px',
-                    borderRadius: '10px',
-                  }}
-                />
-              </label>
+              {isCustomTemplate ? (
+                <>
+                  <label
+                    style={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: '6px',
+                      color: '#aab5c4',
+                      fontSize: '0.82rem',
+                    }}
+                  >
+                    {t('ui_columns', locale)}
+                    <input
+                      type="number"
+                      min="1"
+                      max="6"
+                      step="1"
+                      value={plannerState.customColumns}
+                      onChange={(event) =>
+                        updatePlanner({
+                          customColumns: Math.max(1, Math.min(6, Number(event.target.value) || 1)),
+                        })
+                      }
+                      style={{
+                        width: '100%',
+                        background: '#1d2430',
+                        border: '1px solid rgba(255,255,255,0.08)',
+                        color: '#fff',
+                        padding: '10px 12px',
+                        borderRadius: '10px',
+                      }}
+                    />
+                  </label>
 
-              <label
-                style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: '6px',
-                  color: '#aab5c4',
-                  fontSize: '0.82rem',
-                }}
-              >
-                Wall Height ({unit.label})
-                <input
-                  type="number"
-                  min="0"
-                  step={unit.step}
-                  value={toDisplayValue(plannerState.wallHeight, unitSystem)}
-                  onChange={(event) => updateMeasuredValue('wallHeight', event.target.value)}
-                  style={{
-                    width: '100%',
-                    background: '#1d2430',
-                    border: '1px solid rgba(255,255,255,0.08)',
-                    color: '#fff',
-                    padding: '10px 12px',
-                    borderRadius: '10px',
-                  }}
-                />
-              </label>
-
-              <label
-                style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: '6px',
-                  color: '#aab5c4',
-                  fontSize: '0.82rem',
-                }}
-              >
-                Wall Thickness ({unit.label})
-                <input
-                  type="number"
-                  min="0"
-                  step={unit.step}
-                  value={toDisplayValue(plannerState.wallThickness, unitSystem)}
-                  onChange={(event) =>
-                    updateMeasuredValue('wallThickness', event.target.value)
-                  }
-                  style={{
-                    width: '100%',
-                    background: '#1d2430',
-                    border: '1px solid rgba(255,255,255,0.08)',
-                    color: '#fff',
-                    padding: '10px 12px',
-                    borderRadius: '10px',
-                  }}
-                />
-              </label>
+                  <label
+                    style={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: '6px',
+                      color: '#aab5c4',
+                      fontSize: '0.82rem',
+                    }}
+                  >
+                    {t('ui_rows', locale)}
+                    <input
+                      type="number"
+                      min="1"
+                      max="6"
+                      step="1"
+                      value={plannerState.customRows}
+                      onChange={(event) =>
+                        updatePlanner({
+                          customRows: Math.max(1, Math.min(6, Number(event.target.value) || 1)),
+                        })
+                      }
+                      style={{
+                        width: '100%',
+                        background: '#1d2430',
+                        border: '1px solid rgba(255,255,255,0.08)',
+                        color: '#fff',
+                        padding: '10px 12px',
+                        borderRadius: '10px',
+                      }}
+                    />
+                  </label>
+                </>
+              ) : null}
 
               <div
                 style={{
@@ -449,11 +518,11 @@ const RoomPlannerModal = ({ isOpen, unitSystem, onClose, onCreate }) => {
                 }}
               >
                 {[
-                  ['includeFloor', 'Include floor'],
-                  ['includeCeiling', 'Include ceiling'],
-                  ['includeOuterWalls', 'Include outer walls'],
-                  ['includeDoors', 'Add doors'],
-                  ['replaceExisting', 'Replace current scene'],
+                  ['includeFloor', t('ui_include_floor', locale)],
+                  ['includeCeiling', t('ui_include_ceiling', locale)],
+                  ['includeOuterWalls', t('ui_include_outer_walls', locale)],
+                  ['includeDoors', t('ui_add_doors', locale)],
+                  ['replaceExisting', t('ui_replace_scene', locale)],
                 ].map(([key, label]) => (
                   <label
                     key={key}
@@ -496,7 +565,7 @@ const RoomPlannerModal = ({ isOpen, unitSystem, onClose, onCreate }) => {
               padding: '0.75rem 1rem',
             }}
           >
-            Cancel
+            {t('ui_cancel', locale)}
           </button>
           <button
             onClick={() => onCreate(plannerState)}
@@ -509,7 +578,7 @@ const RoomPlannerModal = ({ isOpen, unitSystem, onClose, onCreate }) => {
               fontWeight: 700,
             }}
           >
-            Build house
+            {t('ui_build_house', locale)}
           </button>
         </div>
       </div>

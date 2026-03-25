@@ -1,6 +1,6 @@
 import React from 'react';
 import { Canvas } from '@react-three/fiber';
-import { OrbitControls, SoftShadows } from '@react-three/drei';
+import { OrbitControls } from '@react-three/drei';
 import Floor from './Floor';
 import Furniture from './Furniture';
 import useStore from '../store/useStore';
@@ -16,18 +16,18 @@ const Scene = () => {
     return (
         <Canvas
             shadows
+            dpr={[1, 1.5]}
             camera={{ position: [9, 7.5, 9], fov: 44 }}
             style={{ width: '100%', height: '100%' }}
             onPointerMissed={() => selectObject(null)}
         >
             <color attach="background" args={['#11151d']} />
-            <SoftShadows />
             <ambientLight intensity={0.6} />
             <directionalLight
                 position={[10, 12, 8]}
                 intensity={1.1}
                 castShadow
-                shadow-mapSize={[2048, 2048]}
+                shadow-mapSize={[1024, 1024]}
             />
             <directionalLight position={[-8, 10, -6]} intensity={0.25} />
 
@@ -45,6 +45,7 @@ const Scene = () => {
                     transformMode={transformMode}
                     isSelected={obj.id === selectedId}
                     isOpen={obj.isOpen}
+                    swing={obj.swing}
                     onClick={(e) => {
                         e.stopPropagation();
                         selectObject(obj.id);

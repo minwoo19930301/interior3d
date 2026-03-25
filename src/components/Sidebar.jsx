@@ -3,12 +3,16 @@ import useStore from '../store/useStore';
 import {
   OBJECT_CATALOG,
   OBJECT_GROUPS,
+  getObjectGroupLabel,
+  getObjectLabel,
   toDisplayValue,
 } from '../lib/objectCatalog';
+import { getBrowserLocale, t } from '../lib/i18n';
 
 const Sidebar = ({ onOpenRoomPlanner, isMobile = false, onClose }) => {
   const addObject = useStore((state) => state.addObject);
   const unitSystem = useStore((state) => state.unitSystem);
+  const locale = getBrowserLocale();
 
   return (
     <div
@@ -38,7 +42,7 @@ const Sidebar = ({ onOpenRoomPlanner, isMobile = false, onClose }) => {
             gap: '12px',
           }}
         >
-          <h2 style={{ margin: 0, fontSize: '1rem' }}>Structure</h2>
+          <h2 style={{ margin: 0, fontSize: '1rem' }}>{t('ui_structure_panel', locale)}</h2>
           <button
             onClick={onClose}
             style={{
@@ -49,7 +53,7 @@ const Sidebar = ({ onOpenRoomPlanner, isMobile = false, onClose }) => {
               padding: '0.4rem 0.8rem',
             }}
           >
-            Close
+            {t('ui_close', locale)}
           </button>
         </div>
       ) : null}
@@ -68,7 +72,7 @@ const Sidebar = ({ onOpenRoomPlanner, isMobile = false, onClose }) => {
                 color: '#7f8da3',
               }}
             >
-              {group.label}
+              {getObjectGroupLabel(group.id, locale)}
             </h3>
 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
@@ -93,7 +97,7 @@ const Sidebar = ({ onOpenRoomPlanner, isMobile = false, onClose }) => {
                   }}
                 >
                   <span style={{ fontSize: '0.92rem', fontWeight: 600 }}>
-                    {item.label}
+                    {getObjectLabel(item.id, locale)}
                   </span>
                   <span
                     style={{
@@ -103,7 +107,7 @@ const Sidebar = ({ onOpenRoomPlanner, isMobile = false, onClose }) => {
                     }}
                   >
                     {item.planner
-                      ? 'Preset layouts'
+                      ? t('ui_preset_layouts', locale)
                       : `${toDisplayValue(item.dimensions[0], unitSystem)} x ${toDisplayValue(item.dimensions[1], unitSystem)} x ${toDisplayValue(item.dimensions[2], unitSystem)} ${unitSystem}`}
                   </span>
                 </button>

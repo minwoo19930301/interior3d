@@ -1,3 +1,5 @@
+import { localizeText } from './i18n';
+
 const GENERIC_MIN_DIMENSIONS = [0.2, 0.2, 0.05];
 
 export const UNIT_SYSTEMS = {
@@ -6,17 +8,17 @@ export const UNIT_SYSTEMS = {
 };
 
 export const OBJECT_GROUPS = [
-  { id: 'structure', label: 'Structure' },
-  { id: 'living', label: 'Living' },
-  { id: 'work', label: 'Work' },
-  { id: 'appliance', label: 'Appliance' },
-  { id: 'bath', label: 'Bath & Kitchen' },
+  { id: 'structure', label: { en: 'Structure', ko: '구조' } },
+  { id: 'living', label: { en: 'Living', ko: '거실' } },
+  { id: 'work', label: { en: 'Work', ko: '작업' } },
+  { id: 'appliance', label: { en: 'Appliance', ko: '가전' } },
+  { id: 'bath', label: { en: 'Bath & Kitchen', ko: '욕실·주방' } },
 ];
 
 export const OBJECT_CATALOG = [
   {
     id: 'room',
-    label: 'House',
+    label: { en: 'House', ko: '집' },
     group: 'structure',
     dimensions: [4, 2.4, 4],
     minDimensions: [2, 2, 2],
@@ -25,7 +27,7 @@ export const OBJECT_CATALOG = [
   },
   {
     id: 'wall',
-    label: 'Wall',
+    label: { en: 'Wall', ko: '벽' },
     group: 'structure',
     dimensions: [3.2, 2.4, 0.12],
     minDimensions: [0.6, 1.4, 0.05],
@@ -33,7 +35,7 @@ export const OBJECT_CATALOG = [
   },
   {
     id: 'floorPanel',
-    label: 'Floor',
+    label: { en: 'Floor', ko: '바닥' },
     group: 'structure',
     dimensions: [3.2, 0.12, 3.2],
     minDimensions: [1, 0.05, 1],
@@ -41,7 +43,7 @@ export const OBJECT_CATALOG = [
   },
   {
     id: 'ceilingPanel',
-    label: 'Ceiling',
+    label: { en: 'Ceiling', ko: '천장' },
     group: 'structure',
     dimensions: [3.2, 0.12, 3.2],
     minDimensions: [1, 0.05, 1],
@@ -49,7 +51,7 @@ export const OBJECT_CATALOG = [
   },
   {
     id: 'door',
-    label: 'Door',
+    label: { en: 'Door', ko: '문' },
     group: 'structure',
     dimensions: [0.9, 2.1, 0.12],
     minDimensions: [0.7, 1.9, 0.08],
@@ -58,7 +60,7 @@ export const OBJECT_CATALOG = [
   },
   {
     id: 'cube',
-    label: 'Cube',
+    label: { en: 'Cube', ko: '큐브' },
     group: 'structure',
     dimensions: [1, 1, 1],
     minDimensions: [0.2, 0.2, 0.2],
@@ -66,7 +68,7 @@ export const OBJECT_CATALOG = [
   },
   {
     id: 'sofa',
-    label: 'Sofa',
+    label: { en: 'Sofa', ko: '소파' },
     group: 'living',
     dimensions: [2.1, 0.85, 0.92],
     minDimensions: [1.1, 0.6, 0.5],
@@ -74,7 +76,7 @@ export const OBJECT_CATALOG = [
   },
   {
     id: 'bed',
-    label: 'Bed',
+    label: { en: 'Bed', ko: '침대' },
     group: 'living',
     dimensions: [1.7, 0.72, 2.2],
     minDimensions: [1.1, 0.4, 1.7],
@@ -82,7 +84,7 @@ export const OBJECT_CATALOG = [
   },
   {
     id: 'chair',
-    label: 'Chair',
+    label: { en: 'Chair', ko: '의자' },
     group: 'living',
     dimensions: [0.52, 0.92, 0.54],
     minDimensions: [0.3, 0.45, 0.3],
@@ -90,7 +92,7 @@ export const OBJECT_CATALOG = [
   },
   {
     id: 'table',
-    label: 'Table',
+    label: { en: 'Table', ko: '테이블' },
     group: 'living',
     dimensions: [1.6, 0.75, 0.92],
     minDimensions: [0.7, 0.55, 0.5],
@@ -98,7 +100,7 @@ export const OBJECT_CATALOG = [
   },
   {
     id: 'desk',
-    label: 'Desk',
+    label: { en: 'Desk', ko: '책상' },
     group: 'work',
     dimensions: [1.4, 0.75, 0.7],
     minDimensions: [0.8, 0.6, 0.45],
@@ -106,7 +108,7 @@ export const OBJECT_CATALOG = [
   },
   {
     id: 'tv',
-    label: 'TV',
+    label: { en: 'TV', ko: 'TV' },
     group: 'work',
     dimensions: [1.4, 0.9, 0.12],
     minDimensions: [0.6, 0.4, 0.05],
@@ -114,7 +116,7 @@ export const OBJECT_CATALOG = [
   },
   {
     id: 'cabinet',
-    label: 'Cabinet',
+    label: { en: 'Cabinet', ko: '수납장' },
     group: 'work',
     dimensions: [0.9, 1.6, 0.45],
     minDimensions: [0.45, 0.8, 0.3],
@@ -123,7 +125,7 @@ export const OBJECT_CATALOG = [
   },
   {
     id: 'wardrobe',
-    label: 'Wardrobe',
+    label: { en: 'Wardrobe', ko: '옷장' },
     group: 'work',
     dimensions: [1.6, 2.1, 0.65],
     minDimensions: [0.8, 1.5, 0.4],
@@ -132,7 +134,7 @@ export const OBJECT_CATALOG = [
   },
   {
     id: 'refrigerator',
-    label: 'Refrigerator',
+    label: { en: 'Refrigerator', ko: '냉장고' },
     group: 'appliance',
     dimensions: [0.9, 1.85, 0.82],
     minDimensions: [0.5, 1.3, 0.45],
@@ -140,7 +142,7 @@ export const OBJECT_CATALOG = [
   },
   {
     id: 'washingMachine',
-    label: 'Washing Machine',
+    label: { en: 'Washing Machine', ko: '세탁기' },
     group: 'appliance',
     dimensions: [0.68, 0.92, 0.68],
     minDimensions: [0.45, 0.6, 0.45],
@@ -148,7 +150,7 @@ export const OBJECT_CATALOG = [
   },
   {
     id: 'sink',
-    label: 'Sink',
+    label: { en: 'Sink', ko: '싱크대' },
     group: 'bath',
     dimensions: [1.1, 0.92, 0.62],
     minDimensions: [0.6, 0.65, 0.35],
@@ -156,7 +158,7 @@ export const OBJECT_CATALOG = [
   },
   {
     id: 'cooktop',
-    label: 'Cooktop',
+    label: { en: 'Cooktop', ko: '인덕션' },
     group: 'bath',
     dimensions: [0.78, 0.16, 0.58],
     minDimensions: [0.4, 0.08, 0.3],
@@ -164,7 +166,7 @@ export const OBJECT_CATALOG = [
   },
   {
     id: 'bathtub',
-    label: 'Bathtub',
+    label: { en: 'Bathtub', ko: '욕조' },
     group: 'bath',
     dimensions: [1.7, 0.58, 0.82],
     minDimensions: [1, 0.35, 0.5],
@@ -172,7 +174,7 @@ export const OBJECT_CATALOG = [
   },
   {
     id: 'toilet',
-    label: 'Toilet',
+    label: { en: 'Toilet', ko: '변기' },
     group: 'bath',
     dimensions: [0.42, 0.78, 0.7],
     minDimensions: [0.28, 0.45, 0.4],
@@ -180,7 +182,7 @@ export const OBJECT_CATALOG = [
   },
   {
     id: 'shower',
-    label: 'Shower',
+    label: { en: 'Shower', ko: '샤워기' },
     group: 'bath',
     dimensions: [0.9, 2.1, 0.9],
     minDimensions: [0.55, 1.7, 0.55],
@@ -198,8 +200,13 @@ export function getObjectDefinition(type) {
   return OBJECT_CATALOG_BY_ID[type] ?? OBJECT_CATALOG_BY_ID.cube;
 }
 
-export function getObjectLabel(type) {
-  return getObjectDefinition(type).label;
+export function getObjectLabel(type, locale) {
+  return localizeText(getObjectDefinition(type).label, locale);
+}
+
+export function getObjectGroupLabel(groupId, locale) {
+  const group = OBJECT_GROUPS.find((item) => item.id === groupId);
+  return localizeText(group?.label ?? '', locale);
 }
 
 export function isObjectOpenable(type) {
@@ -255,6 +262,12 @@ export function normalizeObject(rawObject) {
     ),
     color: normalizeColor(rawObject?.color, definition.color),
     isOpen: definition.openable ? Boolean(rawObject?.isOpen) : undefined,
+    swing:
+      definition.id === 'door'
+        ? rawObject?.swing === 'right'
+          ? 'right'
+          : 'left'
+        : undefined,
   };
 }
 

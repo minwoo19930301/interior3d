@@ -34,6 +34,7 @@ function compactObject(object) {
     d: object.dimensions.map((value) => roundNumber(value, 2)),
     c: object.color,
     x: object.isOpen ? 1 : 0,
+    s: object.swing,
   };
 }
 
@@ -69,6 +70,7 @@ export function parseSceneParam(rawScene) {
           dimensions: item.d,
           color: item.c,
           isOpen: Boolean(item.x),
+          swing: item.s,
         }),
       ),
     };

@@ -9,8 +9,10 @@ import {
   radiansToDegrees,
   toDisplayValue,
 } from '../lib/objectCatalog';
+import { getBrowserLocale, t } from '../lib/i18n';
 
 const PropertiesPanel = ({ isMobile = false, onClose }) => {
+  const locale = getBrowserLocale();
   const selectedId = useStore((state) => state.selectedId);
   const objects = useStore((state) => state.objects);
   const updateObject = useStore((state) => state.updateObject);
@@ -44,7 +46,7 @@ const PropertiesPanel = ({ isMobile = false, onClose }) => {
         paddingBottom: '10px',
       }}
     >
-      <h2 style={{ margin: 0, fontSize: '1.2rem' }}>Properties</h2>
+      <h2 style={{ margin: 0, fontSize: '1.2rem' }}>{t('ui_properties_panel', locale)}</h2>
       {isMobile ? (
         <button
           onClick={onClose}
@@ -56,7 +58,7 @@ const PropertiesPanel = ({ isMobile = false, onClose }) => {
             padding: '0.4rem 0.8rem',
           }}
         >
-          Close
+          {t('ui_close', locale)}
         </button>
       ) : null}
     </div>
@@ -84,7 +86,7 @@ const PropertiesPanel = ({ isMobile = false, onClose }) => {
             lineHeight: 1.6,
           }}
         >
-          Select an object to edit position, rotation, size, and color.
+          {t('ui_select_object_hint', locale)}
         </div>
       </div>
     );
@@ -120,16 +122,16 @@ const PropertiesPanel = ({ isMobile = false, onClose }) => {
 
       <div style={{ marginBottom: '20px' }}>
         <label style={{ display: 'block', marginBottom: '5px', color: '#aaa', fontSize: '12px' }}>
-          Type
+          {t('ui_type', locale)}
         </label>
         <div style={{ padding: '10px', background: '#1a212c', borderRadius: '8px' }}>
-          {getObjectLabel(selectedObject.type)}
+          {getObjectLabel(selectedObject.type, locale)}
         </div>
       </div>
 
       <div style={{ marginBottom: '20px' }}>
         <label style={{ display: 'block', marginBottom: '10px', color: '#aaa', fontSize: '12px' }}>
-          Position ({unit.label})
+          {t('ui_position', locale)} ({unit.label})
         </label>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '5px' }}>
           {['X', 'Y', 'Z'].map((axis, i) => (
@@ -158,7 +160,7 @@ const PropertiesPanel = ({ isMobile = false, onClose }) => {
 
       <div style={{ marginBottom: '20px' }}>
         <label style={{ display: 'block', marginBottom: '10px', color: '#aaa', fontSize: '12px' }}>
-          Rotation (deg)
+          {t('ui_rotation', locale)}
         </label>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '5px' }}>
           {['X', 'Y', 'Z'].map((axis, i) => (
@@ -188,20 +190,20 @@ const PropertiesPanel = ({ isMobile = false, onClose }) => {
             onClick={() => rotateAroundYAxis(-90)}
             style={{ background: '#1a212c', color: '#fff', border: '1px solid rgba(255,255,255,0.08)' }}
           >
-            Y -90°
+            {t('ui_y_minus_90', locale)}
           </button>
           <button
             onClick={() => rotateAroundYAxis(90)}
             style={{ background: '#1a212c', color: '#fff', border: '1px solid rgba(255,255,255,0.08)' }}
           >
-            Y +90°
+            {t('ui_y_plus_90', locale)}
           </button>
         </div>
       </div>
 
       <div style={{ marginBottom: '20px' }}>
         <label style={{ display: 'block', marginBottom: '10px', color: '#aaa', fontSize: '12px' }}>
-          Size ({unit.label})
+          {t('ui_size', locale)} ({unit.label})
         </label>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '5px' }}>
           {['W', 'H', 'D'].map((axis, i) => (
@@ -230,7 +232,7 @@ const PropertiesPanel = ({ isMobile = false, onClose }) => {
 
       <div style={{ marginBottom: '20px' }}>
         <label style={{ display: 'block', marginBottom: '5px', color: '#aaa', fontSize: '12px' }}>
-          Color
+          {t('ui_color', locale)}
         </label>
         <input
           type="color"
@@ -253,7 +255,29 @@ const PropertiesPanel = ({ isMobile = false, onClose }) => {
             cursor: 'pointer',
           }}
         >
-          {selectedObject.isOpen ? 'Close' : 'Open'}
+          {selectedObject.isOpen ? t('ui_close', locale) : t('ui_open', locale)}
+        </button>
+      ) : null}
+
+      {selectedObject.type === 'door' ? (
+        <button
+          onClick={() =>
+            updateObject(selectedId, {
+              swing: selectedObject.swing === 'right' ? 'left' : 'right',
+            })
+          }
+          style={{
+            width: '100%',
+            padding: '12px',
+            background: '#1a212c',
+            color: '#fff',
+            border: '1px solid rgba(255,255,255,0.08)',
+            borderRadius: '8px',
+            cursor: 'pointer',
+            marginTop: '12px',
+          }}
+        >
+          {t('ui_flip_swing', locale)}
         </button>
       ) : null}
 
@@ -270,7 +294,7 @@ const PropertiesPanel = ({ isMobile = false, onClose }) => {
           marginTop: '20px',
         }}
       >
-        Delete Object
+        {t('ui_delete_object', locale)}
       </button>
     </div>
   );

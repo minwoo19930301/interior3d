@@ -1,4 +1,5 @@
-import React, { useRef } from 'react';
+import React, { useMemo, useRef } from 'react';
+import * as THREE from 'three';
 import { TransformControls } from '@react-three/drei';
 import useStore from '../store/useStore';
 
@@ -21,7 +22,7 @@ const CylinderPart = ({
   radiusTop,
   radiusBottom = radiusTop,
   height,
-  segments = 32,
+  segments = 18,
   position,
   rotation,
   color,
@@ -35,7 +36,7 @@ const CylinderPart = ({
 
 const TorusPart = ({ radius, tube, position, rotation, color, material }) => (
   <mesh position={position} rotation={rotation} castShadow receiveShadow>
-    <torusGeometry args={[radius, tube, 24, 60]} />
+    <torusGeometry args={[radius, tube, 12, 24]} />
     <meshStandardMaterial {...commonMaterial(color, material)} />
   </mesh>
 );
@@ -72,65 +73,152 @@ const HingedPanel = ({
   );
 };
 
+const DoorSwingGuide = ({ width, hinge, isOpen }) => {
+  const sweep = Math.PI * 0.55;
+  const shape = useMemo(() => {
+    const fan = new THREE.Shape();
+    const radius = Math.max(width * 0.98, 0.2);
+    fan.moveTo(0, 0);
+    fan.absarc(0, 0, radius, 0, hinge === 'left' ? -sweep : sweep, hinge === 'left');
+    fan.lineTo(0, 0);
+    return fan;
+  }, [hinge, sweep, width]);
+
+  return (
+    <group
+      position={[hinge === 'left' ? -width / 2 + 0.01 : width / 2 - 0.01, 0.02, 0]}
+      rotation={[0, hinge === 'right' ? Math.PI : 0, 0]}
+    >
+      <mesh rotation={[-Math.PI / 2, 0, 0]} renderOrder={2}>
+        <shapeGeometry args={[shape]} />
+        <meshBasicMaterial
+          color="#7ccde4"
+          transparent
+          opacity={isOpen ? 0.16 : 0.1}
+          depthWrite={false}
+          side={THREE.DoubleSide}
+        />
+      </mesh>
+    </group>
+  );
+};
+
 function renderStorage(type, dimensions, color, isOpen) {
   const [width, height, depth] = dimensions;
   const shell = Math.max(0.03, Math.min(0.06, depth * 0.12));
-  const doorGap = 0.02;
-  const doorDepth = Math.max(0.018, depth * 0.06);
+  const panelDepth = Math.max(0.018, depth * 0.05);
+  const interiorWidth = Math.max(0.18, width - shell * 2);
+  const interiorHeight = Math.max(0.24, height - shell * 2);
+  const interiorDepth = Math.max(0.16, depth - shell * 1.2);
+  const doorGap = 0.018;
   const doorWidth = Math.max(0.14, (width - doorGap * 3) / 2);
-  const interiorDepth = Math.max(0.12, depth - shell * 2);
   const openAngle = isOpen ? Math.PI * 0.62 : 0;
 
   return (
     <group>
-      <BoxPart size={[width, height, depth]} position={[0, height / 2, 0]} color={color} />
-      <BoxPart
-        size={[width - shell * 2, height - shell * 2, interiorDepth]}
-        position={[0, height / 2, -shell * 0.35]}
-        color="#483b31"
-      />
-      <BoxPart
-        size={[width - shell * 2, shell, depth - shell * 1.4]}
-        position={[0, height - shell / 2, 0]}
-        color="#6f5a4b"
-      />
+      <BoxPart size={[width, shell, depth]} position={[0, shell / 2, 0]} color="#6f5a4b" />
+      <BoxPart size={[width, shell, depth]} position={[0, height - shell / 2, 0]} color="#6f5a4b" />
+      <BoxPart size={[shell, height, depth]} position={[-width / 2 + shell / 2, height / 2, 0]} color={color} />
+      <BoxPart size={[shell, height, depth]} position={[width / 2 - shell / 2, height / 2, 0]} color={color} />
+      <BoxPart size={[interiorWidth, interiorHeight, shell]} position={[0, height / 2, -depth / 2 + shell / 2]} color="#5f4d40" />
       {type === 'wardrobe' ? (
-        <BoxPart
-          size={[width - shell * 3, shell, depth - shell * 1.8]}
-          position={[0, height * 0.54, 0]}
-          color="#675545"
-        />
-      ) : null}
+        <>
+          <BoxPart size={[interiorWidth * 0.92, shell, interiorDepth * 0.92]} position={[0, height * 0.56, 0]} color="#6b5647" />
+          <CylinderPart radiusTop={0.014} height={interiorWidth * 0.82} position={[0, height * 0.78, -depth * 0.12]} rotation={[0, 0, Math.PI / 2]} color="#c8b28d" material={{ metalness: 0.4, roughness: 0.38 }} />
+        </>
+      ) : (
+        <BoxPart size={[interiorWidth * 0.92, shell, interiorDepth * 0.88]} position={[0, height * 0.52, 0]} color="#6b5647" />
+      )}
       <HingedPanel
         width={doorWidth}
-        height={height * 0.94}
-        depth={doorDepth}
-        center={[-width / 4 - doorGap / 2, height / 2, depth / 2 + doorDepth / 2]}
+        height={height - shell * 1.2}
+        depth={panelDepth}
+        center={[-width / 4 - doorGap / 2, height / 2, depth / 2 + panelDepth / 2]}
         hinge="left"
         angle={openAngle}
-        color="#9e8875"
+        color="#a18b77"
       />
       <HingedPanel
         width={doorWidth}
-        height={height * 0.94}
-        depth={doorDepth}
-        center={[width / 4 + doorGap / 2, height / 2, depth / 2 + doorDepth / 2]}
+        height={height - shell * 1.2}
+        depth={panelDepth}
+        center={[width / 4 + doorGap / 2, height / 2, depth / 2 + panelDepth / 2]}
         hinge="right"
         angle={-openAngle}
-        color="#9e8875"
+        color="#a18b77"
       />
     </group>
   );
 }
 
-function renderFurniture(type, dimensions, color, isOpen) {
+function renderSofa(dimensions, color) {
+  const [width, height, depth] = dimensions;
+  const baseHeight = height * 0.24;
+  const seatHeight = height * 0.24;
+  const backHeight = height * 0.28;
+  const armWidth = Math.max(0.14, width * 0.11);
+  const seatTop = baseHeight + seatHeight;
+  const cushionGap = Math.min(0.04, width * 0.02);
+  const cushionWidth = (width - armWidth * 2 - cushionGap * 4) / 3;
+
+  return (
+    <group>
+      <BoxPart size={[width, baseHeight, depth * 0.9]} position={[0, baseHeight / 2, 0]} color="#665244" />
+      <BoxPart size={[width * 0.86, seatHeight, depth * 0.64]} position={[0, baseHeight + seatHeight / 2, 0.02]} color={color} />
+      {[-1, 0, 1].map((index) => (
+        <BoxPart
+          key={index}
+          size={[cushionWidth, seatHeight * 0.92, depth * 0.58]}
+          position={[index * (cushionWidth + cushionGap), seatTop - seatHeight * 0.04, 0.03]}
+          color="#9a8674"
+        />
+      ))}
+      <BoxPart size={[width * 0.9, backHeight, depth * 0.18]} position={[0, seatTop + backHeight / 2 - 0.02, -depth / 2 + depth * 0.12]} color="#766353" />
+      <BoxPart size={[armWidth, height * 0.54, depth * 0.82]} position={[-width / 2 + armWidth / 2, height * 0.27, 0]} color="#6f5c4f" />
+      <BoxPart size={[armWidth, height * 0.54, depth * 0.82]} position={[width / 2 - armWidth / 2, height * 0.27, 0]} color="#6f5c4f" />
+    </group>
+  );
+}
+
+function renderDoor(dimensions, color, isOpen, swing) {
+  const [width, height, depth] = dimensions;
+  const frameThickness = Math.max(0.04, Math.min(0.07, width * 0.08));
+  const leafDepth = Math.max(0.03, depth * 0.34);
+  const leafWidth = Math.max(0.18, width - frameThickness * 1.4);
+  const leafHeight = Math.max(1.6, height - frameThickness * 1.4);
+  const hinge = swing === 'right' ? 'right' : 'left';
+  const openAngle = isOpen ? (hinge === 'left' ? -Math.PI * 0.55 : Math.PI * 0.55) : 0;
+
+  return (
+    <group>
+      <DoorSwingGuide width={width} hinge={hinge} isOpen={isOpen} />
+      <BoxPart size={[width, frameThickness, depth]} position={[0, height - frameThickness / 2, 0]} color="#72543d" />
+      <BoxPart size={[frameThickness, height, depth]} position={[-width / 2 + frameThickness / 2, height / 2, 0]} color="#72543d" />
+      <BoxPart size={[frameThickness, height, depth]} position={[width / 2 - frameThickness / 2, height / 2, 0]} color="#72543d" />
+      <HingedPanel
+        width={leafWidth}
+        height={leafHeight}
+        depth={leafDepth}
+        center={[0, leafHeight / 2, depth / 2 - leafDepth / 2]}
+        hinge={hinge}
+        angle={openAngle}
+        color={color}
+        material={{ roughness: 0.52 }}
+        handleLength={Math.min(0.18, leafHeight * 0.16)}
+      />
+      <BoxPart size={[width, 0.03, depth]} position={[0, 0.015, 0]} color="#b4a798" />
+    </group>
+  );
+}
+
+function renderFurniture(type, dimensions, color, isOpen, swing) {
   const [width, height, depth] = dimensions;
 
   if (type === 'wall') {
     return (
       <group>
         <BoxPart size={[width, height, depth]} position={[0, height / 2, 0]} color={color} />
-        <BoxPart size={[width, 0.06, depth + 0.02]} position={[0, 0.03, 0]} color="#c0b8ab" />
+        <BoxPart size={[width, 0.05, depth + 0.02]} position={[0, 0.025, 0]} color="#c0b8ab" />
       </group>
     );
   }
@@ -154,38 +242,15 @@ function renderFurniture(type, dimensions, color, isOpen) {
   }
 
   if (type === 'door') {
-    const frameThickness = Math.max(0.04, Math.min(0.07, width * 0.08));
-    const leafDepth = Math.max(0.03, depth * 0.38);
-    const leafWidth = Math.max(0.18, width - frameThickness * 1.4);
-    const leafHeight = Math.max(1.6, height - frameThickness * 1.4);
-
-    return (
-      <group>
-        <BoxPart size={[width, frameThickness, depth]} position={[0, height - frameThickness / 2, 0]} color="#72543d" />
-        <BoxPart size={[frameThickness, height, depth]} position={[-width / 2 + frameThickness / 2, height / 2, 0]} color="#72543d" />
-        <BoxPart size={[frameThickness, height, depth]} position={[width / 2 - frameThickness / 2, height / 2, 0]} color="#72543d" />
-        <HingedPanel
-          width={leafWidth}
-          height={leafHeight}
-          depth={leafDepth}
-          center={[-frameThickness / 2, leafHeight / 2, depth / 2 - leafDepth / 2]}
-          hinge="left"
-          angle={isOpen ? -Math.PI * 0.55 : 0}
-          color={color}
-          material={{ roughness: 0.52 }}
-          handleLength={Math.min(0.18, leafHeight * 0.16)}
-        />
-        <BoxPart size={[width, 0.03, depth]} position={[0, 0.015, 0]} color="#b4a798" />
-      </group>
-    );
+    return renderDoor(dimensions, color, isOpen, swing);
   }
 
   if (type === 'table') {
     const topThickness = Math.max(0.05, height * 0.08);
-    const legSize = Math.min(0.1, Math.min(width, depth) * 0.1);
+    const legSize = Math.min(0.09, Math.min(width, depth) * 0.1);
     const legHeight = height - topThickness;
-    const offsetX = width / 2 - legSize / 2 - 0.06;
-    const offsetZ = depth / 2 - legSize / 2 - 0.06;
+    const offsetX = width / 2 - legSize / 2 - 0.05;
+    const offsetZ = depth / 2 - legSize / 2 - 0.05;
 
     return (
       <group>
@@ -212,8 +277,8 @@ function renderFurniture(type, dimensions, color, isOpen) {
     return (
       <group>
         <BoxPart size={[width, topThickness, depth]} position={[0, legHeight + topThickness / 2, 0]} color={color} />
-        <BoxPart size={[width * 0.34, topThickness * 2, depth * 0.55]} position={[width * 0.22, legHeight - topThickness, 0]} color="#6d4b34" />
-        <BoxPart size={[width, legHeight * 0.46, 0.04]} position={[0, legHeight * 0.38, -depth / 2 + 0.02]} color="#654633" />
+        <BoxPart size={[width * 0.28, legHeight, depth * 0.6]} position={[width * 0.26, legHeight / 2, 0]} color="#6a4b38" />
+        <BoxPart size={[width, legHeight * 0.4, 0.04]} position={[0, legHeight * 0.34, -depth / 2 + 0.02]} color="#654633" />
         {[-width / 2 + legSize / 2, width / 2 - legSize / 2].map((x) => (
           <BoxPart
             key={x}
@@ -223,7 +288,6 @@ function renderFurniture(type, dimensions, color, isOpen) {
           />
         ))}
         <BoxPart size={[legSize, legHeight, legSize]} position={[-width / 2 + legSize / 2, legHeight / 2, -depth / 2 + legSize / 2]} color="#4f3829" />
-        <BoxPart size={[width * 0.28, legHeight, depth * 0.64]} position={[width * 0.26, legHeight / 2, 0]} color="#5d4030" />
       </group>
     );
   }
@@ -231,15 +295,15 @@ function renderFurniture(type, dimensions, color, isOpen) {
   if (type === 'chair') {
     const seatThickness = Math.max(0.04, height * 0.07);
     const seatHeight = height * 0.46;
-    const backHeight = Math.max(height * 0.42, 0.3);
-    const legSize = Math.min(0.06, Math.min(width, depth) * 0.1);
+    const backHeight = Math.max(height * 0.38, 0.28);
+    const legSize = Math.min(0.055, Math.min(width, depth) * 0.1);
     const offsetX = width / 2 - legSize / 2 - 0.03;
     const offsetZ = depth / 2 - legSize / 2 - 0.03;
 
     return (
       <group>
-        <BoxPart size={[width, seatThickness, depth * 0.92]} position={[0, seatHeight, 0]} color={color} />
-        <BoxPart size={[width, backHeight, seatThickness]} position={[0, seatHeight + backHeight / 2, -depth / 2 + seatThickness / 2]} color="#764c32" />
+        <BoxPart size={[width, seatThickness, depth * 0.88]} position={[0, seatHeight, 0]} color={color} />
+        <BoxPart size={[width * 0.92, backHeight, seatThickness]} position={[0, seatHeight + backHeight / 2, -depth / 2 + seatThickness / 2]} color="#764c32" />
         {[-offsetX, offsetX].flatMap((x) =>
           [-offsetZ, offsetZ].map((z) => (
             <BoxPart
@@ -271,18 +335,7 @@ function renderFurniture(type, dimensions, color, isOpen) {
   }
 
   if (type === 'sofa') {
-    const seatHeight = height * 0.45;
-    const backHeight = height * 0.58;
-    const armWidth = Math.max(0.14, width * 0.1);
-
-    return (
-      <group>
-        <BoxPart size={[width, seatHeight, depth]} position={[0, seatHeight / 2, 0]} color={color} />
-        <BoxPart size={[width, backHeight, depth * 0.18]} position={[0, seatHeight + backHeight / 2 - 0.02, -depth / 2 + depth * 0.09]} color="#6d5a4e" />
-        <BoxPart size={[armWidth, height * 0.6, depth]} position={[-width / 2 + armWidth / 2, height * 0.3, 0]} color="#715d51" />
-        <BoxPart size={[armWidth, height * 0.6, depth]} position={[width / 2 - armWidth / 2, height * 0.3, 0]} color="#715d51" />
-      </group>
-    );
+    return renderSofa(dimensions, color);
   }
 
   if (type === 'cabinet' || type === 'wardrobe') {
@@ -306,11 +359,11 @@ function renderFurniture(type, dimensions, color, isOpen) {
   if (type === 'refrigerator') {
     return (
       <group>
-        <BoxPart size={[width, height, depth]} position={[0, height / 2, 0]} color={color} material={{ metalness: 0.25, roughness: 0.3 }} />
-        <BoxPart size={[width * 0.46, height * 0.58, 0.02]} position={[-width * 0.24, height * 0.7, depth / 2 + 0.01]} color="#eef3f7" />
-        <BoxPart size={[width * 0.46, height * 0.34, 0.02]} position={[width * 0.24, height * 0.26, depth / 2 + 0.01]} color="#eef3f7" />
-        <CylinderPart radiusTop={0.012} height={height * 0.34} position={[-width * 0.02, height * 0.66, depth / 2 + 0.02]} rotation={[Math.PI / 2, 0, 0]} color="#8e98a3" material={{ metalness: 0.85, roughness: 0.24 }} />
-        <CylinderPart radiusTop={0.012} height={height * 0.24} position={[width * 0.14, height * 0.24, depth / 2 + 0.02]} rotation={[Math.PI / 2, 0, 0]} color="#8e98a3" material={{ metalness: 0.85, roughness: 0.24 }} />
+        <BoxPart size={[width, height, depth]} position={[0, height / 2, 0]} color={color} material={{ metalness: 0.24, roughness: 0.3 }} />
+        <BoxPart size={[width * 0.46, height * 0.56, 0.02]} position={[-width * 0.24, height * 0.7, depth / 2 + 0.01]} color="#eef3f7" />
+        <BoxPart size={[width * 0.46, height * 0.32, 0.02]} position={[width * 0.24, height * 0.26, depth / 2 + 0.01]} color="#eef3f7" />
+        <CylinderPart radiusTop={0.012} height={height * 0.3} position={[-width * 0.02, height * 0.66, depth / 2 + 0.02]} rotation={[Math.PI / 2, 0, 0]} color="#8e98a3" material={{ metalness: 0.78, roughness: 0.24 }} />
+        <CylinderPart radiusTop={0.012} height={height * 0.2} position={[width * 0.14, height * 0.24, depth / 2 + 0.02]} rotation={[Math.PI / 2, 0, 0]} color="#8e98a3" material={{ metalness: 0.78, roughness: 0.24 }} />
       </group>
     );
   }
@@ -319,9 +372,9 @@ function renderFurniture(type, dimensions, color, isOpen) {
     return (
       <group>
         <BoxPart size={[width, height, depth]} position={[0, height / 2, 0]} color={color} />
-        <CylinderPart radiusTop={Math.min(width, height) * 0.27} height={0.08} position={[0, height * 0.48, depth / 2 + 0.04]} rotation={[Math.PI / 2, 0, 0]} color="#4a5665" material={{ metalness: 0.45, roughness: 0.22 }} />
-        <CylinderPart radiusTop={Math.min(width, height) * 0.19} height={0.09} position={[0, height * 0.48, depth / 2 + 0.06]} rotation={[Math.PI / 2, 0, 0]} color="#90b2cc" material={{ metalness: 0.3, roughness: 0.14, transparent: true, opacity: 0.72 }} />
-        <BoxPart size={[width * 0.7, height * 0.12, 0.03]} position={[0, height * 0.9, depth / 2 + 0.02]} color="#ced6df" />
+        <CylinderPart radiusTop={Math.min(width, height) * 0.26} height={0.08} position={[0, height * 0.48, depth / 2 + 0.04]} rotation={[Math.PI / 2, 0, 0]} color="#4a5665" material={{ metalness: 0.45, roughness: 0.22 }} />
+        <CylinderPart radiusTop={Math.min(width, height) * 0.18} height={0.08} position={[0, height * 0.48, depth / 2 + 0.06]} rotation={[Math.PI / 2, 0, 0]} color="#90b2cc" material={{ metalness: 0.3, roughness: 0.14, transparent: true, opacity: 0.72 }} />
+        <BoxPart size={[width * 0.7, height * 0.1, 0.03]} position={[0, height * 0.9, depth / 2 + 0.02]} color="#ced6df" />
       </group>
     );
   }
@@ -331,7 +384,7 @@ function renderFurniture(type, dimensions, color, isOpen) {
 
     return (
       <group>
-        <BoxPart size={[width, height - counterHeight, depth * 0.92]} position={[0, (height - counterHeight) / 2, 0]} color="#7f6758" />
+        <BoxPart size={[width, height - counterHeight, depth * 0.9]} position={[0, (height - counterHeight) / 2, 0]} color="#7f6758" />
         <BoxPart size={[width, counterHeight, depth]} position={[0, height - counterHeight / 2, 0]} color={color} />
         <BoxPart size={[width * 0.5, counterHeight * 0.7, depth * 0.44]} position={[0, height - counterHeight / 2 + 0.01, 0]} color="#59626f" />
         <CylinderPart radiusTop={0.018} height={height * 0.22} position={[0, height + height * 0.06, -depth * 0.12]} color="#d8e0e7" material={{ metalness: 0.9, roughness: 0.18 }} />
@@ -343,14 +396,14 @@ function renderFurniture(type, dimensions, color, isOpen) {
   if (type === 'cooktop') {
     return (
       <group>
-        <BoxPart size={[width, height, depth]} position={[0, height / 2, 0]} color={color} material={{ metalness: 0.5, roughness: 0.18 }} />
+        <BoxPart size={[width, height, depth]} position={[0, height / 2, 0]} color={color} material={{ metalness: 0.48, roughness: 0.18 }} />
         {[-width * 0.22, width * 0.22].flatMap((x) =>
           [-depth * 0.2, depth * 0.2].map((z) => (
             <CylinderPart
               key={`${x}-${z}`}
-              radiusTop={Math.min(width, depth) * 0.11}
-              height={0.03}
-              position={[x, height + 0.015, z]}
+              radiusTop={Math.min(width, depth) * 0.1}
+              height={0.02}
+              position={[x, height + 0.01, z]}
               color="#414b58"
             />
           )),
@@ -421,21 +474,6 @@ function renderFurniture(type, dimensions, color, isOpen) {
           position={[0, height - height * 0.015, -depth * 0.22]}
           color="#f4f7fa"
         />
-        <CylinderPart
-          radiusTop={0.026}
-          height={0.03}
-          position={[0, height - 0.004, -depth * 0.18]}
-          color="#b8c1ca"
-          material={{ metalness: 0.8, roughness: 0.24 }}
-        />
-        <CylinderPart
-          radiusTop={0.018}
-          height={height * 0.14}
-          position={[0, height * 0.9, -depth * 0.38]}
-          rotation={[Math.PI / 2, 0, 0]}
-          color="#c8d1d9"
-          material={{ metalness: 0.72, roughness: 0.26 }}
-        />
       </group>
     );
   }
@@ -443,12 +481,10 @@ function renderFurniture(type, dimensions, color, isOpen) {
   if (type === 'shower') {
     return (
       <group>
-        <BoxPart size={[width, 0.06, depth]} position={[0, 0.03, 0]} color="#d7dde4" />
-        <BoxPart size={[0.03, height, depth]} position={[-width / 2 + 0.015, height / 2, 0]} color="#bfe1f0" material={{ transparent: true, opacity: 0.35, roughness: 0.1, metalness: 0.1 }} />
-        <BoxPart size={[width, height, 0.03]} position={[0, height / 2, -depth / 2 + 0.015]} color="#bfe1f0" material={{ transparent: true, opacity: 0.35, roughness: 0.1, metalness: 0.1 }} />
-        <CylinderPart radiusTop={0.015} height={height * 0.7} position={[width * 0.34, height * 0.65, -depth * 0.28]} color="#b6c2ce" material={{ metalness: 0.85, roughness: 0.24 }} />
-        <CylinderPart radiusTop={0.014} height={width * 0.24} position={[width * 0.22, height * 0.95, -depth * 0.28]} rotation={[0, 0, Math.PI / 2]} color="#b6c2ce" material={{ metalness: 0.85, roughness: 0.24 }} />
-        <CylinderPart radiusTop={0.06} height={0.03} position={[width * 0.1, height * 0.95, -depth * 0.28]} color="#d5dde5" />
+        <BoxPart size={[width, 0.05, depth]} position={[0, 0.025, 0]} color="#d7dde4" />
+        <BoxPart size={[0.025, height, depth]} position={[-width / 2 + 0.0125, height / 2, 0]} color="#bfe1f0" material={{ transparent: true, opacity: 0.28, roughness: 0.1, metalness: 0.1 }} />
+        <BoxPart size={[width, height, 0.025]} position={[0, height / 2, -depth / 2 + 0.0125]} color="#bfe1f0" material={{ transparent: true, opacity: 0.28, roughness: 0.1, metalness: 0.1 }} />
+        <CylinderPart radiusTop={0.014} height={height * 0.68} position={[width * 0.34, height * 0.64, -depth * 0.28]} color="#b6c2ce" material={{ metalness: 0.85, roughness: 0.24 }} />
       </group>
     );
   }
@@ -466,12 +502,16 @@ const Furniture = ({
   transformMode,
   isSelected,
   isOpen,
+  swing,
   onClick,
   onDoubleClick,
 }) => {
   const updateObject = useStore((state) => state.updateObject);
   const groupRef = useRef(null);
-  const content = renderFurniture(type, dimensions, color, isOpen);
+  const content = useMemo(
+    () => renderFurniture(type, dimensions, color, isOpen, swing),
+    [type, dimensions, color, isOpen, swing],
+  );
 
   const outline = isSelected ? (
     <mesh position={[0, dimensions[1] / 2, 0]} renderOrder={3}>
@@ -523,4 +563,4 @@ const Furniture = ({
   );
 };
 
-export default Furniture;
+export default React.memo(Furniture);

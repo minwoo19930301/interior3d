@@ -1,0 +1,147 @@
+const MESSAGES = {
+  en: {
+    app_title: 'interior3d House Planner',
+    ui_mode: 'Mode',
+    ui_move: 'Move',
+    ui_rotate: 'Rotate',
+    ui_units: 'Units',
+    ui_copy: 'Copy',
+    ui_paste: 'Paste',
+    ui_undo: 'Undo',
+    ui_link_copied: 'Link copied',
+    ui_copy_failed: 'Copy failed',
+    ui_copy_share_link: 'Copy share link',
+    ui_items: 'items',
+    ui_structure: 'Structure',
+    ui_properties: 'Properties',
+    ui_house: 'House',
+    ui_close: 'Close',
+    ui_cancel: 'Cancel',
+    ui_build_house: 'Build house',
+    ui_open: 'Open',
+    ui_delete_object: 'Delete Object',
+    ui_select_object_hint: 'Select an object to edit position, rotation, size, and color.',
+    ui_type: 'Type',
+    ui_position: 'Position',
+    ui_rotation: 'Rotation (deg)',
+    ui_size: 'Size',
+    ui_color: 'Color',
+    ui_include_floor: 'Include floor',
+    ui_include_ceiling: 'Include ceiling',
+    ui_include_outer_walls: 'Include outer walls',
+    ui_add_doors: 'Add doors',
+    ui_replace_scene: 'Replace current scene',
+    ui_grid: 'Grid',
+    ui_scene: 'Scene',
+    ui_zones: 'Zones',
+    ui_width: 'Width',
+    ui_depth: 'Depth',
+    ui_wall_height: 'Wall Height',
+    ui_wall_thickness: 'Wall Thickness',
+    ui_columns: 'Columns',
+    ui_rows: 'Rows',
+    ui_create_template: 'Create template',
+    ui_preset_layouts: 'Preset layouts',
+    ui_template_make: 'Build your own shell with a simple room grid.',
+    ui_start_with_template: 'Start with a full-house template, then tune the footprint before placing furniture.',
+    ui_custom_template: 'Custom template',
+    ui_custom_template_help: 'Set the footprint and room grid yourself.',
+    ui_base: 'Base',
+    ui_flip_swing: 'Flip swing',
+    ui_entrance_door: 'Entrance door',
+    ui_room_prefix: 'Room',
+    ui_y_minus_90: 'Y -90°',
+    ui_y_plus_90: 'Y +90°',
+    ui_template_house: 'House Planner',
+    ui_structure_panel: 'Structure',
+    ui_properties_panel: 'Properties',
+    ui_house_panel: 'House',
+    ui_error_title: 'Something went wrong.',
+  },
+  ko: {
+    app_title: 'interior3d 집 플래너',
+    ui_mode: '모드',
+    ui_move: '이동',
+    ui_rotate: '회전',
+    ui_units: '단위',
+    ui_copy: '복사',
+    ui_paste: '붙여넣기',
+    ui_undo: '되돌리기',
+    ui_link_copied: '링크 복사됨',
+    ui_copy_failed: '복사 실패',
+    ui_copy_share_link: '공유 링크 복사',
+    ui_items: '개',
+    ui_structure: '구조',
+    ui_properties: '속성',
+    ui_house: '집',
+    ui_close: '닫기',
+    ui_cancel: '취소',
+    ui_build_house: '집 만들기',
+    ui_open: '열기',
+    ui_delete_object: '오브젝트 삭제',
+    ui_select_object_hint: '오브젝트를 선택하면 위치, 회전, 크기, 색을 수정할 수 있습니다.',
+    ui_type: '종류',
+    ui_position: '위치',
+    ui_rotation: '회전 (도)',
+    ui_size: '크기',
+    ui_color: '색상',
+    ui_include_floor: '바닥 포함',
+    ui_include_ceiling: '천장 포함',
+    ui_include_outer_walls: '외곽 벽 포함',
+    ui_add_doors: '문 추가',
+    ui_replace_scene: '현재 장면 교체',
+    ui_grid: '그리드',
+    ui_scene: '장면',
+    ui_zones: '구역',
+    ui_width: '가로',
+    ui_depth: '세로',
+    ui_wall_height: '벽 높이',
+    ui_wall_thickness: '벽 두께',
+    ui_columns: '열 수',
+    ui_rows: '행 수',
+    ui_create_template: '템플릿 만들기',
+    ui_preset_layouts: '기본 템플릿',
+    ui_template_make: '직접 방 격자를 정해서 집 틀을 만들 수 있습니다.',
+    ui_start_with_template: '집 전체 템플릿을 고르고, 가구를 놓기 전에 평면 크기를 먼저 조정하세요.',
+    ui_custom_template: '사용자 템플릿',
+    ui_custom_template_help: '집 크기와 방 격자를 직접 정합니다.',
+    ui_base: '기본',
+    ui_flip_swing: '여는 방향 바꾸기',
+    ui_entrance_door: '현관문',
+    ui_room_prefix: '방',
+    ui_y_minus_90: 'Y -90°',
+    ui_y_plus_90: 'Y +90°',
+    ui_template_house: '집 플래너',
+    ui_structure_panel: '구조',
+    ui_properties_panel: '속성',
+    ui_house_panel: '집',
+    ui_error_title: '문제가 발생했습니다.',
+  },
+};
+
+export function getBrowserLocale() {
+  if (typeof navigator === 'undefined') {
+    return 'en';
+  }
+
+  const preferred =
+    navigator.languages?.[0] ?? navigator.language ?? navigator.userLanguage ?? 'en';
+
+  return String(preferred).toLowerCase().startsWith('ko') ? 'ko' : 'en';
+}
+
+export function t(key, locale = getBrowserLocale()) {
+  return MESSAGES[locale]?.[key] ?? MESSAGES.en[key] ?? key;
+}
+
+export function localizeText(value, locale = getBrowserLocale()) {
+  if (typeof value === 'string') {
+    return value;
+  }
+
+  if (!value || typeof value !== 'object') {
+    return '';
+  }
+
+  return value[locale] ?? value.en ?? Object.values(value)[0] ?? '';
+}
