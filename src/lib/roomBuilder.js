@@ -407,9 +407,111 @@ function createDoorObject(door, scaleX, scaleZ, wallHeight, wallThickness) {
     position: [scaleXAxis(door.x, scaleX), 0, scaleZAxis(door.z, scaleZ)],
     rotation: [0, door.axis === 'v' ? Math.PI / 2 : 0, 0],
     color: door.color ?? DEFAULT_DOOR_COLOR,
-    isOpen: false,
+    isOpen: true,
     swing: door.swing === 'right' ? 'right' : 'left',
   };
+}
+
+function pushHorizontalWall(objects, centerX, z, width, wallHeight, wallThickness) {
+  if (width <= 0.06) {
+    return;
+  }
+
+  objects.push({
+    type: 'wall',
+    dimensions: [roundPlanValue(width), wallHeight, wallThickness],
+    position: [roundPlanValue(centerX), 0, roundPlanValue(z)],
+    rotation: [0, 0, 0],
+    color: DEFAULT_WALL_COLOR,
+  });
+}
+
+function pushVerticalWall(objects, x, centerZ, depth, wallHeight, wallThickness) {
+  if (depth <= 0.06) {
+    return;
+  }
+
+  objects.push({
+    type: 'wall',
+    dimensions: [wallThickness, wallHeight, roundPlanValue(depth)],
+    position: [roundPlanValue(x), 0, roundPlanValue(centerZ)],
+    rotation: [0, 0, 0],
+    color: DEFAULT_WALL_COLOR,
+  });
+}
+
+function pushHorizontalWallWithDoorGap(
+  objects,
+  z,
+  totalWidth,
+  wallHeight,
+  wallThickness,
+  doorCenterX,
+  doorWidth,
+) {
+  const halfWidth = totalWidth / 2;
+  const gapSize = Math.min(
+    totalWidth - 0.12,
+    doorWidth + Math.max(0.1, wallThickness * 0.8),
+  );
+  const gapStart = Math.max(-halfWidth, doorCenterX - gapSize / 2);
+  const gapEnd = Math.min(halfWidth, doorCenterX + gapSize / 2);
+  const leftWidth = gapStart + halfWidth;
+  const rightWidth = halfWidth - gapEnd;
+
+  pushHorizontalWall(
+    objects,
+    -halfWidth + leftWidth / 2,
+    z,
+    leftWidth,
+    wallHeight,
+    wallThickness,
+  );
+  pushHorizontalWall(
+    objects,
+    gapEnd + rightWidth / 2,
+    z,
+    rightWidth,
+    wallHeight,
+    wallThickness,
+  );
+}
+
+function pushVerticalWallWithDoorGap(
+  objects,
+  x,
+  totalDepth,
+  wallHeight,
+  wallThickness,
+  doorCenterZ,
+  doorWidth,
+) {
+  const halfDepth = totalDepth / 2;
+  const gapSize = Math.min(
+    totalDepth - 0.12,
+    doorWidth + Math.max(0.1, wallThickness * 0.8),
+  );
+  const gapStart = Math.max(-halfDepth, doorCenterZ - gapSize / 2);
+  const gapEnd = Math.min(halfDepth, doorCenterZ + gapSize / 2);
+  const lowerDepth = gapStart + halfDepth;
+  const upperDepth = halfDepth - gapEnd;
+
+  pushVerticalWall(
+    objects,
+    x,
+    -halfDepth + lowerDepth / 2,
+    lowerDepth,
+    wallHeight,
+    wallThickness,
+  );
+  pushVerticalWall(
+    objects,
+    x,
+    gapEnd + upperDepth / 2,
+    upperDepth,
+    wallHeight,
+    wallThickness,
+  );
 }
 
 function buildCustomHouseObjects({
@@ -445,6 +547,8 @@ function buildCustomHouseObjects({
   const rowCenters = getSegmentCenters(customLayout.rowSizes);
   const verticalDoorZ = getNearestCenter(rowCenters);
   const horizontalDoorX = getNearestCenter(columnCenters);
+  const interiorDoorWidth = 0.9;
+  const entranceDoorWidth = 0.95;
   const objects = [];
 
   if (includeFloor) {
@@ -468,77 +572,117 @@ function buildCustomHouseObjects({
   }
 
   if (includeOuterWalls) {
-    objects.push(
-      {
-        type: 'wall',
-        dimensions: [safeWidth, safeWallHeight, safeWallThickness],
-        position: [0, 0, -(safeDepth / 2 - safeWallThickness / 2)],
-        rotation: [0, 0, 0],
-        color: DEFAULT_WALL_COLOR,
-      },
-      {
-        type: 'wall',
-        dimensions: [safeWidth, safeWallHeight, safeWallThickness],
-        position: [0, 0, safeDepth / 2 - safeWallThickness / 2],
-        rotation: [0, 0, 0],
-        color: DEFAULT_WALL_COLOR,
-      },
-      {
-        type: 'wall',
-        dimensions: [safeWallThickness, safeWallHeight, safeDepth],
-        position: [-(safeWidth / 2 - safeWallThickness / 2), 0, 0],
-        rotation: [0, 0, 0],
-        color: DEFAULT_WALL_COLOR,
-      },
-      {
-        type: 'wall',
-        dimensions: [safeWallThickness, safeWallHeight, safeDepth],
-        position: [safeWidth / 2 - safeWallThickness / 2, 0, 0],
-        rotation: [0, 0, 0],
-        color: DEFAULT_WALL_COLOR,
-      },
+    pushHorizontalWall(
+      objects,
+      0,
+      -(safeDepth / 2 - safeWallThickness / 2),
+      safeWidth,
+      safeWallHeight,
+      safeWallThickness,
+    );
+    if (includeDoors) {
+      pushHorizontalWallWithDoorGap(
+        objects,
+        safeDepth / 2 - safeWallThickness / 2,
+        safeWidth,
+        safeWallHeight,
+        safeWallThickness,
+        0,
+        entranceDoorWidth,
+      );
+    } else {
+      pushHorizontalWall(
+        objects,
+        0,
+        safeDepth / 2 - safeWallThickness / 2,
+        safeWidth,
+        safeWallHeight,
+        safeWallThickness,
+      );
+    }
+    pushVerticalWall(
+      objects,
+      -(safeWidth / 2 - safeWallThickness / 2),
+      0,
+      safeDepth,
+      safeWallHeight,
+      safeWallThickness,
+    );
+    pushVerticalWall(
+      objects,
+      safeWidth / 2 - safeWallThickness / 2,
+      0,
+      safeDepth,
+      safeWallHeight,
+      safeWallThickness,
     );
   }
 
   verticalDividers.forEach((xPosition, columnIndex) => {
-    objects.push({
-      type: 'wall',
-      dimensions: [safeWallThickness, safeWallHeight, safeDepth],
-      position: [xPosition, 0, 0],
-      rotation: [0, 0, 0],
-      color: DEFAULT_WALL_COLOR,
-    });
+    if (includeDoors) {
+      pushVerticalWallWithDoorGap(
+        objects,
+        xPosition,
+        safeDepth,
+        safeWallHeight,
+        safeWallThickness,
+        verticalDoorZ,
+        interiorDoorWidth,
+      );
+    } else {
+      pushVerticalWall(
+        objects,
+        xPosition,
+        0,
+        safeDepth,
+        safeWallHeight,
+        safeWallThickness,
+      );
+    }
 
     if (includeDoors) {
       objects.push({
         type: 'door',
-        dimensions: [0.9, Math.max(1.95, safeWallHeight - 0.18), safeWallThickness],
+        dimensions: [interiorDoorWidth, Math.max(1.95, safeWallHeight - 0.18), safeWallThickness],
         position: [xPosition, 0, verticalDoorZ],
         rotation: [0, Math.PI / 2, 0],
         color: DEFAULT_DOOR_COLOR,
-        isOpen: false,
+        isOpen: true,
         swing: columnIndex % 2 === 0 ? 'right' : 'left',
       });
     }
   });
 
   horizontalDividers.forEach((zPosition, rowIndex) => {
-    objects.push({
-      type: 'wall',
-      dimensions: [safeWidth, safeWallHeight, safeWallThickness],
-      position: [0, 0, zPosition],
-      rotation: [0, 0, 0],
-      color: DEFAULT_WALL_COLOR,
-    });
+    if (includeDoors) {
+      pushHorizontalWallWithDoorGap(
+        objects,
+        zPosition,
+        safeWidth,
+        safeWallHeight,
+        safeWallThickness,
+        horizontalDoorX,
+        interiorDoorWidth,
+      );
+    } else {
+      pushHorizontalWall(
+        objects,
+        0,
+        zPosition,
+        safeWidth,
+        safeWallHeight,
+        safeWallThickness,
+      );
+    }
 
     if (includeDoors) {
       objects.push({
         type: 'door',
-        dimensions: [0.9, Math.max(1.95, safeWallHeight - 0.18), safeWallThickness],
+        dimensions: [interiorDoorWidth, Math.max(1.95, safeWallHeight - 0.18), safeWallThickness],
         position: [horizontalDoorX, 0, zPosition],
         rotation: [0, 0, 0],
         color: DEFAULT_DOOR_COLOR,
-        isOpen: false,
+        isOpen: true,
         swing: rowIndex % 2 === 0 ? 'right' : 'left',
       });
     }
@@ -547,11 +691,11 @@ function buildCustomHouseObjects({
   if (includeOuterWalls && includeDoors) {
     objects.push({
       type: 'door',
-      dimensions: [0.95, Math.max(1.95, safeWallHeight - 0.18), safeWallThickness],
+      dimensions: [entranceDoorWidth, Math.max(1.95, safeWallHeight - 0.18), safeWallThickness],
       position: [0, 0, safeDepth / 2 - safeWallThickness / 2],
       rotation: [0, 0, 0],
       color: DEFAULT_DOOR_COLOR,
-      isOpen: false,
+      isOpen: true,
       swing: 'left',
     });
   }

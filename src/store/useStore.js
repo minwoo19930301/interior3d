@@ -5,6 +5,7 @@ import {
   getSpawnPosition,
   normalizeColor,
   normalizeObject,
+  normalizePositionForType,
   normalizeVector,
   clampDimensions,
 } from '../lib/objectCatalog';
@@ -24,7 +25,7 @@ function createSceneObject(type, index) {
     rotation: [0, 0, 0],
     dimensions: [...definition.dimensions],
     color: definition.color,
-    isOpen: definition.openable ? false : undefined,
+    isOpen: definition.openable ? definition.id === 'door' : undefined,
     swing: definition.id === 'door' ? 'left' : undefined,
   };
 }
@@ -75,7 +76,11 @@ function patchObject(currentObject, newData) {
     ...newData,
     type: definition.id,
     position: newData.position
-      ? normalizeVector(newData.position, currentObject.position)
+      ? normalizePositionForType(
+          definition.id,
+          newData.position,
+          currentObject.position,
+        )
       : currentObject.position,
     rotation: newData.rotation
       ? normalizeVector(newData.rotation, currentObject.rotation)
@@ -90,7 +95,7 @@ function patchObject(currentObject, newData) {
       definition.openable && newData.isOpen !== undefined
         ? Boolean(newData.isOpen)
         : definition.openable
-          ? Boolean(currentObject.isOpen)
+          ? currentObject.isOpen ?? definition.id === 'door'
           : undefined,
     swing:
       definition.id === 'door'

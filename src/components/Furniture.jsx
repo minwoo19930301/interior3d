@@ -552,7 +552,7 @@ const Furniture = ({
           mode={transformMode}
           space={transformMode === 'rotate' ? 'local' : 'world'}
           showX={transformMode !== 'rotate'}
-          showY
+          showY={transformMode === 'rotate'}
           showZ={transformMode !== 'rotate'}
           rotationSnap={transformMode === 'rotate' ? Math.PI / 24 : undefined}
           onMouseUp={handleObjectChange}

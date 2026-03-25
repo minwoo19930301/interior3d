@@ -231,6 +231,16 @@ export function normalizeVector(value, fallback) {
   );
 }
 
+export function normalizePositionForType(type, value, fallback = [0, 0, 0]) {
+  const nextPosition = normalizeVector(value, fallback);
+
+  if (type !== 'ceilingPanel') {
+    nextPosition[1] = 0;
+  }
+
+  return nextPosition;
+}
+
 export function normalizeColor(value, fallback) {
   return COLOR_PATTERN.test(value ?? '') ? value : fallback;
 }
@@ -254,14 +264,19 @@ export function normalizeObject(rawObject) {
 
   return {
     type: definition.id,
-    position: normalizeVector(rawObject?.position, [0, 0, 0]),
+    position: normalizePositionForType(definition.id, rawObject?.position, [0, 0, 0]),
     rotation: normalizeVector(rawObject?.rotation, [0, 0, 0]),
     dimensions: clampDimensions(
       definition.id,
       normalizeVector(rawObject?.dimensions, definition.dimensions),
     ),
     color: normalizeColor(rawObject?.color, definition.color),
-    isOpen: definition.openable ? Boolean(rawObject?.isOpen) : undefined,
+    isOpen:
+      definition.openable
+        ? rawObject?.isOpen !== undefined
+          ? Boolean(rawObject.isOpen)
+          : definition.id === 'door'
+        : undefined,
     swing:
       definition.id === 'door'
         ? rawObject?.swing === 'right'

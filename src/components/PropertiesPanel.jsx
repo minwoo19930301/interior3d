@@ -22,6 +22,17 @@ const PropertiesPanel = ({ isMobile = false, onClose }) => {
 
   const selectedObject = objects.find((obj) => obj.id === selectedId);
   const unit = UNIT_SYSTEMS[unitSystem] ?? UNIT_SYSTEMS.m;
+  const positionAxes =
+    selectedObject?.type === 'ceilingPanel'
+      ? [
+          ['X', 0],
+          ['Y', 1],
+          ['Z', 2],
+        ]
+      : [
+          ['X', 0],
+          ['Z', 2],
+        ];
   const containerStyle = {
     width: isMobile ? '100%' : '300px',
     background: 'rgba(13,17,23,0.96)',
@@ -133,8 +144,14 @@ const PropertiesPanel = ({ isMobile = false, onClose }) => {
         <label style={{ display: 'block', marginBottom: '10px', color: '#aaa', fontSize: '12px' }}>
           {t('ui_position', locale)} ({unit.label})
         </label>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '5px' }}>
-          {['X', 'Y', 'Z'].map((axis, i) => (
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: `repeat(${positionAxes.length}, 1fr)`,
+            gap: '5px',
+          }}
+        >
+          {positionAxes.map(([axis, index]) => (
             <div key={axis}>
               <label style={{ display: 'block', fontSize: '10px', marginBottom: '2px', color: '#666' }}>
                 {axis}
@@ -142,12 +159,12 @@ const PropertiesPanel = ({ isMobile = false, onClose }) => {
               <input
                 type="number"
                 step={unit.step}
-                value={toDisplayValue(selectedObject.position[i], unitSystem)}
+                value={toDisplayValue(selectedObject.position[index], unitSystem)}
                 onChange={(e) =>
                   handleVectorChange(
                     'position',
                     e.target.value,
-                    i,
+                    index,
                     (rawValue) => fromDisplayValue(rawValue, unitSystem),
                   )
                 }
