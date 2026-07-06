@@ -1,8 +1,10 @@
 import React from 'react';
 import useStore from '../store/useStore';
+import { getGroundTexture } from '../lib/textures';
 
 const Floor = () => {
     const selectObject = useStore((state) => state.selectObject);
+    const groundTexture = getGroundTexture();
 
     return (
         <group>
@@ -16,7 +18,7 @@ const Floor = () => {
                 }}
             >
                 <planeGeometry args={[40, 40]} />
-                <meshStandardMaterial color="#232832" />
+                <meshStandardMaterial map={groundTexture} roughness={0.95} />
             </mesh>
             <gridHelper args={[40, 40, 0x4d5a70, 0x2f3948]} />
         </group>

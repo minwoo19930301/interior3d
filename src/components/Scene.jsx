@@ -1,6 +1,6 @@
 import React from 'react';
 import { Canvas } from '@react-three/fiber';
-import { OrbitControls } from '@react-three/drei';
+import { OrbitControls, Environment, Lightformer, ContactShadows } from '@react-three/drei';
 import { MOUSE, TOUCH } from 'three';
 import Floor from './Floor';
 import Furniture from './Furniture';
@@ -67,16 +67,49 @@ const Scene = () => {
             onDoubleClick={(event) => event.preventDefault()}
         >
             <color attach="background" args={['#11151d']} />
-            <ambientLight intensity={0.6} />
+            <ambientLight intensity={0.4} />
             <directionalLight
                 position={[10, 12, 8]}
                 intensity={1.1}
                 castShadow
-                shadow-mapSize={[1024, 1024]}
+                shadow-mapSize={[2048, 2048]}
+                shadow-bias={-0.0002}
+                shadow-camera-left={-14}
+                shadow-camera-right={14}
+                shadow-camera-top={14}
+                shadow-camera-bottom={-14}
             />
             <directionalLight position={[-8, 10, -6]} intensity={0.25} />
 
+            <Environment resolution={256} frames={1}>
+                <Lightformer
+                    form="rect"
+                    intensity={1.1}
+                    scale={[10, 10, 1]}
+                    position={[0, 8, 0]}
+                    rotation={[Math.PI / 2, 0, 0]}
+                />
+                <Lightformer
+                    form="rect"
+                    color="#dbe7ff"
+                    intensity={0.7}
+                    scale={[6, 6, 1]}
+                    position={[8, 4, 0]}
+                    rotation={[0, -Math.PI / 2, 0]}
+                />
+                <Lightformer
+                    form="rect"
+                    color="#ffe3c0"
+                    intensity={0.35}
+                    scale={[6, 6, 1]}
+                    position={[-6, 2, -6]}
+                    rotation={[0, Math.PI / 4, 0]}
+                />
+            </Environment>
+
             <Floor />
+
+            <ContactShadows position={[0, 0.01, 0]} opacity={0.4} scale={34} blur={2.6} far={5} resolution={512} />
 
             {objects.map((obj) => (
                 <Furniture

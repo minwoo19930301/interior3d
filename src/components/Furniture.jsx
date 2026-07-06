@@ -1,8 +1,14 @@
 import React, { useMemo, useRef, useState } from 'react';
 import * as THREE from 'three';
-import { TransformControls } from '@react-three/drei';
+import { TransformControls, RoundedBox } from '@react-three/drei';
 import useStore from '../store/useStore';
 import { clampDimensions, getObjectDefinition, roundNumber } from '../lib/objectCatalog';
+import {
+  getWoodTexture,
+  getFabricTexture,
+  getBrushedMetalTexture,
+  getScreenTexture,
+} from '../lib/textures';
 
 const commonMaterial = (color, extra = {}) => ({
   color,
@@ -10,6 +16,13 @@ const commonMaterial = (color, extra = {}) => ({
   metalness: extra.metalness ?? 0.12,
   transparent: extra.transparent ?? false,
   opacity: extra.opacity ?? 1,
+  ...(extra.map !== undefined ? { map: extra.map } : {}),
+  ...(extra.bumpMap !== undefined ? { bumpMap: extra.bumpMap } : {}),
+  ...(extra.bumpScale !== undefined ? { bumpScale: extra.bumpScale } : {}),
+  ...(extra.emissive !== undefined ? { emissive: extra.emissive } : {}),
+  ...(extra.emissiveMap !== undefined ? { emissiveMap: extra.emissiveMap } : {}),
+  ...(extra.emissiveIntensity !== undefined ? { emissiveIntensity: extra.emissiveIntensity } : {}),
+  ...(extra.envMapIntensity !== undefined ? { envMapIntensity: extra.envMapIntensity } : {}),
 });
 
 function mixHexColors(baseColor, targetColor, amount) {
@@ -25,12 +38,30 @@ function arePositionsEqual(current, next) {
   return current.every((value, index) => Math.abs(value - next[index]) < 0.001);
 }
 
-const BoxPart = ({ size, position, color, rotation, material }) => (
-  <mesh position={position} rotation={rotation} castShadow receiveShadow>
-    <boxGeometry args={size} />
-    <meshStandardMaterial {...commonMaterial(color, material)} />
-  </mesh>
-);
+const BoxPart = ({ size, position, color, rotation, material, radius = 0 }) => {
+  if (radius > 0) {
+    return (
+      <RoundedBox
+        args={size}
+        radius={Math.min(radius, Math.min(...size) * 0.49)}
+        smoothness={4}
+        castShadow
+        receiveShadow
+        position={position}
+        rotation={rotation}
+      >
+        <meshStandardMaterial {...commonMaterial(color, material)} />
+      </RoundedBox>
+    );
+  }
+
+  return (
+    <mesh position={position} rotation={rotation} castShadow receiveShadow>
+      <boxGeometry args={size} />
+      <meshStandardMaterial {...commonMaterial(color, material)} />
+    </mesh>
+  );
+};
 
 const CylinderPart = ({
   radiusTop,
@@ -64,6 +95,7 @@ const HingedPanel = ({
   angle = 0,
   color,
   material,
+  radius = 0,
   handleLength = 0.12,
 }) => {
   const hingeX = center[0] + (hinge === 'left' ? -width / 2 : width / 2);
@@ -73,14 +105,14 @@ const HingedPanel = ({
   return (
     <group position={[hingeX, center[1], center[2]]} rotation={[0, angle, 0]}>
       <group position={[leafCenterX, 0, 0]}>
-        <BoxPart size={[width, height, depth]} position={[0, 0, 0]} color={color} material={material} />
+        <BoxPart size={[width, height, depth]} position={[0, 0, 0]} color={color} material={material} radius={radius} />
         <CylinderPart
           radiusTop={Math.min(0.015, depth * 0.45)}
           height={handleLength}
           position={[handleX, 0, depth / 2 + 0.01]}
           rotation={[Math.PI / 2, 0, 0]}
           color="#d1b26d"
-          material={{ metalness: 0.82, roughness: 0.25 }}
+          material={{ metalness: 0.85, roughness: 0.25 }}
         />
       </group>
     </group>
@@ -127,6 +159,7 @@ function renderStorage(type, dimensions, color, isOpen) {
   const doorGap = 0.018;
   const doorWidth = Math.max(0.14, (width - doorGap * 3) / 2);
   const openAngle = isOpen ? Math.PI * 0.62 : 0;
+  const doorLeafMaterial = { map: getWoodTexture('warm'), roughness: 0.6 };
 
   return (
     <group>
@@ -151,6 +184,8 @@ function renderStorage(type, dimensions, color, isOpen) {
         hinge="left"
         angle={openAngle}
         color="#a18b77"
+        material={doorLeafMaterial}
+        radius={0.008}
       />
       <HingedPanel
         width={doorWidth}
@@ -160,6 +195,8 @@ function renderStorage(type, dimensions, color, isOpen) {
         hinge="right"
         angle={-openAngle}
         color="#a18b77"
+        material={doorLeafMaterial}
+        radius={0.008}
       />
     </group>
   );
@@ -174,22 +211,26 @@ function renderSofa(dimensions, color) {
   const seatTop = baseHeight + seatHeight;
   const cushionGap = Math.min(0.04, width * 0.02);
   const cushionWidth = (width - armWidth * 2 - cushionGap * 4) / 3;
+  const woodDark = { map: getWoodTexture('dark'), roughness: 0.65 };
+  const fabricMaterial = { map: getFabricTexture(), roughness: 0.9, metalness: 0 };
 
   return (
     <group>
-      <BoxPart size={[width, baseHeight, depth * 0.9]} position={[0, baseHeight / 2, 0]} color="#665244" />
-      <BoxPart size={[width * 0.86, seatHeight, depth * 0.64]} position={[0, baseHeight + seatHeight / 2, 0.02]} color={color} />
+      <BoxPart size={[width, baseHeight, depth * 0.9]} position={[0, baseHeight / 2, 0]} color="#665244" material={woodDark} />
+      <BoxPart size={[width * 0.86, seatHeight, depth * 0.64]} position={[0, baseHeight + seatHeight / 2, 0.02]} color={color} radius={0.045} material={fabricMaterial} />
       {[-1, 0, 1].map((index) => (
         <BoxPart
           key={index}
           size={[cushionWidth, seatHeight * 0.92, depth * 0.58]}
           position={[index * (cushionWidth + cushionGap), seatTop - seatHeight * 0.04, 0.03]}
-          color="#9a8674"
+          color={color}
+          radius={0.045}
+          material={fabricMaterial}
         />
       ))}
-      <BoxPart size={[width * 0.9, backHeight, depth * 0.18]} position={[0, seatTop + backHeight / 2 - 0.02, -depth / 2 + depth * 0.12]} color="#766353" />
-      <BoxPart size={[armWidth, height * 0.54, depth * 0.82]} position={[-width / 2 + armWidth / 2, height * 0.27, 0]} color="#6f5c4f" />
-      <BoxPart size={[armWidth, height * 0.54, depth * 0.82]} position={[width / 2 - armWidth / 2, height * 0.27, 0]} color="#6f5c4f" />
+      <BoxPart size={[width * 0.9, backHeight, depth * 0.18]} position={[0, seatTop + backHeight / 2 - 0.02, -depth / 2 + depth * 0.12]} color={color} radius={0.045} material={fabricMaterial} />
+      <BoxPart size={[armWidth, height * 0.54, depth * 0.82]} position={[-width / 2 + armWidth / 2, height * 0.27, 0]} color={color} radius={0.045} material={fabricMaterial} />
+      <BoxPart size={[armWidth, height * 0.54, depth * 0.82]} position={[width / 2 - armWidth / 2, height * 0.27, 0]} color={color} radius={0.045} material={fabricMaterial} />
     </group>
   );
 }
@@ -217,7 +258,8 @@ function renderDoor(dimensions, color, isOpen, swing) {
         hinge={hinge}
         angle={openAngle}
         color={color}
-        material={{ roughness: 0.52 }}
+        material={{ map: getWoodTexture('dark'), roughness: 0.52 }}
+        radius={0.008}
         handleLength={Math.min(0.18, leafHeight * 0.16)}
       />
       <BoxPart size={[width, 0.03, depth]} position={[0, 0.015, 0]} color="#b4a798" />
@@ -231,7 +273,12 @@ function renderFurniture(type, dimensions, color, isOpen, swing) {
   if (type === 'wall') {
     return (
       <group>
-        <BoxPart size={[width, height, depth]} position={[0, height / 2, 0]} color={color} />
+        <BoxPart
+          size={[width, height, depth]}
+          position={[0, height / 2, 0]}
+          color={color}
+          material={{ bumpMap: getFabricTexture(), bumpScale: 0.02 }}
+        />
         <BoxPart size={[width, 0.05, depth + 0.02]} position={[0, 0.025, 0]} color="#c0b8ab" />
       </group>
     );
@@ -239,6 +286,9 @@ function renderFurniture(type, dimensions, color, isOpen, swing) {
 
   if (type === 'floorPanel') {
     const baseColor = mixHexColors(color, '#a39a8f', 0.18);
+    const repeatKey = `${roundNumber(width / 0.9)}x${roundNumber(depth / 0.9)}`;
+    const topTexture = getWoodTexture('warm', repeatKey);
+    topTexture.repeat.set(width / 0.9, depth / 0.9);
 
     return (
       <group>
@@ -247,6 +297,7 @@ function renderFurniture(type, dimensions, color, isOpen, swing) {
           size={[width * 0.98, 0.02, depth * 0.98]}
           position={[0, 0.01, 0]}
           color={color}
+          material={{ map: topTexture, roughness: 0.7 }}
         />
       </group>
     );
@@ -257,7 +308,12 @@ function renderFurniture(type, dimensions, color, isOpen, swing) {
 
     return (
       <group>
-        <BoxPart size={[width, height, depth]} position={[0, height / 2, 0]} color={edgeColor} />
+        <BoxPart
+          size={[width, height, depth]}
+          position={[0, height / 2, 0]}
+          color={edgeColor}
+          material={{ bumpMap: getFabricTexture(), bumpScale: 0.02 }}
+        />
         <BoxPart
           size={[width * 0.96, 0.015, depth * 0.96]}
           position={[0, 0.01, 0]}
@@ -273,19 +329,31 @@ function renderFurniture(type, dimensions, color, isOpen, swing) {
 
   if (type === 'table') {
     const topThickness = Math.max(0.05, height * 0.08);
-    const legSize = Math.min(0.09, Math.min(width, depth) * 0.1);
+    const legRadiusTop = 0.03;
+    const legRadiusBottom = 0.022;
     const legHeight = height - topThickness;
-    const offsetX = width / 2 - legSize / 2 - 0.05;
-    const offsetZ = depth / 2 - legSize / 2 - 0.05;
+    const offsetX = width / 2 - legRadiusBottom - 0.05;
+    const offsetZ = depth / 2 - legRadiusBottom - 0.05;
+    const repeatKey = `${roundNumber(width / 0.9)}x${roundNumber(depth / 0.9)}`;
+    const topTexture = getWoodTexture('warm', repeatKey);
+    topTexture.repeat.set(width / 0.9, depth / 0.9);
 
     return (
       <group>
-        <BoxPart size={[width, topThickness, depth]} position={[0, legHeight + topThickness / 2, 0]} color={color} />
+        <BoxPart
+          size={[width, topThickness, depth]}
+          position={[0, legHeight + topThickness / 2, 0]}
+          color={color}
+          radius={0.015}
+          material={{ map: topTexture, roughness: 0.55 }}
+        />
         {[-offsetX, offsetX].flatMap((x) =>
           [-offsetZ, offsetZ].map((z) => (
-            <BoxPart
+            <CylinderPart
               key={`${x}-${z}`}
-              size={[legSize, legHeight, legSize]}
+              radiusTop={legRadiusTop}
+              radiusBottom={legRadiusBottom}
+              height={legHeight}
               position={[x, legHeight / 2, z]}
               color="#4f3829"
             />
@@ -297,23 +365,57 @@ function renderFurniture(type, dimensions, color, isOpen, swing) {
 
   if (type === 'desk') {
     const topThickness = Math.max(0.05, height * 0.08);
-    const legSize = Math.min(0.08, Math.min(width, depth) * 0.08);
+    const legRadiusTop = 0.03;
+    const legRadiusBottom = 0.022;
     const legHeight = height - topThickness;
+    const repeatKey = `${roundNumber(width / 0.9)}x${roundNumber(depth / 0.9)}`;
+    const topTexture = getWoodTexture('warm', repeatKey);
+    topTexture.repeat.set(width / 0.9, depth / 0.9);
 
     return (
       <group>
-        <BoxPart size={[width, topThickness, depth]} position={[0, legHeight + topThickness / 2, 0]} color={color} />
+        <BoxPart
+          size={[width, topThickness, depth]}
+          position={[0, legHeight + topThickness / 2, 0]}
+          color={color}
+          radius={0.015}
+          material={{ map: topTexture, roughness: 0.55 }}
+        />
         <BoxPart size={[width * 0.28, legHeight, depth * 0.6]} position={[width * 0.26, legHeight / 2, 0]} color="#6a4b38" />
         <BoxPart size={[width, legHeight * 0.4, 0.04]} position={[0, legHeight * 0.34, -depth / 2 + 0.02]} color="#654633" />
-        {[-width / 2 + legSize / 2, width / 2 - legSize / 2].map((x) => (
-          <BoxPart
+        <CylinderPart
+          radiusTop={0.012}
+          height={0.03}
+          position={[width * 0.14, legHeight * 0.34, depth / 2 - 0.005]}
+          rotation={[Math.PI / 2, 0, 0]}
+          color="#c8b28d"
+          material={{ metalness: 0.8, roughness: 0.3 }}
+        />
+        <CylinderPart
+          radiusTop={0.012}
+          height={0.03}
+          position={[width * 0.38, legHeight * 0.34, depth / 2 - 0.005]}
+          rotation={[Math.PI / 2, 0, 0]}
+          color="#c8b28d"
+          material={{ metalness: 0.8, roughness: 0.3 }}
+        />
+        {[-width / 2 + legRadiusBottom, width / 2 - legRadiusBottom].map((x) => (
+          <CylinderPart
             key={x}
-            size={[legSize, legHeight, legSize]}
-            position={[x, legHeight / 2, depth / 2 - legSize / 2]}
+            radiusTop={legRadiusTop}
+            radiusBottom={legRadiusBottom}
+            height={legHeight}
+            position={[x, legHeight / 2, depth / 2 - legRadiusBottom]}
             color="#4f3829"
           />
         ))}
-        <BoxPart size={[legSize, legHeight, legSize]} position={[-width / 2 + legSize / 2, legHeight / 2, -depth / 2 + legSize / 2]} color="#4f3829" />
+        <CylinderPart
+          radiusTop={legRadiusTop}
+          radiusBottom={legRadiusBottom}
+          height={legHeight}
+          position={[-width / 2 + legRadiusBottom, legHeight / 2, -depth / 2 + legRadiusBottom]}
+          color="#4f3829"
+        />
       </group>
     );
   }
@@ -322,19 +424,23 @@ function renderFurniture(type, dimensions, color, isOpen, swing) {
     const seatThickness = Math.max(0.04, height * 0.07);
     const seatHeight = height * 0.46;
     const backHeight = Math.max(height * 0.38, 0.28);
-    const legSize = Math.min(0.055, Math.min(width, depth) * 0.1);
-    const offsetX = width / 2 - legSize / 2 - 0.03;
-    const offsetZ = depth / 2 - legSize / 2 - 0.03;
+    const legRadiusTop = Math.min(0.028, Math.min(width, depth) * 0.05);
+    const legRadiusBottom = legRadiusTop * 0.75;
+    const offsetX = width / 2 - legRadiusBottom - 0.03;
+    const offsetZ = depth / 2 - legRadiusBottom - 0.03;
+    const fabricMaterial = { map: getFabricTexture(), roughness: 0.9, metalness: 0 };
 
     return (
       <group>
-        <BoxPart size={[width, seatThickness, depth * 0.88]} position={[0, seatHeight, 0]} color={color} />
-        <BoxPart size={[width * 0.92, backHeight, seatThickness]} position={[0, seatHeight + backHeight / 2, -depth / 2 + seatThickness / 2]} color="#764c32" />
+        <BoxPart size={[width, seatThickness, depth * 0.88]} position={[0, seatHeight, 0]} color={color} radius={0.03} material={fabricMaterial} />
+        <BoxPart size={[width * 0.92, backHeight, seatThickness]} position={[0, seatHeight + backHeight / 2, -depth / 2 + seatThickness / 2]} color={color} radius={0.03} material={fabricMaterial} />
         {[-offsetX, offsetX].flatMap((x) =>
           [-offsetZ, offsetZ].map((z) => (
-            <BoxPart
+            <CylinderPart
               key={`${x}-${z}`}
-              size={[legSize, seatHeight, legSize]}
+              radiusTop={legRadiusTop}
+              radiusBottom={legRadiusBottom}
+              height={seatHeight}
               position={[x, seatHeight / 2, z]}
               color="#5a3d2c"
             />
@@ -348,14 +454,22 @@ function renderFurniture(type, dimensions, color, isOpen, swing) {
     const frameHeight = Math.max(0.12, height * 0.22);
     const mattressHeight = Math.max(0.18, height * 0.34);
     const mattressTop = frameHeight + mattressHeight;
+    const woodDark = { map: getWoodTexture('dark'), roughness: 0.65 };
+    const blanketDepth = depth * 0.3;
 
     return (
       <group>
-        <BoxPart size={[width, frameHeight, depth]} position={[0, frameHeight / 2, 0]} color={color} />
-        <BoxPart size={[width * 0.95, mattressHeight, depth * 0.94]} position={[0, frameHeight + mattressHeight / 2, 0]} color="#f2f0eb" />
-        <BoxPart size={[width, height, 0.08]} position={[0, height / 2, -depth / 2 + 0.04]} color="#5b473f" />
-        <BoxPart size={[width * 0.28, 0.1, depth * 0.18]} position={[-width * 0.18, mattressTop - 0.02, -depth * 0.28]} color="#ffffff" />
-        <BoxPart size={[width * 0.28, 0.1, depth * 0.18]} position={[width * 0.18, mattressTop - 0.02, -depth * 0.28]} color="#ffffff" />
+        <BoxPart size={[width, frameHeight, depth]} position={[0, frameHeight / 2, 0]} color={color} material={woodDark} />
+        <BoxPart size={[width * 0.95, mattressHeight, depth * 0.94]} position={[0, frameHeight + mattressHeight / 2, 0]} color="#f2f0eb" radius={0.05} />
+        <BoxPart size={[width, height, 0.08]} position={[0, height / 2, -depth / 2 + 0.04]} color="#5b473f" material={woodDark} />
+        <BoxPart size={[width * 0.28, 0.1, depth * 0.18]} position={[-width * 0.18, mattressTop - 0.02, -depth * 0.28]} color="#ffffff" radius={0.06} />
+        <BoxPart size={[width * 0.28, 0.1, depth * 0.18]} position={[width * 0.18, mattressTop - 0.02, -depth * 0.28]} color="#ffffff" radius={0.06} />
+        <BoxPart
+          size={[width * 0.93, 0.04, blanketDepth]}
+          position={[0, mattressTop + 0.01, depth * 0.28]}
+          color={color}
+          radius={0.03}
+        />
       </group>
     );
   }
@@ -374,8 +488,18 @@ function renderFurniture(type, dimensions, color, isOpen, swing) {
 
     return (
       <group>
-        <BoxPart size={[width, screenHeight, depth]} position={[0, height - screenHeight / 2, 0]} color="#111418" />
-        <BoxPart size={[width * 0.96, screenHeight * 0.9, depth / 2]} position={[0, height - screenHeight / 2, depth * 0.26]} color="#27313d" />
+        <BoxPart size={[width, screenHeight, depth]} position={[0, height - screenHeight / 2, 0]} color="#111418" material={{ metalness: 0.6, roughness: 0.3 }} />
+        <BoxPart
+          size={[width * 0.96, screenHeight * 0.9, depth / 2]}
+          position={[0, height - screenHeight / 2, depth * 0.26]}
+          color="#27313d"
+          material={{
+            emissive: '#4a6a9a',
+            emissiveMap: getScreenTexture(),
+            emissiveIntensity: 0.9,
+            roughness: 0.15,
+          }}
+        />
         <CylinderPart radiusTop={0.04} height={height * 0.26} position={[0, height * 0.18, 0]} color="#5b6675" />
         <BoxPart size={[width * 0.42, baseHeight, depth * 3.2]} position={[0, baseHeight / 2, depth * 0.1]} color="#4e5967" />
       </group>
@@ -383,24 +507,28 @@ function renderFurniture(type, dimensions, color, isOpen, swing) {
   }
 
   if (type === 'refrigerator') {
+    const bodyMaterial = { map: getBrushedMetalTexture(), metalness: 0.7, roughness: 0.35 };
+
     return (
       <group>
-        <BoxPart size={[width, height, depth]} position={[0, height / 2, 0]} color={color} material={{ metalness: 0.24, roughness: 0.3 }} />
+        <BoxPart size={[width, height, depth]} position={[0, height / 2, 0]} color={color} radius={0.02} material={bodyMaterial} />
         <BoxPart size={[width * 0.46, height * 0.56, 0.02]} position={[-width * 0.24, height * 0.7, depth / 2 + 0.01]} color="#eef3f7" />
         <BoxPart size={[width * 0.46, height * 0.32, 0.02]} position={[width * 0.24, height * 0.26, depth / 2 + 0.01]} color="#eef3f7" />
-        <CylinderPart radiusTop={0.012} height={height * 0.3} position={[-width * 0.02, height * 0.66, depth / 2 + 0.02]} rotation={[Math.PI / 2, 0, 0]} color="#8e98a3" material={{ metalness: 0.78, roughness: 0.24 }} />
-        <CylinderPart radiusTop={0.012} height={height * 0.2} position={[width * 0.14, height * 0.24, depth / 2 + 0.02]} rotation={[Math.PI / 2, 0, 0]} color="#8e98a3" material={{ metalness: 0.78, roughness: 0.24 }} />
+        <CylinderPart radiusTop={0.012} height={height * 0.3} position={[-width * 0.02, height * 0.66, depth / 2 + 0.02]} rotation={[Math.PI / 2, 0, 0]} color="#8e98a3" material={{ metalness: 0.9, roughness: 0.2 }} />
+        <CylinderPart radiusTop={0.012} height={height * 0.2} position={[width * 0.14, height * 0.24, depth / 2 + 0.02]} rotation={[Math.PI / 2, 0, 0]} color="#8e98a3" material={{ metalness: 0.9, roughness: 0.2 }} />
       </group>
     );
   }
 
   if (type === 'washingMachine') {
+    const bodyMaterial = { map: getBrushedMetalTexture(), metalness: 0.5, roughness: 0.3 };
+
     return (
       <group>
-        <BoxPart size={[width, height, depth]} position={[0, height / 2, 0]} color={color} />
+        <BoxPart size={[width, height, depth]} position={[0, height / 2, 0]} color={color} material={bodyMaterial} />
         <CylinderPart radiusTop={Math.min(width, height) * 0.26} height={0.08} position={[0, height * 0.48, depth / 2 + 0.04]} rotation={[Math.PI / 2, 0, 0]} color="#4a5665" material={{ metalness: 0.45, roughness: 0.22 }} />
-        <CylinderPart radiusTop={Math.min(width, height) * 0.18} height={0.08} position={[0, height * 0.48, depth / 2 + 0.06]} rotation={[Math.PI / 2, 0, 0]} color="#90b2cc" material={{ metalness: 0.3, roughness: 0.14, transparent: true, opacity: 0.72 }} />
-        <BoxPart size={[width * 0.7, height * 0.1, 0.03]} position={[0, height * 0.9, depth / 2 + 0.02]} color="#ced6df" />
+        <CylinderPart radiusTop={Math.min(width, height) * 0.18} height={0.08} position={[0, height * 0.48, depth / 2 + 0.06]} rotation={[Math.PI / 2, 0, 0]} color="#90b2cc" material={{ metalness: 0.9, roughness: 0.05, transparent: true, opacity: 0.4 }} />
+        <BoxPart size={[width * 0.7, height * 0.1, 0.03]} position={[0, height * 0.9, depth / 2 + 0.02]} color="#ced6df" material={{ roughness: 0.2 }} />
       </group>
     );
   }
@@ -411,10 +539,10 @@ function renderFurniture(type, dimensions, color, isOpen, swing) {
     return (
       <group>
         <BoxPart size={[width, height - counterHeight, depth * 0.9]} position={[0, (height - counterHeight) / 2, 0]} color="#7f6758" />
-        <BoxPart size={[width, counterHeight, depth]} position={[0, height - counterHeight / 2, 0]} color={color} />
-        <BoxPart size={[width * 0.5, counterHeight * 0.7, depth * 0.44]} position={[0, height - counterHeight / 2 + 0.01, 0]} color="#59626f" />
-        <CylinderPart radiusTop={0.018} height={height * 0.22} position={[0, height + height * 0.06, -depth * 0.12]} color="#d8e0e7" material={{ metalness: 0.9, roughness: 0.18 }} />
-        <CylinderPart radiusTop={0.014} height={depth * 0.22} position={[0.08, height + height * 0.12, -depth * 0.05]} rotation={[0, 0, Math.PI / 2]} color="#d8e0e7" material={{ metalness: 0.9, roughness: 0.18 }} />
+        <BoxPart size={[width, counterHeight, depth]} position={[0, height - counterHeight / 2, 0]} color={color} material={{ roughness: 0.15 }} />
+        <BoxPart size={[width * 0.5, counterHeight * 0.7, depth * 0.44]} position={[0, height - counterHeight / 2 + 0.01, 0]} color="#59626f" material={{ metalness: 0.85, roughness: 0.25 }} />
+        <CylinderPart radiusTop={0.018} height={height * 0.22} position={[0, height + height * 0.06, -depth * 0.12]} color="#d8e0e7" material={{ metalness: 0.85, roughness: 0.25 }} />
+        <CylinderPart radiusTop={0.014} height={depth * 0.22} position={[0.08, height + height * 0.12, -depth * 0.05]} rotation={[0, 0, Math.PI / 2]} color="#d8e0e7" material={{ metalness: 0.85, roughness: 0.25 }} />
       </group>
     );
   }
@@ -422,7 +550,7 @@ function renderFurniture(type, dimensions, color, isOpen, swing) {
   if (type === 'cooktop') {
     return (
       <group>
-        <BoxPart size={[width, height, depth]} position={[0, height / 2, 0]} color={color} material={{ metalness: 0.48, roughness: 0.18 }} />
+        <BoxPart size={[width, height, depth]} position={[0, height / 2, 0]} color={color} material={{ metalness: 0.3, roughness: 0.08 }} />
         {[-width * 0.22, width * 0.22].flatMap((x) =>
           [-depth * 0.2, depth * 0.2].map((z) => (
             <CylinderPart
@@ -431,6 +559,7 @@ function renderFurniture(type, dimensions, color, isOpen, swing) {
               height={0.02}
               position={[x, height + 0.01, z]}
               color="#414b58"
+              material={{ emissive: '#331a0d', emissiveIntensity: 0.25 }}
             />
           )),
         )}
@@ -439,10 +568,12 @@ function renderFurniture(type, dimensions, color, isOpen, swing) {
   }
 
   if (type === 'bathtub') {
+    const ceramicMaterial = { roughness: 0.12 };
+
     return (
       <group>
-        <BoxPart size={[width, height, depth]} position={[0, height / 2, 0]} color={color} />
-        <BoxPart size={[width * 0.84, height * 0.58, depth * 0.72]} position={[0, height * 0.56, 0]} color="#d5dde5" />
+        <BoxPart size={[width, height, depth]} position={[0, height / 2, 0]} color={color} material={ceramicMaterial} />
+        <BoxPart size={[width * 0.84, height * 0.58, depth * 0.72]} position={[0, height * 0.56, 0]} color="#d5dde5" radius={0.04} material={ceramicMaterial} />
         <CylinderPart radiusTop={0.018} height={height * 0.22} position={[width * 0.32, height + height * 0.08, -depth * 0.18]} color="#bcc7d2" material={{ metalness: 0.85, roughness: 0.2 }} />
       </group>
     );
@@ -453,6 +584,7 @@ function renderFurniture(type, dimensions, color, isOpen, swing) {
     const bowlHeight = height * 0.28;
     const tankHeight = height * 0.3;
     const tankDepth = depth * 0.28;
+    const ceramicMaterial = { roughness: 0.12 };
 
     return (
       <group>
@@ -462,6 +594,7 @@ function renderFurniture(type, dimensions, color, isOpen, swing) {
           height={baseHeight}
           position={[0, baseHeight / 2, depth * 0.1]}
           color={color}
+          material={ceramicMaterial}
         />
         <CylinderPart
           radiusTop={width * 0.26}
@@ -469,6 +602,7 @@ function renderFurniture(type, dimensions, color, isOpen, swing) {
           height={bowlHeight}
           position={[0, baseHeight + bowlHeight / 2 - 0.02, depth * 0.06]}
           color={color}
+          material={ceramicMaterial}
         />
         <CylinderPart
           radiusTop={width * 0.14}
@@ -494,6 +628,7 @@ function renderFurniture(type, dimensions, color, isOpen, swing) {
           size={[width * 0.68, tankHeight, tankDepth]}
           position={[0, height - tankHeight / 2, -depth * 0.22]}
           color={color}
+          material={ceramicMaterial}
         />
         <BoxPart
           size={[width * 0.66, height * 0.03, tankDepth]}
@@ -505,12 +640,23 @@ function renderFurniture(type, dimensions, color, isOpen, swing) {
   }
 
   if (type === 'shower') {
+    const glassMaterial = { transparent: true, opacity: 0.25, roughness: 0.04, metalness: 0.1 };
+
     return (
       <group>
         <BoxPart size={[width, 0.05, depth]} position={[0, 0.025, 0]} color="#d7dde4" />
-        <BoxPart size={[0.025, height, depth]} position={[-width / 2 + 0.0125, height / 2, 0]} color="#bfe1f0" material={{ transparent: true, opacity: 0.28, roughness: 0.1, metalness: 0.1 }} />
-        <BoxPart size={[width, height, 0.025]} position={[0, height / 2, -depth / 2 + 0.0125]} color="#bfe1f0" material={{ transparent: true, opacity: 0.28, roughness: 0.1, metalness: 0.1 }} />
+        <BoxPart size={[0.025, height, depth]} position={[-width / 2 + 0.0125, height / 2, 0]} color="#bfe1f0" material={glassMaterial} />
+        <BoxPart size={[width, height, 0.025]} position={[0, height / 2, -depth / 2 + 0.0125]} color="#bfe1f0" material={glassMaterial} />
         <CylinderPart radiusTop={0.014} height={height * 0.68} position={[width * 0.34, height * 0.64, -depth * 0.28]} color="#b6c2ce" material={{ metalness: 0.85, roughness: 0.24 }} />
+        <CylinderPart
+          radiusTop={0.06}
+          radiusBottom={0.06}
+          height={0.02}
+          position={[width * 0.34, height * 0.96, -depth * 0.2]}
+          rotation={[0, 0, Math.PI * 0.18]}
+          color="#b6c2ce"
+          material={{ metalness: 0.85, roughness: 0.2 }}
+        />
       </group>
     );
   }
@@ -744,7 +890,7 @@ const Furniture = ({
             <meshStandardMaterial
               color="#4b83ff"
               emissive="#1f4fb3"
-              emissiveIntensity={0.35}
+              emissiveIntensity={0.24}
               metalness={0.15}
               roughness={0.22}
               depthTest={false}
