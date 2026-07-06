@@ -23,7 +23,7 @@ export const OBJECT_CATALOG = [
     group: 'structure',
     dimensions: [4, 2.4, 4],
     minDimensions: [2, 2, 2],
-    color: '#d7d1c7',
+    color: '#ece5da',
     planner: true,
   },
   {
@@ -32,7 +32,7 @@ export const OBJECT_CATALOG = [
     group: 'structure',
     dimensions: [3.2, 2.4, 0.08],
     minDimensions: [0.6, 1.4, 0.05],
-    color: '#d7d1c7',
+    color: '#ece5da',
   },
   {
     id: 'floorPanel',
@@ -40,7 +40,7 @@ export const OBJECT_CATALOG = [
     group: 'structure',
     dimensions: [3.2, 0.12, 3.2],
     minDimensions: [1, 0.05, 1],
-    color: '#ece8df',
+    color: '#c9a87c',
   },
   {
     id: 'ceilingPanel',
@@ -48,7 +48,7 @@ export const OBJECT_CATALOG = [
     group: 'structure',
     dimensions: [3.2, 0.12, 3.2],
     minDimensions: [1, 0.05, 1],
-    color: '#e4e8ed',
+    color: '#f4f0e8',
   },
   {
     id: 'door',
@@ -56,7 +56,7 @@ export const OBJECT_CATALOG = [
     group: 'structure',
     dimensions: [0.9, 2.1, 0.08],
     minDimensions: [0.7, 1.9, 0.08],
-    color: '#9f7b59',
+    color: '#c9a87c',
     openable: true,
   },
   {
@@ -73,7 +73,7 @@ export const OBJECT_CATALOG = [
     group: 'living',
     dimensions: [2.1, 0.85, 0.92],
     minDimensions: [1.1, 0.6, 0.5],
-    color: '#8d7764',
+    color: '#e8e2d5',
   },
   {
     id: 'bed',
@@ -81,7 +81,7 @@ export const OBJECT_CATALOG = [
     group: 'living',
     dimensions: [1.7, 0.72, 2.2],
     minDimensions: [1.1, 0.4, 1.7],
-    color: '#6e5d58',
+    color: '#f2ede3',
   },
   {
     id: 'chair',
@@ -89,7 +89,7 @@ export const OBJECT_CATALOG = [
     group: 'living',
     dimensions: [0.52, 0.92, 0.54],
     minDimensions: [0.3, 0.45, 0.3],
-    color: '#a86d43',
+    color: '#f2ede3',
   },
   {
     id: 'table',
@@ -97,7 +97,7 @@ export const OBJECT_CATALOG = [
     group: 'living',
     dimensions: [1.6, 0.75, 0.92],
     minDimensions: [0.7, 0.55, 0.5],
-    color: '#9c714c',
+    color: '#c9a87c',
   },
   {
     id: 'desk',
@@ -105,7 +105,7 @@ export const OBJECT_CATALOG = [
     group: 'work',
     dimensions: [1.4, 0.75, 0.7],
     minDimensions: [0.8, 0.6, 0.45],
-    color: '#8b6548',
+    color: '#c9a87c',
   },
   {
     id: 'tv',
@@ -113,7 +113,7 @@ export const OBJECT_CATALOG = [
     group: 'work',
     dimensions: [1.4, 0.9, 0.12],
     minDimensions: [0.6, 0.4, 0.05],
-    color: '#1f2328',
+    color: '#161616',
   },
   {
     id: 'cabinet',
@@ -121,7 +121,7 @@ export const OBJECT_CATALOG = [
     group: 'work',
     dimensions: [0.9, 1.6, 0.45],
     minDimensions: [0.45, 0.8, 0.3],
-    color: '#8a715b',
+    color: '#c9a87c',
     openable: true,
   },
   {
@@ -130,7 +130,7 @@ export const OBJECT_CATALOG = [
     group: 'work',
     dimensions: [1.6, 2.1, 0.65],
     minDimensions: [0.8, 1.5, 0.4],
-    color: '#8b7968',
+    color: '#c9a87c',
     openable: true,
   },
   {
@@ -139,7 +139,7 @@ export const OBJECT_CATALOG = [
     group: 'appliance',
     dimensions: [0.9, 1.85, 0.82],
     minDimensions: [0.5, 1.3, 0.45],
-    color: '#d8dde3',
+    color: '#3a3d42',
   },
   {
     id: 'washingMachine',
@@ -147,7 +147,7 @@ export const OBJECT_CATALOG = [
     group: 'appliance',
     dimensions: [0.68, 0.92, 0.68],
     minDimensions: [0.45, 0.6, 0.45],
-    color: '#dfe3e8',
+    color: '#f4f1ea',
   },
   {
     id: 'sink',
@@ -155,7 +155,7 @@ export const OBJECT_CATALOG = [
     group: 'bath',
     dimensions: [1.1, 0.92, 0.62],
     minDimensions: [0.6, 0.65, 0.35],
-    color: '#aab6c3',
+    color: '#f5f3ef',
   },
   {
     id: 'cooktop',
@@ -163,7 +163,7 @@ export const OBJECT_CATALOG = [
     group: 'bath',
     dimensions: [0.78, 0.16, 0.58],
     minDimensions: [0.4, 0.08, 0.3],
-    color: '#20252d',
+    color: '#161616',
   },
   {
     id: 'bathtub',
@@ -171,7 +171,7 @@ export const OBJECT_CATALOG = [
     group: 'bath',
     dimensions: [1.7, 0.58, 0.82],
     minDimensions: [1, 0.35, 0.5],
-    color: '#e8ecef',
+    color: '#f4f1ea',
   },
   {
     id: 'toilet',
@@ -179,7 +179,7 @@ export const OBJECT_CATALOG = [
     group: 'bath',
     dimensions: [0.42, 0.78, 0.7],
     minDimensions: [0.28, 0.45, 0.4],
-    color: '#eef1f4',
+    color: '#f4f1ea',
   },
   {
     id: 'shower',
@@ -187,7 +187,7 @@ export const OBJECT_CATALOG = [
     group: 'bath',
     dimensions: [0.9, 2.1, 0.9],
     minDimensions: [0.55, 1.7, 0.55],
-    color: '#b8d4e8',
+    color: '#dfe7ee',
   },
 ];
 

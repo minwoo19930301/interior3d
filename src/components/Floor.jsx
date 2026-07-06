@@ -1,10 +1,26 @@
 import React from 'react';
+import * as THREE from 'three';
 import useStore from '../store/useStore';
-import { getGroundTexture } from '../lib/textures';
+import { getGroundTexture, getGridOverlayTexture } from '../lib/textures';
+
+const FLOOR_SIZE = 40;
 
 const Floor = () => {
     const selectObject = useStore((state) => state.selectObject);
-    const groundTexture = getGroundTexture();
+
+    const groundTexture = React.useMemo(() => {
+        const texture = getGroundTexture().clone();
+        texture.needsUpdate = true;
+        texture.repeat.set(FLOOR_SIZE / 3.2, FLOOR_SIZE / 3.2);
+        return texture;
+    }, []);
+
+    const gridTexture = React.useMemo(() => {
+        const texture = getGridOverlayTexture().clone();
+        texture.needsUpdate = true;
+        texture.repeat.set(FLOOR_SIZE, FLOOR_SIZE);
+        return texture;
+    }, []);
 
     return (
         <group>
@@ -17,10 +33,19 @@ const Floor = () => {
                     selectObject(null);
                 }}
             >
-                <planeGeometry args={[40, 40]} />
-                <meshStandardMaterial map={groundTexture} roughness={0.95} />
+                <planeGeometry args={[FLOOR_SIZE, FLOOR_SIZE]} />
+                <meshStandardMaterial map={groundTexture} roughness={0.92} />
             </mesh>
-            <gridHelper args={[40, 40, 0x4d5a70, 0x2f3948]} />
+            <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.001, 0]}>
+                <planeGeometry args={[FLOOR_SIZE, FLOOR_SIZE]} />
+                <meshBasicMaterial
+                    map={gridTexture}
+                    transparent
+                    opacity={1}
+                    depthWrite={false}
+                    blending={THREE.NormalBlending}
+                />
+            </mesh>
         </group>
     );
 };

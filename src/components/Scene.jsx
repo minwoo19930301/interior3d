@@ -1,11 +1,22 @@
 import React from 'react';
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls, Environment, Lightformer, ContactShadows } from '@react-three/drei';
-import { MOUSE, TOUCH } from 'three';
+import { MOUSE, TOUCH, BackSide } from 'three';
 import Floor from './Floor';
 import Furniture from './Furniture';
 import useStore from '../store/useStore';
 import { isObjectOpenable } from '../lib/objectCatalog';
+import { getSkyGradientTexture } from '../lib/textures';
+
+const DuskSky = () => {
+    const texture = getSkyGradientTexture();
+    return (
+        <mesh scale={[-1, 1, 1]}>
+            <sphereGeometry args={[60, 32, 32]} />
+            <meshBasicMaterial map={texture} side={BackSide} depthWrite={false} fog={false} />
+        </mesh>
+    );
+};
 
 const Scene = () => {
     const objects = useStore((state) => state.objects);
@@ -66,11 +77,12 @@ const Scene = () => {
             onPointerMissed={() => selectObject(null)}
             onDoubleClick={(event) => event.preventDefault()}
         >
-            <color attach="background" args={['#11151d']} />
-            <ambientLight intensity={0.4} />
+            <DuskSky />
+            <ambientLight intensity={0.22} />
             <directionalLight
-                position={[10, 12, 8]}
-                intensity={1.1}
+                position={[8, 10, 4]}
+                intensity={1.35}
+                color="#ffd9b0"
                 castShadow
                 shadow-mapSize={[2048, 2048]}
                 shadow-bias={-0.0002}
@@ -79,37 +91,38 @@ const Scene = () => {
                 shadow-camera-top={14}
                 shadow-camera-bottom={-14}
             />
-            <directionalLight position={[-8, 10, -6]} intensity={0.25} />
+            <directionalLight position={[-9, 7, -7]} intensity={0.5} color="#a9c4ff" />
 
             <Environment resolution={256} frames={1}>
                 <Lightformer
                     form="rect"
-                    intensity={1.1}
+                    color="#ffd9b0"
+                    intensity={1.4}
+                    scale={[8, 8, 1]}
+                    position={[8, 5, 2]}
+                    rotation={[0, -Math.PI / 2, 0]}
+                />
+                <Lightformer
+                    form="rect"
+                    color="#bcd0ff"
+                    intensity={0.7}
                     scale={[10, 10, 1]}
                     position={[0, 8, 0]}
                     rotation={[Math.PI / 2, 0, 0]}
                 />
                 <Lightformer
                     form="rect"
-                    color="#dbe7ff"
-                    intensity={0.7}
-                    scale={[6, 6, 1]}
-                    position={[8, 4, 0]}
-                    rotation={[0, -Math.PI / 2, 0]}
-                />
-                <Lightformer
-                    form="rect"
-                    color="#ffe3c0"
-                    intensity={0.35}
-                    scale={[6, 6, 1]}
-                    position={[-6, 2, -6]}
-                    rotation={[0, Math.PI / 4, 0]}
+                    color="#c9a87c"
+                    intensity={0.3}
+                    scale={[10, 10, 1]}
+                    position={[0, -2, 0]}
+                    rotation={[-Math.PI / 2, 0, 0]}
                 />
             </Environment>
 
             <Floor />
 
-            <ContactShadows position={[0, 0.01, 0]} opacity={0.4} scale={34} blur={2.6} far={5} resolution={512} />
+            <ContactShadows position={[0, 0.01, 0]} opacity={0.55} scale={34} blur={2.2} far={5} resolution={512} />
 
             {objects.map((obj) => (
                 <Furniture
