@@ -42,9 +42,13 @@ function copyText(text) {
   input.style.left = '-9999px';
   document.body.appendChild(input);
   input.select();
-  document.execCommand('copy');
-  document.body.removeChild(input);
-  return Promise.resolve();
+  try {
+    return document.execCommand('copy')
+      ? Promise.resolve()
+      : Promise.reject(new Error('Copy was not permitted'));
+  } finally {
+    document.body.removeChild(input);
+  }
 }
 
 function isEditableTarget(target) {
@@ -84,6 +88,7 @@ function App() {
   const setCameraMode = useStore((state) => state.setCameraMode);
   const clipboardObject = useStore((state) => state.clipboardObject);
   const historyPastLength = useStore((state) => state.historyPast.length);
+  const historyFutureLength = useStore((state) => state.historyFuture.length);
   const copySelectedObject = useStore((state) => state.copySelectedObject);
   const pasteClipboardObject = useStore((state) => state.pasteClipboardObject);
   const addObjects = useStore((state) => state.addObjects);
@@ -101,7 +106,16 @@ function App() {
   const selectedObject = objects.find((object) => object.id === selectedId);
 
   useEffect(() => {
-    syncSceneToUrl({ objects, unitSystem });
+    let timeout;
+    let retryDelay = 500;
+    const sync = () => {
+      if (syncSceneToUrl({ objects, unitSystem }) === false && retryDelay <= 32000) {
+        timeout = window.setTimeout(sync, retryDelay);
+        retryDelay *= 2;
+      }
+    };
+    sync();
+    return () => window.clearTimeout(timeout);
   }, [objects, unitSystem]);
 
   useEffect(() => {
@@ -136,17 +150,16 @@ function App() {
 
   useEffect(() => {
     const handleKeyDown = (event) => {
-      if (isEditableTarget(event.target)) {
-        return;
-      }
-
       const key = event.key.toLowerCase();
 
       if (key === 'escape') {
+        setIsRoomPlannerOpen(false);
         setIsSidebarOpen(false);
         setIsPropertiesOpen(false);
         return;
       }
+
+      if (isRoomPlannerOpen || isEditableTarget(event.target)) return;
 
       if ((key === 'backspace' || key === 'delete') && selectedId) {
         event.preventDefault();
@@ -186,7 +199,7 @@ function App() {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [copySelectedObject, pasteClipboardObject, redo, removeObject, selectedId, undo]);
+  }, [copySelectedObject, pasteClipboardObject, redo, removeObject, selectedId, undo, isRoomPlannerOpen]);
 
   const handleCopyShareLink = async () => {
     try {
@@ -418,6 +431,13 @@ function App() {
                   style={actionButtonStyle(historyPastLength > 0)}
                 >
                   {t('ui_undo', locale)}
+                </button>
+                <button
+                  onClick={() => redo()}
+                  disabled={historyFutureLength === 0}
+                  style={actionButtonStyle(historyFutureLength > 0)}
+                >
+                  {t('ui_redo', locale)}
                 </button>
               </div>
 

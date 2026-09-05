@@ -1,5 +1,5 @@
-import { getObjectDefinition } from './objectCatalog';
-import { localizeText } from './i18n';
+import { getObjectDefinition } from './objectCatalog.js';
+import { localizeText } from './i18n.js';
 
 const DEFAULT_WALL_COLOR = '#d7d1c7';
 const DEFAULT_FLOOR_COLOR = '#ece8df';

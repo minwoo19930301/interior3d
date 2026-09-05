@@ -47,12 +47,30 @@
 ## 로컬 개발
 
 ```bash
-cd "/Users/minwokim/Documents/New project/interior3d"
-npm install
+git clone https://github.com/minwoo19930301/interior3d.git
+cd interior3d
+npm ci
 npm run dev
 ```
 
 브라우저에서 `http://localhost:5173`를 열면 됩니다.
+
+## 검증
+
+```bash
+npm test
+npm run lint
+npm run build
+```
+
+회귀 검사는 세 아파트 템플릿의 8cm 벽·좁은 바닥/천장 치수, 공유 링크,
+브라우저 URL 갱신 실패, 복사·삭제·되돌리기·다시 실행을 확인합니다.
+정지한 장면은 필요할 때만 렌더링하며 카메라나 오브젝트를 조작하면 다시 그립니다.
+
+Chrome과 Playwright가 설치된 환경에서는 `npm run dev -- --port 4174` 실행 후
+`node tests/browser-smoke.mjs`로 1440/390/820px 조작과 템플릿 공유·복원을 확인할 수 있습니다.
+`PLAYWRIGHT_MODULE`로 기존 Playwright 모듈 경로를, `TEST_URL`로 로컬 주소를,
+`EVIDENCE_DIR`로 스크린샷 저장 폴더를 지정할 수 있습니다.
 
 ## 빌드와 배포
 

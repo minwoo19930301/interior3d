@@ -1,4 +1,4 @@
-import { localizeText } from './i18n';
+import { localizeText } from './i18n.js';
 
 const GENERIC_MIN_DIMENSIONS = [0.2, 0.2, 0.05];
 
@@ -31,7 +31,8 @@ export const OBJECT_CATALOG = [
     label: { en: 'Wall', ko: '벽' },
     group: 'structure',
     dimensions: [3.2, 2.4, 0.08],
-    minDimensions: [0.6, 1.4, 0.05],
+    // Template walls run along either axis; X can be thickness, not length.
+    minDimensions: [0.05, 1.4, 0.05],
     color: '#ece5da',
   },
   {
@@ -39,7 +40,7 @@ export const OBJECT_CATALOG = [
     label: { en: 'Floor', ko: '바닥' },
     group: 'structure',
     dimensions: [3.2, 0.12, 3.2],
-    minDimensions: [1, 0.05, 1],
+    minDimensions: [0.05, 0.02, 0.05],
     color: '#c9a87c',
   },
   {
@@ -47,7 +48,7 @@ export const OBJECT_CATALOG = [
     label: { en: 'Ceiling', ko: '천장' },
     group: 'structure',
     dimensions: [3.2, 0.12, 3.2],
-    minDimensions: [1, 0.05, 1],
+    minDimensions: [0.05, 0.02, 0.05],
     color: '#f4f0e8',
   },
   {
@@ -207,7 +208,9 @@ export const DEFAULT_CAMERA_STATE = {
 };
 
 export function getObjectDefinition(type) {
-  return OBJECT_CATALOG_BY_ID[type] ?? OBJECT_CATALOG_BY_ID.cube;
+  return Object.hasOwn(OBJECT_CATALOG_BY_ID, type)
+    ? OBJECT_CATALOG_BY_ID[type]
+    : OBJECT_CATALOG_BY_ID.cube;
 }
 
 export function getObjectLabel(type, locale) {
@@ -229,8 +232,7 @@ export function normalizeNumber(value, fallback = 0) {
 }
 
 export function roundNumber(value, digits = 3) {
-  const factor = 10 ** digits;
-  return Math.round(normalizeNumber(value) * factor) / factor;
+  return Number(normalizeNumber(value).toFixed(digits));
 }
 
 export function normalizeVector(value, fallback) {

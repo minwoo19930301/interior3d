@@ -9,8 +9,8 @@ import {
   normalizePositionForType,
   normalizeVector,
   clampDimensions,
-} from '../lib/objectCatalog';
-import { loadSceneFromUrl } from '../lib/sceneUrl';
+} from '../lib/objectCatalog.js';
+import { loadSceneFromUrl } from '../lib/sceneUrl.js';
 
 const initialScene = loadSceneFromUrl();
 const HISTORY_LIMIT = 60;
@@ -274,17 +274,18 @@ const useStore = create((set, get) => ({
 
   updateObject: (id, newData) =>
     set((state) => {
-      const hasTarget = state.objects.some((object) => object.id === id);
-
-      if (!hasTarget) {
+      const currentObject = state.objects.find((object) => object.id === id);
+      if (!currentObject) {
         return state;
       }
+      const nextObject = patchObject(currentObject, newData);
+      if (JSON.stringify(currentObject) === JSON.stringify(nextObject)) return state;
 
       return {
         historyPast: pushHistoryEntry(state.historyPast, state),
         historyFuture: [],
         objects: state.objects.map((object) =>
-          object.id === id ? patchObject(object, newData) : object,
+          object.id === id ? nextObject : object,
         ),
       };
     }),

@@ -66,6 +66,7 @@ const Scene = () => {
 
     return (
         <Canvas
+            frameloop="demand"
             shadows
             dpr={[1, 1.5]}
             camera={{ position: [9, 7.5, 9], fov: 44 }}
