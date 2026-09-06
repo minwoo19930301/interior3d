@@ -1,0 +1,4 @@
+node_modules/
+__pycache__/
+*.blend1
+*.blend2

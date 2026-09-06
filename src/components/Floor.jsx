@@ -26,7 +26,7 @@ const Floor = () => {
         <group>
             <mesh
                 rotation={[-Math.PI / 2, 0, 0]}
-                position={[0, -0.01, 0]}
+                position={[0, -0.03, 0]}
                 receiveShadow
                 onClick={(e) => {
                     e.stopPropagation();
@@ -36,12 +36,12 @@ const Floor = () => {
                 <planeGeometry args={[FLOOR_SIZE, FLOOR_SIZE]} />
                 <meshStandardMaterial map={groundTexture} roughness={0.92} />
             </mesh>
-            <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.001, 0]}>
+            <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.029, 0]}>
                 <planeGeometry args={[FLOOR_SIZE, FLOOR_SIZE]} />
                 <meshBasicMaterial
                     map={gridTexture}
                     transparent
-                    opacity={1}
+                    opacity={0.22}
                     depthWrite={false}
                     blending={THREE.NormalBlending}
                 />

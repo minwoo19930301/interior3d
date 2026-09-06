@@ -1002,7 +1002,7 @@ function clampObjectCoordinate(value, minEdge, maxEdge, size) {
 
 function createPlacedRoomObject(type, bounds, options = {}) {
   const definition = getObjectDefinition(type);
-  const dimensions = (options.dimensions ?? definition.dimensions).map(roundPlanValue);
+  const dimensions = [...(options.dimensions ?? definition.dimensions)];
   const desiredX = options.x ?? bounds.centerX;
   const desiredZ = options.z ?? bounds.centerZ;
 
@@ -1022,57 +1022,29 @@ function createPlacedRoomObject(type, bounds, options = {}) {
 }
 
 function buildDefaultRoomObjects(tileGrid, columnSizes, rowSizes) {
-  const regions = buildTileRegions(tileGrid, columnSizes, rowSizes);
   const objects = [];
-
-  regions.forEach((region) => {
-    if (region.type === 'entry') {
-      objects.push(
-        createPlacedRoomObject('cabinet', region, {
-          dimensions: [
-            Math.min(0.95, Math.max(0.7, region.width * 0.48)),
-            1.15,
-            0.38,
-          ],
-          z: region.z1 + 0.28,
-        }),
-      );
+  for (const region of buildTileRegions(tileGrid, columnSizes, rowSizes)) {
+    function place(type, options = {}) {
+      const dimensions = getObjectDefinition(type).dimensions;
+      const yaw = options.rotationY ?? 0;
+      const w = Math.abs(Math.cos(yaw))*dimensions[0]+Math.abs(Math.sin(yaw))*dimensions[2];
+      const d = Math.abs(Math.sin(yaw))*dimensions[0]+Math.abs(Math.cos(yaw))*dimensions[2];
+      if (region.width < w+.3 || region.depth < d+.3) return;
+      const candidate = createPlacedRoomObject(type,region,options);
+      candidate.position[0] = clampObjectCoordinate(options.x ?? region.centerX,region.x1,region.x2,w);
+      candidate.position[2] = clampObjectCoordinate(options.z ?? region.centerZ,region.z1,region.z2,d);
+      objects.push(candidate);
     }
-
-    if (region.type === 'bath') {
-      objects.push(
-        createPlacedRoomObject('sink', region, {
-          dimensions: [
-            Math.min(1, Math.max(0.75, region.width * 0.55)),
-            0.92,
-            0.58,
-          ],
-          z: region.z1 + 0.34,
-        }),
-      );
-      objects.push(
-        createPlacedRoomObject('toilet', region, {
-          x: region.x1 + Math.min(0.38, region.width * 0.28),
-          z: region.centerZ,
-        }),
-      );
-
-      if (region.width > 1.25 && region.depth > 1.25) {
-        objects.push(
-          createPlacedRoomObject('shower', region, {
-            dimensions: [
-              Math.min(0.9, Math.max(0.7, region.width * 0.36)),
-              2.1,
-              Math.min(0.9, Math.max(0.7, region.depth * 0.36)),
-            ],
-            x: region.x2 - 0.42,
-            z: region.z2 - 0.42,
-          }),
-        );
-      }
+    if (region.type==='entry') place('cabinet',{z:region.z1+.34});
+    if (region.type==='bath') {
+      // SUNNERSTA is a mini-kitchen, never a bathroom basin.
+      place('toilet',{x:region.x1+.4,z:region.z1+.5});
+      if(region.width>2.1 && region.depth>1.7) place('shower',{x:region.x2-.55,z:region.z2-.55});
     }
-  });
-
+    if (region.type==='kitchen' || region.type==='utility') place('sink',{z:region.z1+.4});
+    if (region.type==='bedroom') place('bed',{z:region.z1+1.25});
+    if (region.type==='living') place('sofa',{z:region.z1+.65});
+  }
   return objects;
 }
 

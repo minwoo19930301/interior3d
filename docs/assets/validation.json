@@ -1,0 +1,233 @@
+{
+  "passed": true,
+  "assets": [
+    {
+      "type": "sofa",
+      "dimensions": [
+        2.28,
+        0.83,
+        0.95
+      ],
+      "triangles": 9632,
+      "bytes": 229632,
+      "degenerateTriangles": 0,
+      "pivotCount": 0
+    },
+    {
+      "type": "bed",
+      "dimensions": [
+        1.66,
+        1.0,
+        2.0899999
+      ],
+      "triangles": 11128,
+      "bytes": 311652,
+      "degenerateTriangles": 144,
+      "pivotCount": 0
+    },
+    {
+      "type": "chair",
+      "dimensions": [
+        0.46,
+        0.8,
+        0.51
+      ],
+      "triangles": 6584,
+      "bytes": 229116,
+      "degenerateTriangles": 0,
+      "pivotCount": 0
+    },
+    {
+      "type": "table",
+      "dimensions": [
+        1.4,
+        0.74,
+        0.78
+      ],
+      "triangles": 2264,
+      "bytes": 135944,
+      "degenerateTriangles": 0,
+      "pivotCount": 0
+    },
+    {
+      "type": "desk",
+      "dimensions": [
+        1.05,
+        0.75,
+        0.5
+      ],
+      "triangles": 4144,
+      "bytes": 114896,
+      "degenerateTriangles": 128,
+      "pivotCount": 2
+    },
+    {
+      "type": "tv",
+      "dimensions": [
+        1.2321,
+        0.7488,
+        0.2263
+      ],
+      "triangles": 1788,
+      "bytes": 51728,
+      "degenerateTriangles": 0,
+      "pivotCount": 0
+    },
+    {
+      "type": "cabinet",
+      "dimensions": [
+        0.8,
+        1.0,
+        0.48
+      ],
+      "triangles": 5452,
+      "bytes": 139244,
+      "degenerateTriangles": 0,
+      "pivotCount": 4
+    },
+    {
+      "type": "wardrobe",
+      "dimensions": [
+        1.0,
+        2.3640001,
+        0.6
+      ],
+      "triangles": 5184,
+      "bytes": 134500,
+      "degenerateTriangles": 0,
+      "pivotCount": 2
+    },
+    {
+      "type": "refrigerator",
+      "dimensions": [
+        0.78,
+        1.8,
+        0.73
+      ],
+      "triangles": 5268,
+      "bytes": 139544,
+      "degenerateTriangles": 0,
+      "pivotCount": 2
+    },
+    {
+      "type": "washingMachine",
+      "dimensions": [
+        0.6,
+        0.85,
+        0.565
+      ],
+      "triangles": 19736,
+      "bytes": 648464,
+      "degenerateTriangles": 34,
+      "pivotCount": 1
+    },
+    {
+      "type": "sink",
+      "dimensions": [
+        1.12,
+        1.39,
+        0.56
+      ],
+      "triangles": 13532,
+      "bytes": 337200,
+      "degenerateTriangles": 64,
+      "pivotCount": 0
+    },
+    {
+      "type": "cooktop",
+      "dimensions": [
+        0.59,
+        0.049,
+        0.52
+      ],
+      "triangles": 6116,
+      "bytes": 345784,
+      "degenerateTriangles": 0,
+      "pivotCount": 0
+    },
+    {
+      "type": "bathtub",
+      "dimensions": [
+        1.7,
+        0.61,
+        0.75
+      ],
+      "triangles": 2292,
+      "bytes": 57212,
+      "degenerateTriangles": 64,
+      "pivotCount": 0
+    },
+    {
+      "type": "toilet",
+      "dimensions": [
+        0.42,
+        0.74,
+        0.72
+      ],
+      "triangles": 5912,
+      "bytes": 187616,
+      "degenerateTriangles": 72,
+      "pivotCount": 1
+    },
+    {
+      "type": "shower",
+      "dimensions": [
+        0.9,
+        2.3499999,
+        0.9
+      ],
+      "triangles": 24492,
+      "bytes": 658928,
+      "degenerateTriangles": 80,
+      "pivotCount": 2
+    },
+    {
+      "type": "armchair",
+      "dimensions": [
+        0.68,
+        1.0,
+        0.82
+      ],
+      "triangles": 11532,
+      "bytes": 249000,
+      "degenerateTriangles": 11,
+      "pivotCount": 0
+    },
+    {
+      "type": "floorLamp",
+      "dimensions": [
+        0.62,
+        1.5099999,
+        0.62
+      ],
+      "triangles": 5976,
+      "bytes": 303776,
+      "degenerateTriangles": 72,
+      "pivotCount": 0
+    },
+    {
+      "type": "tableLamp",
+      "dimensions": [
+        0.25,
+        0.24,
+        0.25
+      ],
+      "triangles": 4744,
+      "bytes": 110572,
+      "degenerateTriangles": 142,
+      "pivotCount": 0
+    },
+    {
+      "type": "pendantLamp",
+      "dimensions": [
+        0.5,
+        0.54,
+        0.5
+      ],
+      "triangles": 30220,
+      "bytes": 1384836,
+      "degenerateTriangles": 72,
+      "pivotCount": 1
+    }
+  ]
+}

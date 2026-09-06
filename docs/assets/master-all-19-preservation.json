@@ -1,0 +1,382 @@
+{
+  "originalsPreserved": true,
+  "masters": [
+    {
+      "name": "sanitized",
+      "expectedSha256": "03dac07c9a72d9b439abfeab9c48c87fcbafab23ecfb889750c21402cda450f5",
+      "bytes": 13056212,
+      "actualSha256": "03dac07c9a72d9b439abfeab9c48c87fcbafab23ecfb889750c21402cda450f5",
+      "unchanged": true
+    },
+    {
+      "name": "original",
+      "expectedSha256": "dc646f4d7fa73ce159dd090243ea8aa5e1639d90813917be5266ce5f75b9d5c9",
+      "bytes": 13053588,
+      "actualSha256": "dc646f4d7fa73ce159dd090243ea8aa5e1639d90813917be5266ce5f75b9d5c9",
+      "unchanged": true
+    }
+  ],
+  "assets": [
+    {
+      "type": "sofa",
+      "originalMatchesReleaseManifest": true,
+      "originalBytesMatchManifest": true,
+      "binaryChunkByteIdentical": true,
+      "fullJsonEqualExceptNodePrefixAndTwoOperationalSceneFields": true,
+      "oldSceneHistory": [
+        {
+          "last_asset": "shower",
+          "asset_batch": "sofa,chair,table,desk,bed,cabinet,wardrobe,tv,refrigerator,washingMachine,sink,cooktop,bathtub,toilet,shower,armchair,floorLamp,tableLamp,pendantLamp"
+        }
+      ],
+      "newSceneHistory": [
+        {
+          "last_asset": "floorLamp",
+          "asset_batch": "toilet,floorLamp"
+        }
+      ]
+    },
+    {
+      "type": "bed",
+      "originalMatchesReleaseManifest": true,
+      "originalBytesMatchManifest": true,
+      "binaryChunkByteIdentical": true,
+      "fullJsonEqualExceptNodePrefixAndTwoOperationalSceneFields": true,
+      "oldSceneHistory": [
+        {
+          "last_asset": "desk",
+          "asset_batch": "sofa,chair,table,desk,bed,cabinet,wardrobe,tv,refrigerator,washingMachine,sink,cooktop,bathtub,toilet,shower,armchair,floorLamp,tableLamp,pendantLamp"
+        }
+      ],
+      "newSceneHistory": [
+        {
+          "last_asset": "floorLamp",
+          "asset_batch": "toilet,floorLamp"
+        }
+      ]
+    },
+    {
+      "type": "chair",
+      "originalMatchesReleaseManifest": true,
+      "originalBytesMatchManifest": true,
+      "binaryChunkByteIdentical": true,
+      "fullJsonEqualExceptNodePrefixAndTwoOperationalSceneFields": true,
+      "oldSceneHistory": [
+        {
+          "last_asset": "sofa",
+          "asset_batch": "sofa,chair,table,desk,bed,cabinet,wardrobe,tv,refrigerator,washingMachine,sink,cooktop,bathtub,toilet,shower,armchair,floorLamp,tableLamp,pendantLamp"
+        }
+      ],
+      "newSceneHistory": [
+        {
+          "last_asset": "floorLamp",
+          "asset_batch": "toilet,floorLamp"
+        }
+      ]
+    },
+    {
+      "type": "table",
+      "originalMatchesReleaseManifest": true,
+      "originalBytesMatchManifest": true,
+      "binaryChunkByteIdentical": true,
+      "fullJsonEqualExceptNodePrefixAndTwoOperationalSceneFields": true,
+      "oldSceneHistory": [
+        {
+          "last_asset": "chair",
+          "asset_batch": "sofa,chair,table,desk,bed,cabinet,wardrobe,tv,refrigerator,washingMachine,sink,cooktop,bathtub,toilet,shower,armchair,floorLamp,tableLamp,pendantLamp"
+        }
+      ],
+      "newSceneHistory": [
+        {
+          "last_asset": "floorLamp",
+          "asset_batch": "toilet,floorLamp"
+        }
+      ]
+    },
+    {
+      "type": "desk",
+      "originalMatchesReleaseManifest": true,
+      "originalBytesMatchManifest": true,
+      "binaryChunkByteIdentical": true,
+      "fullJsonEqualExceptNodePrefixAndTwoOperationalSceneFields": true,
+      "oldSceneHistory": [
+        {
+          "last_asset": "table",
+          "asset_batch": "sofa,chair,table,desk,bed,cabinet,wardrobe,tv,refrigerator,washingMachine,sink,cooktop,bathtub,toilet,shower,armchair,floorLamp,tableLamp,pendantLamp"
+        }
+      ],
+      "newSceneHistory": [
+        {
+          "last_asset": "floorLamp",
+          "asset_batch": "toilet,floorLamp"
+        }
+      ]
+    },
+    {
+      "type": "tv",
+      "originalMatchesReleaseManifest": true,
+      "originalBytesMatchManifest": true,
+      "binaryChunkByteIdentical": true,
+      "fullJsonEqualExceptNodePrefixAndTwoOperationalSceneFields": true,
+      "oldSceneHistory": [
+        {
+          "last_asset": "wardrobe",
+          "asset_batch": "sofa,chair,table,desk,bed,cabinet,wardrobe,tv,refrigerator,washingMachine,sink,cooktop,bathtub,toilet,shower,armchair,floorLamp,tableLamp,pendantLamp"
+        }
+      ],
+      "newSceneHistory": [
+        {
+          "last_asset": "floorLamp",
+          "asset_batch": "toilet,floorLamp"
+        }
+      ]
+    },
+    {
+      "type": "cabinet",
+      "originalMatchesReleaseManifest": true,
+      "originalBytesMatchManifest": true,
+      "binaryChunkByteIdentical": true,
+      "fullJsonEqualExceptNodePrefixAndTwoOperationalSceneFields": true,
+      "oldSceneHistory": [
+        {
+          "last_asset": "bed",
+          "asset_batch": "sofa,chair,table,desk,bed,cabinet,wardrobe,tv,refrigerator,washingMachine,sink,cooktop,bathtub,toilet,shower,armchair,floorLamp,tableLamp,pendantLamp"
+        }
+      ],
+      "newSceneHistory": [
+        {
+          "last_asset": "floorLamp",
+          "asset_batch": "toilet,floorLamp"
+        }
+      ]
+    },
+    {
+      "type": "wardrobe",
+      "originalMatchesReleaseManifest": true,
+      "originalBytesMatchManifest": true,
+      "binaryChunkByteIdentical": true,
+      "fullJsonEqualExceptNodePrefixAndTwoOperationalSceneFields": true,
+      "oldSceneHistory": [
+        {
+          "last_asset": "cabinet",
+          "asset_batch": "sofa,chair,table,desk,bed,cabinet,wardrobe,tv,refrigerator,washingMachine,sink,cooktop,bathtub,toilet,shower,armchair,floorLamp,tableLamp,pendantLamp"
+        }
+      ],
+      "newSceneHistory": [
+        {
+          "last_asset": "floorLamp",
+          "asset_batch": "toilet,floorLamp"
+        }
+      ]
+    },
+    {
+      "type": "refrigerator",
+      "originalMatchesReleaseManifest": true,
+      "originalBytesMatchManifest": true,
+      "binaryChunkByteIdentical": true,
+      "fullJsonEqualExceptNodePrefixAndTwoOperationalSceneFields": true,
+      "oldSceneHistory": [
+        {
+          "last_asset": "tv",
+          "asset_batch": "sofa,chair,table,desk,bed,cabinet,wardrobe,tv,refrigerator,washingMachine,sink,cooktop,bathtub,toilet,shower,armchair,floorLamp,tableLamp,pendantLamp"
+        }
+      ],
+      "newSceneHistory": [
+        {
+          "last_asset": "floorLamp",
+          "asset_batch": "toilet,floorLamp"
+        }
+      ]
+    },
+    {
+      "type": "washingMachine",
+      "originalMatchesReleaseManifest": true,
+      "originalBytesMatchManifest": true,
+      "binaryChunkByteIdentical": true,
+      "fullJsonEqualExceptNodePrefixAndTwoOperationalSceneFields": true,
+      "oldSceneHistory": [
+        {
+          "last_asset": "refrigerator",
+          "asset_batch": "sofa,chair,table,desk,bed,cabinet,wardrobe,tv,refrigerator,washingMachine,sink,cooktop,bathtub,toilet,shower,armchair,floorLamp,tableLamp,pendantLamp"
+        }
+      ],
+      "newSceneHistory": [
+        {
+          "last_asset": "floorLamp",
+          "asset_batch": "toilet,floorLamp"
+        }
+      ]
+    },
+    {
+      "type": "sink",
+      "originalMatchesReleaseManifest": true,
+      "originalBytesMatchManifest": true,
+      "binaryChunkByteIdentical": true,
+      "fullJsonEqualExceptNodePrefixAndTwoOperationalSceneFields": true,
+      "oldSceneHistory": [
+        {
+          "last_asset": "washingMachine",
+          "asset_batch": "sofa,chair,table,desk,bed,cabinet,wardrobe,tv,refrigerator,washingMachine,sink,cooktop,bathtub,toilet,shower,armchair,floorLamp,tableLamp,pendantLamp"
+        }
+      ],
+      "newSceneHistory": [
+        {
+          "last_asset": "floorLamp",
+          "asset_batch": "toilet,floorLamp"
+        }
+      ]
+    },
+    {
+      "type": "cooktop",
+      "originalMatchesReleaseManifest": true,
+      "originalBytesMatchManifest": true,
+      "binaryChunkByteIdentical": true,
+      "fullJsonEqualExceptNodePrefixAndTwoOperationalSceneFields": true,
+      "oldSceneHistory": [
+        {
+          "last_asset": "sink",
+          "asset_batch": "sofa,chair,table,desk,bed,cabinet,wardrobe,tv,refrigerator,washingMachine,sink,cooktop,bathtub,toilet,shower,armchair,floorLamp,tableLamp,pendantLamp"
+        }
+      ],
+      "newSceneHistory": [
+        {
+          "last_asset": "floorLamp",
+          "asset_batch": "toilet,floorLamp"
+        }
+      ]
+    },
+    {
+      "type": "bathtub",
+      "originalMatchesReleaseManifest": true,
+      "originalBytesMatchManifest": true,
+      "binaryChunkByteIdentical": true,
+      "fullJsonEqualExceptNodePrefixAndTwoOperationalSceneFields": true,
+      "oldSceneHistory": [
+        {
+          "last_asset": "cooktop",
+          "asset_batch": "sofa,chair,table,desk,bed,cabinet,wardrobe,tv,refrigerator,washingMachine,sink,cooktop,bathtub,toilet,shower,armchair,floorLamp,tableLamp,pendantLamp"
+        }
+      ],
+      "newSceneHistory": [
+        {
+          "last_asset": "floorLamp",
+          "asset_batch": "toilet,floorLamp"
+        }
+      ]
+    },
+    {
+      "type": "toilet",
+      "originalMatchesReleaseManifest": true,
+      "originalBytesMatchManifest": true,
+      "binaryChunkByteIdentical": true,
+      "fullJsonEqualExceptNodePrefixAndTwoOperationalSceneFields": true,
+      "oldSceneHistory": [
+        {
+          "last_asset": "pendantLamp",
+          "asset_batch": "toilet,floorLamp"
+        }
+      ],
+      "newSceneHistory": [
+        {
+          "last_asset": "floorLamp",
+          "asset_batch": "toilet,floorLamp"
+        }
+      ]
+    },
+    {
+      "type": "shower",
+      "originalMatchesReleaseManifest": true,
+      "originalBytesMatchManifest": true,
+      "binaryChunkByteIdentical": true,
+      "fullJsonEqualExceptNodePrefixAndTwoOperationalSceneFields": true,
+      "oldSceneHistory": [
+        {
+          "last_asset": "toilet",
+          "asset_batch": "sofa,chair,table,desk,bed,cabinet,wardrobe,tv,refrigerator,washingMachine,sink,cooktop,bathtub,toilet,shower,armchair,floorLamp,tableLamp,pendantLamp"
+        }
+      ],
+      "newSceneHistory": [
+        {
+          "last_asset": "floorLamp",
+          "asset_batch": "toilet,floorLamp"
+        }
+      ]
+    },
+    {
+      "type": "armchair",
+      "originalMatchesReleaseManifest": true,
+      "originalBytesMatchManifest": true,
+      "binaryChunkByteIdentical": true,
+      "fullJsonEqualExceptNodePrefixAndTwoOperationalSceneFields": true,
+      "oldSceneHistory": [
+        {
+          "last_asset": "shower",
+          "asset_batch": "sofa,chair,table,desk,bed,cabinet,wardrobe,tv,refrigerator,washingMachine,sink,cooktop,bathtub,toilet,shower,armchair,floorLamp,tableLamp,pendantLamp"
+        }
+      ],
+      "newSceneHistory": [
+        {
+          "last_asset": "floorLamp",
+          "asset_batch": "toilet,floorLamp"
+        }
+      ]
+    },
+    {
+      "type": "floorLamp",
+      "originalMatchesReleaseManifest": true,
+      "originalBytesMatchManifest": true,
+      "binaryChunkByteIdentical": true,
+      "fullJsonEqualExceptNodePrefixAndTwoOperationalSceneFields": true,
+      "oldSceneHistory": [
+        {
+          "last_asset": "toilet",
+          "asset_batch": "toilet,floorLamp"
+        }
+      ],
+      "newSceneHistory": [
+        {
+          "last_asset": "floorLamp",
+          "asset_batch": "toilet,floorLamp"
+        }
+      ]
+    },
+    {
+      "type": "tableLamp",
+      "originalMatchesReleaseManifest": true,
+      "originalBytesMatchManifest": true,
+      "binaryChunkByteIdentical": true,
+      "fullJsonEqualExceptNodePrefixAndTwoOperationalSceneFields": true,
+      "oldSceneHistory": [
+        {
+          "last_asset": "floorLamp",
+          "asset_batch": "sofa,chair,table,desk,bed,cabinet,wardrobe,tv,refrigerator,washingMachine,sink,cooktop,bathtub,toilet,shower,armchair,floorLamp,tableLamp,pendantLamp"
+        }
+      ],
+      "newSceneHistory": [
+        {
+          "last_asset": "floorLamp",
+          "asset_batch": "toilet,floorLamp"
+        }
+      ]
+    },
+    {
+      "type": "pendantLamp",
+      "originalMatchesReleaseManifest": true,
+      "originalBytesMatchManifest": true,
+      "binaryChunkByteIdentical": true,
+      "fullJsonEqualExceptNodePrefixAndTwoOperationalSceneFields": true,
+      "oldSceneHistory": [
+        {
+          "last_asset": "tableLamp",
+          "asset_batch": "sofa,chair,table,desk,bed,cabinet,wardrobe,tv,refrigerator,washingMachine,sink,cooktop,bathtub,toilet,shower,armchair,floorLamp,tableLamp,pendantLamp"
+        }
+      ],
+      "newSceneHistory": [
+        {
+          "last_asset": "floorLamp",
+          "asset_batch": "toilet,floorLamp"
+        }
+      ]
+    }
+  ]
+}

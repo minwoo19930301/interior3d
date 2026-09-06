@@ -1,6 +1,6 @@
 const MESSAGES = {
   en: {
-    app_title: 'interior3d House Templates',
+    app_title: 'interior3d · Reference Design Studio',
     ui_mode: 'Mode',
     ui_camera: 'Camera',
     ui_camera_orbit: 'Orbit',
@@ -79,7 +79,7 @@ const MESSAGES = {
     ui_error_title: 'Something went wrong.',
   },
   ko: {
-    app_title: 'interior3d 집 템플릿',
+    app_title: 'interior3d · 실존 디자인 스튜디오',
     ui_mode: '모드',
     ui_camera: '카메라',
     ui_camera_orbit: '회전',

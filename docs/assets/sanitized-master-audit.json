@@ -1,0 +1,78 @@
+{
+  "result": "passed_read_only_binary_metadata_audit",
+  "glbCount": 19,
+  "allGlbHashesMatchManifest": true,
+  "sourceClaims": {
+    "createdWith": "Blender 4.5.11 LTS via real local Blender MCP (upstream1.9.1); no external asset-generation API",
+    "referenceOnly": true,
+    "notManufacturerCad": true
+  },
+  "savedKhronosResult": {
+    "validator": "2.0.0-dev.3.10",
+    "errors": 0,
+    "warnings": 0,
+    "count": 19,
+    "note": "Saved report inspected; validator not rerun by this script"
+  },
+  "master": {
+    "file": "interior-furniture.blend",
+    "isCopy": true,
+    "bytes": 13056212,
+    "sha256": "03dac07c9a72d9b439abfeab9c48c87fcbafab23ecfb889750c21402cda450f5",
+    "header": "BLENDER-v405",
+    "collectionNameTokens": [
+      "ASSET_armchair",
+      "ASSET_bathtub",
+      "ASSET_bed",
+      "ASSET_cabinet",
+      "ASSET_chair",
+      "ASSET_cooktop",
+      "ASSET_desk",
+      "ASSET_floorLamp",
+      "ASSET_pendantLamp",
+      "ASSET_refrigerator",
+      "ASSET_shower",
+      "ASSET_sink",
+      "ASSET_sofa",
+      "ASSET_table",
+      "ASSET_tableLamp",
+      "ASSET_toilet",
+      "ASSET_tv",
+      "ASSET_wardrobe",
+      "ASSET_washingMachine"
+    ],
+    "finalDetailMarkers": {
+      "toiletFlushNeck": true,
+      "floorLampHollowShade": true
+    },
+    "embeddedUserPathOccurrences": 0,
+    "retainedOriginalUserNameFragments": 0,
+    "retainedWorkDirectoryFragments": 0,
+    "publishWarning": null,
+    "verified": "19 collection blocks and final-detail object-name markers are present in current bytes",
+    "notAttestedByThisReadOnlyScript": [
+      "Blender can reopen the file",
+      "Each collection geometry equals its final GLB",
+      "Re-export is byte-identical",
+      "Fresh full build reproduces release hashes"
+    ]
+  },
+  "sourceScripts": [
+    {
+      "file": "build_assets.py",
+      "sha256": "cab8bc27fe6ae181da9bf64b1c78d96f3a7cc6fac2a0d6db40d430c3e14bc094"
+    },
+    {
+      "file": "verify_assets.py",
+      "sha256": "13d30c32020913170c26fdb7ab3c6fd8cc30ee68a1eb67a0a796e95507b010c4"
+    },
+    {
+      "file": "batch_final.py",
+      "sha256": "bf7882a9b6606dc25b03606f6d0fad516fa19ffef0b4b90d78ae71dacda62012"
+    },
+    {
+      "file": "batch_final_detail.py",
+      "sha256": "1ef7e2ad7b19b7dba53d2f40a159bddce70bcaf693c6d4eb5ad34c1369e9b64e"
+    }
+  ]
+}

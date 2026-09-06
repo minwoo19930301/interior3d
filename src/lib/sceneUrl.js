@@ -29,9 +29,9 @@ function decodeBase64Url(value) {
 function compactObject(object) {
   return {
     t: object.type,
-    p: object.position.map((value) => roundNumber(value, 2)),
+    p: object.position.map((value) => roundNumber(value, 4)),
     r: object.rotation.map((value) => roundNumber(value, 3)),
-    d: object.dimensions.map((value) => roundNumber(value, 2)),
+    d: object.dimensions.map((value) => roundNumber(value, 4)),
     c: object.color,
     x: object.isOpen ? 1 : 0,
     s: object.swing,
@@ -100,14 +100,8 @@ export function buildSceneUrl({ objects, unitSystem }) {
 
   const url = new URL(window.location.href);
 
-  if (objects.length === 0 && normalizeUnitSystem(unitSystem) === 'm') {
-    url.searchParams.delete(SCENE_QUERY_KEY);
-  } else {
-    url.searchParams.set(
-      SCENE_QUERY_KEY,
-      serializeScene({ objects, unitSystem }),
-    );
-  }
+  // An explicitly empty design must not reload the default furnished room.
+  url.searchParams.set(SCENE_QUERY_KEY, serializeScene({ objects, unitSystem }));
 
   return url.toString();
 }

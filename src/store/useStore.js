@@ -11,6 +11,7 @@ import {
   clampDimensions,
 } from '../lib/objectCatalog.js';
 import { loadSceneFromUrl } from '../lib/sceneUrl.js';
+import { buildDesignRoom } from '../lib/designRooms.js';
 
 const initialScene = loadSceneFromUrl();
 const HISTORY_LIMIT = 60;
@@ -21,17 +22,20 @@ function createSceneObject(type, state) {
   const selectedObject = state.objects.find(
     (object) => object.id === state.selectedId,
   );
+  const position = getSpawnPosition({
+    type: definition.id, dimensions: definition.dimensions,
+    objects: state.objects, selectedObject, cameraState: state.cameraState,
+  });
+  if (definition.reference?.elevated) {
+    position[1] = definition.id === 'pendantLamp' ? 2.1 :
+      selectedObject ? selectedObject.position[1] + selectedObject.dimensions[1] :
+      definition.id === 'cooktop' ? .816 : .75;
+  }
 
   return {
     id: uuidv4(),
     type: definition.id,
-    position: getSpawnPosition({
-      type: definition.id,
-      dimensions: definition.dimensions,
-      objects: state.objects,
-      selectedObject,
-      cameraState: state.cameraState,
-    }),
+    position,
     rotation: [0, 0, 0],
     dimensions: [...definition.dimensions],
     color: definition.color,
@@ -128,7 +132,7 @@ function patchObject(currentObject, newData) {
   };
 }
 
-const initialObjects = (initialScene?.objects ?? []).map((object) => ({
+const initialObjects = (initialScene?.objects ?? buildDesignRoom()).map((object) => ({
   id: uuidv4(),
   ...normalizeObject(object),
 }));
