@@ -9,8 +9,9 @@ import {
   normalizePositionForType,
   normalizeVector,
   clampDimensions,
-} from '../lib/objectCatalog';
-import { loadSceneFromUrl } from '../lib/sceneUrl';
+} from '../lib/objectCatalog.js';
+import { loadSceneFromUrl } from '../lib/sceneUrl.js';
+import { buildDesignRoom } from '../lib/designRooms.js';
 
 const initialScene = loadSceneFromUrl();
 const HISTORY_LIMIT = 60;
@@ -21,17 +22,20 @@ function createSceneObject(type, state) {
   const selectedObject = state.objects.find(
     (object) => object.id === state.selectedId,
   );
+  const position = getSpawnPosition({
+    type: definition.id, dimensions: definition.dimensions,
+    objects: state.objects, selectedObject, cameraState: state.cameraState,
+  });
+  if (definition.reference?.elevated) {
+    position[1] = definition.id === 'pendantLamp' ? 2.1 :
+      selectedObject ? selectedObject.position[1] + selectedObject.dimensions[1] :
+      definition.id === 'cooktop' ? .816 : .75;
+  }
 
   return {
     id: uuidv4(),
     type: definition.id,
-    position: getSpawnPosition({
-      type: definition.id,
-      dimensions: definition.dimensions,
-      objects: state.objects,
-      selectedObject,
-      cameraState: state.cameraState,
-    }),
+    position,
     rotation: [0, 0, 0],
     dimensions: [...definition.dimensions],
     color: definition.color,
@@ -128,7 +132,7 @@ function patchObject(currentObject, newData) {
   };
 }
 
-const initialObjects = (initialScene?.objects ?? []).map((object) => ({
+const initialObjects = (initialScene?.objects ?? buildDesignRoom()).map((object) => ({
   id: uuidv4(),
   ...normalizeObject(object),
 }));
@@ -274,17 +278,18 @@ const useStore = create((set, get) => ({
 
   updateObject: (id, newData) =>
     set((state) => {
-      const hasTarget = state.objects.some((object) => object.id === id);
-
-      if (!hasTarget) {
+      const currentObject = state.objects.find((object) => object.id === id);
+      if (!currentObject) {
         return state;
       }
+      const nextObject = patchObject(currentObject, newData);
+      if (JSON.stringify(currentObject) === JSON.stringify(nextObject)) return state;
 
       return {
         historyPast: pushHistoryEntry(state.historyPast, state),
         historyFuture: [],
         objects: state.objects.map((object) =>
-          object.id === id ? patchObject(object, newData) : object,
+          object.id === id ? nextObject : object,
         ),
       };
     }),

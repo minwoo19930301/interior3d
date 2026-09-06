@@ -1,0 +1,8 @@
+{
+  "name": "interior-reference-reproduction-tools",
+  "private": true,
+  "description": "Optional local format validation only; not an app dependency",
+  "dependencies": {
+    "gltf-validator": "2.0.0-dev.3.10"
+  }
+}

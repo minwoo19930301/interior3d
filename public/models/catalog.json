@@ -1,0 +1,690 @@
+{
+  "axes": "W,H,D; glTF Y-up, front +Z, floor-centre origin",
+  "assets": [
+    {
+      "type": "sofa",
+      "model": "sofa.glb",
+      "thumbnail": "renders/sofa.png",
+      "dimensions": [
+        2.28,
+        0.83,
+        0.95
+      ],
+      "defaultColor": "#a3967f",
+      "referenceManufacturer": "IKEA",
+      "referenceProduct": "KIVIK 3-seat sofa",
+      "referenceSku": "594.405.92",
+      "referenceUrl": "https://www.ikea.com/kr/ko/p/kivik-3-seat-sofa-tibbleby-beige-grey-s59440592/",
+      "referenceOnly": true,
+      "pivots": [],
+      "tintMaterials": [
+        "TINT_Tibbleby_woven_fabric"
+      ]
+    },
+    {
+      "type": "bed",
+      "model": "bed.glb",
+      "thumbnail": "renders/bed.png",
+      "dimensions": [
+        1.66,
+        1,
+        2.09
+      ],
+      "defaultColor": "#e9e8e3",
+      "referenceManufacturer": "IKEA",
+      "referenceProduct": "MALM high bed 150x200",
+      "referenceSku": "890.052.64",
+      "referenceUrl": "https://www.ikea.com/kr/en/p/malm-bed-frame-high-white-s89005264/",
+      "referenceOnly": true,
+      "pivots": [],
+      "tintMaterials": [
+        "TINT_Sage_duvet",
+        "TINT_Linen_bedding",
+        "TINT_White_lacquer"
+      ]
+    },
+    {
+      "type": "chair",
+      "model": "chair.glb",
+      "thumbnail": "renders/chair.png",
+      "dimensions": [
+        0.46,
+        0.8,
+        0.51
+      ],
+      "defaultColor": "#c2a275",
+      "referenceManufacturer": "IKEA",
+      "referenceProduct": "LISABO ash chair",
+      "referenceSku": "804.572.36",
+      "referenceUrl": "https://www.ikea.com/kr/ko/p/lisabo-chair-ash-80457236/",
+      "referenceOnly": true,
+      "pivots": [],
+      "tintMaterials": []
+    },
+    {
+      "type": "table",
+      "model": "table.glb",
+      "thumbnail": "renders/table.png",
+      "dimensions": [
+        1.4,
+        0.74,
+        0.78
+      ],
+      "defaultColor": "#c2a275",
+      "referenceManufacturer": "IKEA",
+      "referenceProduct": "LISABO ash table",
+      "referenceSku": "803.657.17",
+      "referenceUrl": "https://www.ikea.com/kr/ko/p/lisabo-table-ash-veneer-80365717/",
+      "referenceOnly": true,
+      "pivots": [],
+      "tintMaterials": []
+    },
+    {
+      "type": "desk",
+      "model": "desk.glb",
+      "thumbnail": "renders/desk.png",
+      "dimensions": [
+        1.05,
+        0.75,
+        0.5
+      ],
+      "defaultColor": "#e9e8e3",
+      "referenceManufacturer": "IKEA",
+      "referenceProduct": "MICKE desk",
+      "referenceSku": "803.542.76",
+      "referenceUrl": "https://www.ikea.com/kr/ko/p/micke-desk-white-80354276/",
+      "referenceOnly": true,
+      "pivots": [
+        {
+          "node": "pivot_door_right",
+          "motion": "rotation",
+          "axis": "Y",
+          "openAmount": 1.67,
+          "restTranslation": [
+            0.4869999289512634,
+            0.3087649345397949,
+            0.2280876487493515
+          ],
+          "worldPosition": [
+            0.4869999,
+            0.3087649,
+            0.2280876
+          ],
+          "verifiedOpenCentreDelta": [
+            0.2325921,
+            0.0,
+            0.1831181
+          ]
+        },
+        {
+          "node": "pivot_drawer_main",
+          "motion": "translation",
+          "axis": "Z",
+          "openAmount": 0.27,
+          "restTranslation": [
+            -0.15700002014636993,
+            0.6543824672698975,
+            0.003984061535447836
+          ],
+          "worldPosition": [
+            -0.157,
+            0.6543825,
+            0.0039841
+          ],
+          "verifiedOpenCentreDelta": [
+            0.0,
+            0.0,
+            0.27
+          ]
+        }
+      ],
+      "tintMaterials": [
+        "TINT_White_lacquer"
+      ]
+    },
+    {
+      "type": "tv",
+      "model": "tv.glb",
+      "thumbnail": "renders/tv.png",
+      "dimensions": [
+        1.2321,
+        0.7488,
+        0.2263
+      ],
+      "defaultColor": "#1b2227",
+      "referenceManufacturer": "Samsung",
+      "referenceProduct": "DU8000 55 inch with stands",
+      "referenceSku": "UA55DU8000UXTW",
+      "referenceUrl": "https://www.samsung.com/levant/tvs/uhd-4k-tv/du8000-55-inch-crystal-uhd-4k-tizen-os-smart-tv-ua55du8000uxtw/",
+      "referenceOnly": true,
+      "pivots": [],
+      "tintMaterials": []
+    },
+    {
+      "type": "cabinet",
+      "model": "cabinet.glb",
+      "thumbnail": "renders/cabinet.png",
+      "dimensions": [
+        0.8,
+        1,
+        0.48
+      ],
+      "defaultColor": "#e9e8e3",
+      "referenceManufacturer": "IKEA",
+      "referenceProduct": "MALM chest of 4 drawers",
+      "referenceSku": "203.546.46",
+      "referenceUrl": "https://www.ikea.com/kr/ko/p/malm-chest-of-4-drawers-white-20354646/",
+      "referenceOnly": true,
+      "pivots": [
+        {
+          "node": "pivot_drawer_1",
+          "motion": "translation",
+          "axis": "Z",
+          "openAmount": 0.27,
+          "restTranslation": [
+            0,
+            0.19699999690055847,
+            0.0020000000949949026
+          ],
+          "worldPosition": [
+            0.0,
+            0.197,
+            0.002
+          ],
+          "verifiedOpenCentreDelta": [
+            0.0,
+            0.0,
+            0.27
+          ]
+        },
+        {
+          "node": "pivot_drawer_2",
+          "motion": "translation",
+          "axis": "Z",
+          "openAmount": 0.27,
+          "restTranslation": [
+            0,
+            0.421999990940094,
+            0.0020000000949949026
+          ],
+          "worldPosition": [
+            0.0,
+            0.422,
+            0.002
+          ],
+          "verifiedOpenCentreDelta": [
+            0.0,
+            0.0,
+            0.27
+          ]
+        },
+        {
+          "node": "pivot_drawer_3",
+          "motion": "translation",
+          "axis": "Z",
+          "openAmount": 0.27,
+          "restTranslation": [
+            0,
+            0.6470000147819519,
+            0.0020000000949949026
+          ],
+          "worldPosition": [
+            0.0,
+            0.647,
+            0.002
+          ],
+          "verifiedOpenCentreDelta": [
+            0.0,
+            0.0,
+            0.27
+          ]
+        },
+        {
+          "node": "pivot_drawer_4",
+          "motion": "translation",
+          "axis": "Z",
+          "openAmount": 0.27,
+          "restTranslation": [
+            0,
+            0.871999979019165,
+            0.0020000000949949026
+          ],
+          "worldPosition": [
+            0.0,
+            0.872,
+            0.002
+          ],
+          "verifiedOpenCentreDelta": [
+            0.0,
+            0.0,
+            0.27
+          ]
+        }
+      ],
+      "tintMaterials": [
+        "TINT_White_lacquer"
+      ]
+    },
+    {
+      "type": "wardrobe",
+      "model": "wardrobe.glb",
+      "thumbnail": "renders/wardrobe.png",
+      "dimensions": [
+        1,
+        2.364,
+        0.6
+      ],
+      "defaultColor": "#e9e8e3",
+      "referenceManufacturer": "IKEA",
+      "referenceProduct": "PAX/FORSAND wardrobe",
+      "referenceSku": "095.006.49",
+      "referenceUrl": "https://www.ikea.com/no/en/p/pax-forsand-wardrobe-white-white-s09500649/",
+      "referenceOnly": true,
+      "pivots": [
+        {
+          "node": "pivot_door_left",
+          "motion": "rotation",
+          "axis": "Y",
+          "openAmount": -1.67,
+          "restTranslation": [
+            -0.4909999966621399,
+            0,
+            0.28600001335144043
+          ],
+          "worldPosition": [
+            -0.491,
+            0.0,
+            0.286
+          ],
+          "verifiedOpenCentreDelta": [
+            -0.0315618,
+            0.0,
+            0.0599605
+          ]
+        },
+        {
+          "node": "pivot_door_right",
+          "motion": "rotation",
+          "axis": "Y",
+          "openAmount": 1.67,
+          "restTranslation": [
+            0.4909999966621399,
+            0,
+            0.28600001335144043
+          ],
+          "worldPosition": [
+            0.491,
+            0.0,
+            0.286
+          ],
+          "verifiedOpenCentreDelta": [
+            0.0468877,
+            0.0,
+            0.0738367
+          ]
+        }
+      ],
+      "tintMaterials": [
+        "TINT_White_lacquer"
+      ]
+    },
+    {
+      "type": "refrigerator",
+      "model": "refrigerator.glb",
+      "thumbnail": "renders/refrigerator.png",
+      "dimensions": [
+        0.78,
+        1.8,
+        0.73
+      ],
+      "defaultColor": "#9ca4a8",
+      "referenceManufacturer": "LG",
+      "referenceProduct": "B502S33 top freezer refrigerator",
+      "referenceSku": "B502S33",
+      "referenceUrl": "https://www.lge.co.kr/business/refrigerators/b502s33",
+      "referenceOnly": true,
+      "pivots": [
+        {
+          "node": "pivot_door_freezer",
+          "motion": "rotation",
+          "axis": "Y",
+          "openAmount": -1.57,
+          "restTranslation": [
+            -0.38199999928474426,
+            1.5399999618530273,
+            0.3151487112045288
+          ],
+          "worldPosition": [
+            -0.382,
+            1.54,
+            0.3151487
+          ],
+          "verifiedOpenCentreDelta": [
+            -0.4109921,
+            0.0,
+            0.3981795
+          ]
+        },
+        {
+          "node": "pivot_door_fridge",
+          "motion": "rotation",
+          "axis": "Y",
+          "openAmount": -1.57,
+          "restTranslation": [
+            -0.38199999928474426,
+            0.6520000100135803,
+            0.3151487112045288
+          ],
+          "worldPosition": [
+            -0.382,
+            0.652,
+            0.3151487
+          ],
+          "verifiedOpenCentreDelta": [
+            -0.4109921,
+            0.0,
+            0.3981795
+          ]
+        }
+      ],
+      "tintMaterials": [
+        "TINT_White_lacquer"
+      ]
+    },
+    {
+      "type": "washingMachine",
+      "model": "washingMachine.glb",
+      "thumbnail": "renders/washingMachine.png",
+      "dimensions": [
+        0.6,
+        0.85,
+        0.565
+      ],
+      "defaultColor": "#e9e8e3",
+      "referenceManufacturer": "LG",
+      "referenceProduct": "F6V1010WTSE front loader",
+      "referenceSku": "F6V1010WTSE",
+      "referenceUrl": "https://www.lg.com/uk/washing-machines/f6v1010wtse/",
+      "referenceOnly": true,
+      "pivots": [
+        {
+          "node": "pivot_door_left",
+          "motion": "rotation",
+          "axis": "Y",
+          "openAmount": -1.74,
+          "restTranslation": [
+            -0.22499999403953552,
+            0.4300000071525574,
+            0.24945904314517975
+          ],
+          "worldPosition": [
+            -0.225,
+            0.43,
+            0.249459
+          ],
+          "verifiedOpenCentreDelta": [
+            -0.2794392,
+            0.0,
+            0.2133772
+          ]
+        }
+      ],
+      "tintMaterials": [
+        "TINT_White_lacquer"
+      ]
+    },
+    {
+      "type": "sink",
+      "model": "sink.glb",
+      "thumbnail": "renders/sink.png",
+      "dimensions": [
+        1.12,
+        1.39,
+        0.56
+      ],
+      "defaultColor": "#e9e8e3",
+      "referenceManufacturer": "IKEA",
+      "referenceProduct": "SUNNERSTA mini-kitchen with LAGAN",
+      "referenceSku": "791.396.88",
+      "referenceUrl": "https://www.ikea.com/gb/en/p/sunnersta-mini-kitchen-s79139688/",
+      "referenceOnly": true,
+      "pivots": [],
+      "tintMaterials": [
+        "TINT_White_lacquer"
+      ]
+    },
+    {
+      "type": "cooktop",
+      "model": "cooktop.glb",
+      "thumbnail": "renders/cooktop.png",
+      "dimensions": [
+        0.59,
+        0.049,
+        0.52
+      ],
+      "defaultColor": "#171c20",
+      "referenceManufacturer": "IKEA",
+      "referenceProduct": "MATMASSIG induction hob IKEA 300",
+      "referenceSku": "104.670.93",
+      "referenceUrl": "https://www.ikea.com/de/en/p/matmaessig-induction-hob-ikea-300-black-10467093/",
+      "referenceOnly": true,
+      "pivots": [],
+      "tintMaterials": []
+    },
+    {
+      "type": "bathtub",
+      "model": "bathtub.glb",
+      "thumbnail": "renders/bathtub.png",
+      "dimensions": [
+        1.7,
+        0.61,
+        0.75
+      ],
+      "defaultColor": "#f2f2ed",
+      "referenceManufacturer": "KOHLER",
+      "referenceProduct": "Evok 2.0 Seamless Oval 1700",
+      "referenceSku": "25165A-0",
+      "referenceUrl": "https://kohler.co.nz/content/KOHLER_NZ_Catalogue_Apr25_eBook.pdf",
+      "referenceOnly": true,
+      "pivots": [],
+      "tintMaterials": []
+    },
+    {
+      "type": "toilet",
+      "model": "toilet.glb",
+      "thumbnail": "renders/toilet.png",
+      "dimensions": [
+        0.42,
+        0.74,
+        0.72
+      ],
+      "defaultColor": "#f2f2ed",
+      "referenceManufacturer": "Daelim Bath",
+      "referenceProduct": "CC-720N two-piece toilet",
+      "referenceSku": "CC-720N",
+      "referenceUrl": "https://www.daelimbath.com/upload/product/CC-720N_do.pdf",
+      "referenceOnly": true,
+      "pivots": [
+        {
+          "node": "pivot_lid",
+          "motion": "rotation",
+          "axis": "X",
+          "openAmount": -1.7,
+          "restTranslation": [
+            0.0014893646584823728,
+            0.4050000011920929,
+            -0.12000001221895218
+          ],
+          "worldPosition": [
+            0.0014894,
+            0.405,
+            -0.12
+          ],
+          "verifiedOpenCentreDelta": [
+            0.0,
+            0.2285258,
+            -0.2692451
+          ]
+        }
+      ],
+      "tintMaterials": [
+        "TINT_White_lacquer"
+      ]
+    },
+    {
+      "type": "shower",
+      "model": "shower.glb",
+      "thumbnail": "renders/shower.png",
+      "dimensions": [
+        0.9,
+        2.35,
+        0.9
+      ],
+      "defaultColor": "#bacbd0",
+      "referenceManufacturer": "hansgrohe + custom enclosure",
+      "referenceProduct": "Crometta E 240 in custom shower zone",
+      "referenceSku": "27271000",
+      "referenceUrl": "https://www.hansgrohe.co.uk/articledetail-crometta-e-showerpipe-240-1jet-with-thermostatic-shower-mixer-27271000",
+      "referenceOnly": true,
+      "pivots": [
+        {
+          "node": "Crometta_fixture_mount",
+          "motion": "fixed",
+          "axis": "Y",
+          "openAmount": 0,
+          "restTranslation": [
+            0,
+            1.100000023841858,
+            -0.40786266326904297
+          ],
+          "worldPosition": [
+            0.0,
+            1.1,
+            -0.4078627
+          ]
+        },
+        {
+          "node": "pivot_door_left",
+          "motion": "rotation",
+          "axis": "Y",
+          "openAmount": -1.57,
+          "restTranslation": [
+            -0.43799999356269836,
+            0.07999999821186066,
+            0.3849073350429535
+          ],
+          "worldPosition": [
+            -0.438,
+            0.08,
+            0.3849073
+          ],
+          "verifiedOpenCentreDelta": [
+            -0.4300806,
+            0.0,
+            0.3961476
+          ]
+        }
+      ],
+      "tintMaterials": [
+        "TINT_White_lacquer"
+      ]
+    },
+    {
+      "type": "armchair",
+      "model": "armchair.glb",
+      "thumbnail": "renders/armchair.png",
+      "dimensions": [
+        0.68,
+        1,
+        0.82
+      ],
+      "defaultColor": "#768f9c",
+      "referenceManufacturer": "IKEA",
+      "referenceProduct": "POANG bentwood armchair",
+      "referenceSku": "896.252.59",
+      "referenceUrl": "https://www.ikea.com/kr/ko/p/poaeng-armchair-black-kelinge-grey-blue-s89625259/",
+      "referenceOnly": true,
+      "pivots": [],
+      "tintMaterials": [
+        "TINT_Kelinge_corduroy"
+      ]
+    },
+    {
+      "type": "floorLamp",
+      "model": "floorLamp.glb",
+      "thumbnail": "renders/floorLamp.png",
+      "dimensions": [
+        0.62,
+        1.51,
+        0.62
+      ],
+      "defaultColor": "#ddd7c8",
+      "referenceManufacturer": "IKEA",
+      "referenceProduct": "LAUTERS ash floor lamp",
+      "referenceSku": "804.050.54",
+      "referenceUrl": "https://www.ikea.com/kr/ko/p/lauters-floor-lamp-ash-white-80405054/",
+      "referenceOnly": true,
+      "pivots": [],
+      "tintMaterials": [
+        "TINT_White_linen_lampshade",
+        "TINT_White_lacquer"
+      ]
+    },
+    {
+      "type": "tableLamp",
+      "model": "tableLamp.glb",
+      "thumbnail": "renders/tableLamp.png",
+      "dimensions": [
+        0.25,
+        0.24,
+        0.25
+      ],
+      "defaultColor": "#eeebe0",
+      "referenceManufacturer": "IKEA",
+      "referenceProduct": "FADO opal table lamp",
+      "referenceSku": "302.838.99",
+      "referenceUrl": "https://www.ikea.com/kr/ko/p/fado-table-lamp-white-30283899/",
+      "referenceOnly": true,
+      "pivots": [],
+      "tintMaterials": [
+        "TINT_White_lacquer",
+        "TINT_Frosted_opal_globe"
+      ]
+    },
+    {
+      "type": "pendantLamp",
+      "model": "pendantLamp.glb",
+      "thumbnail": "renders/pendantLamp.png",
+      "dimensions": [
+        0.5,
+        0.54,
+        0.5
+      ],
+      "defaultColor": "#c2a275",
+      "referenceManufacturer": "IKEA",
+      "referenceProduct": "SINNERLIG bamboo pendant",
+      "referenceSku": "503.421.95",
+      "referenceUrl": "https://www.ikea.com/kr/ko/p/sinnerlig-pendant-lamp-bamboo-handmade-50342195/",
+      "referenceOnly": true,
+      "pivots": [
+        {
+          "node": "mount_ceiling_anchor",
+          "motion": "fixed",
+          "axis": "Y",
+          "openAmount": 0,
+          "restTranslation": [
+            0,
+            0.5400000214576721,
+            0
+          ],
+          "worldPosition": [
+            0.0,
+            0.54,
+            0.0
+          ]
+        }
+      ],
+      "tintMaterials": []
+    }
+  ]
+}

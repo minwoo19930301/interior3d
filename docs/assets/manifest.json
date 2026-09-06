@@ -1,0 +1,2199 @@
+{
+  "schemaVersion": 1,
+  "createdWith": "Blender 4.5.11 LTS via real local Blender MCP (upstream1.9.1); no external asset-generation API",
+  "assetNotice": "Unofficial, newly authored visual reconstructions inspired by publicly documented products. Not official CAD, not manufacturer-endorsed; no product photos redistributed.",
+  "units": "metres",
+  "axes": {
+    "gltf": [
+      "width X",
+      "height Y",
+      "depth Z"
+    ],
+    "front": "+Z",
+    "origin": "floor-centre, closed/rest state",
+    "blender": "X width, Y depth, Z height; front -Y"
+  },
+  "animationContract": {
+    "rotation": "Set pivot.rotation[axis.toLowerCase()] = openAmount * progress; units radians. Rest rotations are identity.",
+    "translation": "Set pivot.position[axis.toLowerCase()] = restTranslation[axisIndex] + openAmount * progress; units metres.",
+    "fixed": "Anchor only; do not animate.",
+    "progress": "0 closed, 1 open. Preserve all child transforms.",
+    "tint": "Preserve authored materials by default. Only TINT_ materials are color-customizable; metal/glass/wood retain identity."
+  },
+  "verification": {
+    "binaryGlbBounds": true,
+    "positionAttributeFinite": true,
+    "indexRangesValid": true,
+    "yUpFloorOrigin": true,
+    "dimensionsToleranceMetres": 1e-05,
+    "embeddedTexturesOnly": true,
+    "maxTrianglesPerAsset": 80000,
+    "maxBytesPerAsset": 2097152,
+    "manufacturerDimensionsVerifiedBy": "work/interior-references.md official-page/PDF research; reconstructed geometry verified separately",
+    "notVerified": [
+      "Official CAD equivalence",
+      "Manufacturing/structural/plumbing/electrical safety",
+      "Real-world assembly/clearance fit",
+      "Color calibration of physical materials"
+    ]
+  },
+  "assets": [
+    {
+      "type": "sofa",
+      "model": "sofa.glb",
+      "thumbnail": "renders/sofa.png",
+      "referenceManufacturer": "IKEA",
+      "referenceProduct": "KIVIK 3-seat sofa",
+      "referenceSku": "594.405.92",
+      "referenceUrl": "https://www.ikea.com/kr/ko/p/kivik-3-seat-sofa-tibbleby-beige-grey-s59440592/",
+      "referenceOnly": true,
+      "measuredByAuthor": false,
+      "dimensions": [
+        2.28,
+        0.83,
+        0.95
+      ],
+      "measuredGlbDimensions": [
+        2.28,
+        0.83,
+        0.95
+      ],
+      "bounds": {
+        "min": [
+          -1.14,
+          0.0,
+          -0.475
+        ],
+        "max": [
+          1.14,
+          0.83,
+          0.475
+        ]
+      },
+      "defaultColor": "#a3967f",
+      "tintMaterials": [
+        "TINT_Tibbleby_woven_fabric"
+      ],
+      "materials": [
+        {
+          "name": "TINT_Tibbleby_woven_fabric",
+          "baseColorFactor": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "metallicFactor": 0,
+          "roughnessFactor": 0.9100000262260437,
+          "textured": true
+        },
+        {
+          "name": "Graphite_polymer",
+          "baseColorFactor": [
+            0.014999999664723873,
+            0.01899999938905239,
+            0.02199999988079071,
+            1
+          ],
+          "metallicFactor": 0,
+          "roughnessFactor": 0.41999998688697815,
+          "textured": false
+        },
+        {
+          "name": "Woven_piping",
+          "baseColorFactor": [
+            0.4099999964237213,
+            0.36500000953674316,
+            0.28999999165534973,
+            1
+          ],
+          "metallicFactor": 0,
+          "roughnessFactor": 0.8999999761581421,
+          "textured": false
+        }
+      ],
+      "pivots": [],
+      "triangles": 9632,
+      "meshNodes": 14,
+      "bytes": 229632,
+      "sha256": "367a1f11e02f042c22a480aabff25dfe4b5f58393fd82409745158e2f5a5402b",
+      "embeddedImages": 1,
+      "degenerateTriangles": 0,
+      "blenderCalibrationScaleXYZ": [
+        1.0,
+        1.0,
+        0.9912279844284058
+      ],
+      "dimensionsSource": "published product exterior dimensions",
+      "estimatedDetails": [
+        "Seat and back cushion profiles, seams, bevels and woven shader are authored estimates.",
+        "Panel thicknesses, bevel radii, fabric folds/UVs and all PBR parameters are reconstructed estimates, not official CAD or material measurements."
+      ]
+    },
+    {
+      "type": "bed",
+      "model": "bed.glb",
+      "thumbnail": "renders/bed.png",
+      "referenceManufacturer": "IKEA",
+      "referenceProduct": "MALM high bed 150x200",
+      "referenceSku": "890.052.64",
+      "referenceUrl": "https://www.ikea.com/kr/en/p/malm-bed-frame-high-white-s89005264/",
+      "referenceOnly": true,
+      "measuredByAuthor": false,
+      "dimensions": [
+        1.66,
+        1,
+        2.09
+      ],
+      "measuredGlbDimensions": [
+        1.66,
+        1.0,
+        2.0899999
+      ],
+      "bounds": {
+        "min": [
+          -0.83,
+          0.0,
+          -1.045
+        ],
+        "max": [
+          0.83,
+          1.0,
+          1.045
+        ]
+      },
+      "defaultColor": "#e9e8e3",
+      "tintMaterials": [
+        "TINT_Sage_duvet",
+        "TINT_Linen_bedding",
+        "TINT_White_lacquer"
+      ],
+      "materials": [
+        {
+          "name": "TINT_Sage_duvet",
+          "baseColorFactor": [
+            0.28999999165534973,
+            0.36000001430511475,
+            0.3100000023841858,
+            1
+          ],
+          "metallicFactor": 0,
+          "roughnessFactor": 0.9100000262260437,
+          "textured": false
+        },
+        {
+          "name": "TINT_Linen_bedding",
+          "baseColorFactor": [
+            0.800000011920929,
+            0.7699999809265137,
+            0.6600000262260437,
+            1
+          ],
+          "metallicFactor": 0,
+          "roughnessFactor": 0.9200000166893005,
+          "textured": false
+        },
+        {
+          "name": "TINT_White_lacquer",
+          "baseColorFactor": [
+            0.8799999952316284,
+            0.8650000095367432,
+            0.824999988079071,
+            1
+          ],
+          "metallicFactor": 0,
+          "roughnessFactor": 0.36000001430511475,
+          "textured": false
+        },
+        {
+          "name": "Ash_veneer_procedural",
+          "baseColorFactor": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "metallicFactor": 0,
+          "roughnessFactor": 0.3799999952316284,
+          "textured": true
+        },
+        {
+          "name": "Brushed_stainless",
+          "baseColorFactor": [
+            0.41999998688697815,
+            0.46000000834465027,
+            0.47999998927116394,
+            1
+          ],
+          "metallicFactor": 0.8500000238418579,
+          "roughnessFactor": 0.30000001192092896,
+          "textured": false
+        }
+      ],
+      "pivots": [],
+      "triangles": 11128,
+      "meshNodes": 25,
+      "bytes": 311652,
+      "sha256": "71db5afaf2a6d9da254ef276c32a74e27135f6a6c514f9d3491019c093cf105d",
+      "embeddedImages": 1,
+      "degenerateTriangles": 144,
+      "blenderCalibrationScaleXYZ": [
+        0.9999999403953552,
+        1.0,
+        1.0
+      ],
+      "dimensionsSource": "published product exterior dimensions",
+      "estimatedDetails": [
+        "Published dimensions describe the frame, not the 1.50 x 2.00 m mattress.",
+        "Mattress, pillows and duvet are separate artistic staging; their thickness and folds are not IKEA specifications.",
+        "Panel thicknesses, bevel radii, fabric folds/UVs and all PBR parameters are reconstructed estimates, not official CAD or material measurements."
+      ]
+    },
+    {
+      "type": "chair",
+      "model": "chair.glb",
+      "thumbnail": "renders/chair.png",
+      "referenceManufacturer": "IKEA",
+      "referenceProduct": "LISABO ash chair",
+      "referenceSku": "804.572.36",
+      "referenceUrl": "https://www.ikea.com/kr/ko/p/lisabo-chair-ash-80457236/",
+      "referenceOnly": true,
+      "measuredByAuthor": false,
+      "dimensions": [
+        0.46,
+        0.8,
+        0.51
+      ],
+      "measuredGlbDimensions": [
+        0.46,
+        0.8,
+        0.51
+      ],
+      "bounds": {
+        "min": [
+          -0.23,
+          0.0,
+          -0.255
+        ],
+        "max": [
+          0.23,
+          0.8,
+          0.255
+        ]
+      },
+      "defaultColor": "#c2a275",
+      "tintMaterials": [],
+      "materials": [
+        {
+          "name": "Ash_veneer_procedural",
+          "baseColorFactor": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "metallicFactor": 0,
+          "roughnessFactor": 0.3799999952316284,
+          "textured": true
+        }
+      ],
+      "pivots": [],
+      "triangles": 6584,
+      "meshNodes": 8,
+      "bytes": 229116,
+      "sha256": "c6659341a6a6508e2c410c8e92b3067087663f46c64d24fd9320750f39ef2415",
+      "embeddedImages": 1,
+      "degenerateTriangles": 0,
+      "blenderCalibrationScaleXYZ": [
+        0.9839077591896057,
+        0.964729905128479,
+        0.9936299324035645
+      ],
+      "dimensionsSource": "published product exterior dimensions",
+      "estimatedDetails": [
+        "Panel thicknesses, bevel radii, fabric folds/UVs and all PBR parameters are reconstructed estimates, not official CAD or material measurements."
+      ]
+    },
+    {
+      "type": "table",
+      "model": "table.glb",
+      "thumbnail": "renders/table.png",
+      "referenceManufacturer": "IKEA",
+      "referenceProduct": "LISABO ash table",
+      "referenceSku": "803.657.17",
+      "referenceUrl": "https://www.ikea.com/kr/ko/p/lisabo-table-ash-veneer-80365717/",
+      "referenceOnly": true,
+      "measuredByAuthor": false,
+      "dimensions": [
+        1.4,
+        0.74,
+        0.78
+      ],
+      "measuredGlbDimensions": [
+        1.4,
+        0.74,
+        0.78
+      ],
+      "bounds": {
+        "min": [
+          -0.7,
+          0.0,
+          -0.39
+        ],
+        "max": [
+          0.7,
+          0.74,
+          0.39
+        ]
+      },
+      "defaultColor": "#c2a275",
+      "tintMaterials": [],
+      "materials": [
+        {
+          "name": "Ash_veneer_procedural",
+          "baseColorFactor": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "metallicFactor": 0,
+          "roughnessFactor": 0.3799999952316284,
+          "textured": true
+        }
+      ],
+      "pivots": [],
+      "triangles": 2264,
+      "meshNodes": 10,
+      "bytes": 135944,
+      "sha256": "5d20deb873ff83884eba2bb3c00463ce77b9c5f59d7e6741ef9d1e5b8d158240",
+      "embeddedImages": 1,
+      "degenerateTriangles": 0,
+      "blenderCalibrationScaleXYZ": [
+        1.0,
+        1.0,
+        0.9971403479576111
+      ],
+      "dimensionsSource": "published product exterior dimensions",
+      "estimatedDetails": [
+        "Panel thicknesses, bevel radii, fabric folds/UVs and all PBR parameters are reconstructed estimates, not official CAD or material measurements."
+      ]
+    },
+    {
+      "type": "desk",
+      "model": "desk.glb",
+      "thumbnail": "renders/desk.png",
+      "referenceManufacturer": "IKEA",
+      "referenceProduct": "MICKE desk",
+      "referenceSku": "803.542.76",
+      "referenceUrl": "https://www.ikea.com/kr/ko/p/micke-desk-white-80354276/",
+      "referenceOnly": true,
+      "measuredByAuthor": false,
+      "dimensions": [
+        1.05,
+        0.75,
+        0.5
+      ],
+      "measuredGlbDimensions": [
+        1.05,
+        0.75,
+        0.5
+      ],
+      "bounds": {
+        "min": [
+          -0.525,
+          0.0,
+          -0.25
+        ],
+        "max": [
+          0.525,
+          0.75,
+          0.25
+        ]
+      },
+      "defaultColor": "#e9e8e3",
+      "tintMaterials": [
+        "TINT_White_lacquer"
+      ],
+      "materials": [
+        {
+          "name": "Interior_shadow",
+          "baseColorFactor": [
+            0.04500000178813934,
+            0.05000000074505806,
+            0.052000001072883606,
+            1
+          ],
+          "metallicFactor": 0,
+          "roughnessFactor": 0.6399999856948853,
+          "textured": false
+        },
+        {
+          "name": "TINT_White_lacquer",
+          "baseColorFactor": [
+            0.8799999952316284,
+            0.8650000095367432,
+            0.824999988079071,
+            1
+          ],
+          "metallicFactor": 0,
+          "roughnessFactor": 0.36000001430511475,
+          "textured": false
+        }
+      ],
+      "pivots": [
+        {
+          "node": "pivot_door_right",
+          "motion": "rotation",
+          "axis": "Y",
+          "openAmount": 1.67,
+          "restTranslation": [
+            0.4869999289512634,
+            0.3087649345397949,
+            0.2280876487493515
+          ],
+          "worldPosition": [
+            0.4869999,
+            0.3087649,
+            0.2280876
+          ],
+          "verifiedOpenCentreDelta": [
+            0.2325921,
+            0.0,
+            0.1831181
+          ]
+        },
+        {
+          "node": "pivot_drawer_main",
+          "motion": "translation",
+          "axis": "Z",
+          "openAmount": 0.27,
+          "restTranslation": [
+            -0.15700002014636993,
+            0.6543824672698975,
+            0.003984061535447836
+          ],
+          "worldPosition": [
+            -0.157,
+            0.6543825,
+            0.0039841
+          ],
+          "verifiedOpenCentreDelta": [
+            0.0,
+            0.0,
+            0.27
+          ]
+        }
+      ],
+      "triangles": 4144,
+      "meshNodes": 20,
+      "bytes": 114896,
+      "sha256": "3f959b55ea74d101188e305b7a1b6fed0ca7321343ce460874ab9b33ecfac18d",
+      "embeddedImages": 0,
+      "degenerateTriangles": 128,
+      "blenderCalibrationScaleXYZ": [
+        0.9999999403953552,
+        0.9960159063339233,
+        0.9960159063339233
+      ],
+      "dimensionsSource": "published product exterior dimensions",
+      "estimatedDetails": [
+        "Panel thicknesses, bevel radii, fabric folds/UVs and all PBR parameters are reconstructed estimates, not official CAD or material measurements."
+      ]
+    },
+    {
+      "type": "tv",
+      "model": "tv.glb",
+      "thumbnail": "renders/tv.png",
+      "referenceManufacturer": "Samsung",
+      "referenceProduct": "DU8000 55 inch with stands",
+      "referenceSku": "UA55DU8000UXTW",
+      "referenceUrl": "https://www.samsung.com/levant/tvs/uhd-4k-tv/du8000-55-inch-crystal-uhd-4k-tizen-os-smart-tv-ua55du8000uxtw/",
+      "referenceOnly": true,
+      "measuredByAuthor": false,
+      "dimensions": [
+        1.2321,
+        0.7488,
+        0.2263
+      ],
+      "measuredGlbDimensions": [
+        1.2321,
+        0.7488,
+        0.2263
+      ],
+      "bounds": {
+        "min": [
+          -0.61605,
+          0.0,
+          -0.11315
+        ],
+        "max": [
+          0.61605,
+          0.7488,
+          0.11315
+        ]
+      },
+      "defaultColor": "#1b2227",
+      "tintMaterials": [],
+      "materials": [
+        {
+          "name": "Graphite_polymer",
+          "baseColorFactor": [
+            0.014999999664723873,
+            0.01899999938905239,
+            0.02199999988079071,
+            1
+          ],
+          "metallicFactor": 0,
+          "roughnessFactor": 0.41999998688697815,
+          "textured": false
+        },
+        {
+          "name": "Display_standby_blue",
+          "baseColorFactor": [
+            0.017999999225139618,
+            0.04500000178813934,
+            0.0689999982714653,
+            1
+          ],
+          "metallicFactor": 0.1599999964237213,
+          "roughnessFactor": 0.18000000715255737,
+          "textured": false
+        },
+        {
+          "name": "Status_indicator",
+          "baseColorFactor": [
+            0.47999998927116394,
+            0.014999999664723873,
+            0.00800000037997961,
+            1
+          ],
+          "metallicFactor": 0,
+          "roughnessFactor": 0.25,
+          "textured": false
+        }
+      ],
+      "pivots": [],
+      "triangles": 1788,
+      "meshNodes": 9,
+      "bytes": 51728,
+      "sha256": "6a2a163086e76f715f4574a773ea328ccbbfb2881f6a69e25af0e0e05903ca95",
+      "embeddedImages": 0,
+      "degenerateTriangles": 0,
+      "blenderCalibrationScaleXYZ": [
+        1.0,
+        1.0,
+        0.9999999403953552
+      ],
+      "dimensionsSource": "published product exterior dimensions",
+      "estimatedDetails": [
+        "Panel thicknesses, bevel radii, fabric folds/UVs and all PBR parameters are reconstructed estimates, not official CAD or material measurements."
+      ]
+    },
+    {
+      "type": "cabinet",
+      "model": "cabinet.glb",
+      "thumbnail": "renders/cabinet.png",
+      "referenceManufacturer": "IKEA",
+      "referenceProduct": "MALM chest of 4 drawers",
+      "referenceSku": "203.546.46",
+      "referenceUrl": "https://www.ikea.com/kr/ko/p/malm-chest-of-4-drawers-white-20354646/",
+      "referenceOnly": true,
+      "measuredByAuthor": false,
+      "dimensions": [
+        0.8,
+        1,
+        0.48
+      ],
+      "measuredGlbDimensions": [
+        0.8,
+        1.0,
+        0.48
+      ],
+      "bounds": {
+        "min": [
+          -0.4,
+          0.0,
+          -0.24
+        ],
+        "max": [
+          0.4,
+          1.0,
+          0.24
+        ]
+      },
+      "defaultColor": "#e9e8e3",
+      "tintMaterials": [
+        "TINT_White_lacquer"
+      ],
+      "materials": [
+        {
+          "name": "Interior_shadow",
+          "baseColorFactor": [
+            0.04500000178813934,
+            0.05000000074505806,
+            0.052000001072883606,
+            1
+          ],
+          "metallicFactor": 0,
+          "roughnessFactor": 0.6399999856948853,
+          "textured": false
+        },
+        {
+          "name": "TINT_White_lacquer",
+          "baseColorFactor": [
+            0.8799999952316284,
+            0.8650000095367432,
+            0.824999988079071,
+            1
+          ],
+          "metallicFactor": 0,
+          "roughnessFactor": 0.36000001430511475,
+          "textured": false
+        }
+      ],
+      "pivots": [
+        {
+          "node": "pivot_drawer_1",
+          "motion": "translation",
+          "axis": "Z",
+          "openAmount": 0.27,
+          "restTranslation": [
+            0,
+            0.19699999690055847,
+            0.0020000000949949026
+          ],
+          "worldPosition": [
+            0.0,
+            0.197,
+            0.002
+          ],
+          "verifiedOpenCentreDelta": [
+            0.0,
+            0.0,
+            0.27
+          ]
+        },
+        {
+          "node": "pivot_drawer_2",
+          "motion": "translation",
+          "axis": "Z",
+          "openAmount": 0.27,
+          "restTranslation": [
+            0,
+            0.421999990940094,
+            0.0020000000949949026
+          ],
+          "worldPosition": [
+            0.0,
+            0.422,
+            0.002
+          ],
+          "verifiedOpenCentreDelta": [
+            0.0,
+            0.0,
+            0.27
+          ]
+        },
+        {
+          "node": "pivot_drawer_3",
+          "motion": "translation",
+          "axis": "Z",
+          "openAmount": 0.27,
+          "restTranslation": [
+            0,
+            0.6470000147819519,
+            0.0020000000949949026
+          ],
+          "worldPosition": [
+            0.0,
+            0.647,
+            0.002
+          ],
+          "verifiedOpenCentreDelta": [
+            0.0,
+            0.0,
+            0.27
+          ]
+        },
+        {
+          "node": "pivot_drawer_4",
+          "motion": "translation",
+          "axis": "Z",
+          "openAmount": 0.27,
+          "restTranslation": [
+            0,
+            0.871999979019165,
+            0.0020000000949949026
+          ],
+          "worldPosition": [
+            0.0,
+            0.872,
+            0.002
+          ],
+          "verifiedOpenCentreDelta": [
+            0.0,
+            0.0,
+            0.27
+          ]
+        }
+      ],
+      "triangles": 5452,
+      "meshNodes": 29,
+      "bytes": 139244,
+      "sha256": "d21fe666c79147b42e4d5784ff68c7bc28e56c9b99afd151a54bef6f0c6e6d93",
+      "embeddedImages": 0,
+      "degenerateTriangles": 0,
+      "blenderCalibrationScaleXYZ": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "dimensionsSource": "published product exterior dimensions",
+      "estimatedDetails": [
+        "Drawers translate +Z by 0.27 m; do not rotate them like doors.",
+        "Panel thicknesses, bevel radii, fabric folds/UVs and all PBR parameters are reconstructed estimates, not official CAD or material measurements."
+      ]
+    },
+    {
+      "type": "wardrobe",
+      "model": "wardrobe.glb",
+      "thumbnail": "renders/wardrobe.png",
+      "referenceManufacturer": "IKEA",
+      "referenceProduct": "PAX/FORSAND wardrobe",
+      "referenceSku": "095.006.49",
+      "referenceUrl": "https://www.ikea.com/no/en/p/pax-forsand-wardrobe-white-white-s09500649/",
+      "referenceOnly": true,
+      "measuredByAuthor": false,
+      "dimensions": [
+        1,
+        2.364,
+        0.6
+      ],
+      "measuredGlbDimensions": [
+        1.0,
+        2.3640001,
+        0.6
+      ],
+      "bounds": {
+        "min": [
+          -0.5,
+          0.0,
+          -0.3
+        ],
+        "max": [
+          0.5,
+          2.3640001,
+          0.3
+        ]
+      },
+      "defaultColor": "#e9e8e3",
+      "tintMaterials": [
+        "TINT_White_lacquer"
+      ],
+      "materials": [
+        {
+          "name": "Polished_chrome",
+          "baseColorFactor": [
+            0.6000000238418579,
+            0.6299999952316284,
+            0.6700000166893005,
+            1
+          ],
+          "metallicFactor": 0.949999988079071,
+          "roughnessFactor": 0.12999999523162842,
+          "textured": false
+        },
+        {
+          "name": "Brushed_stainless",
+          "baseColorFactor": [
+            0.41999998688697815,
+            0.46000000834465027,
+            0.47999998927116394,
+            1
+          ],
+          "metallicFactor": 0.8500000238418579,
+          "roughnessFactor": 0.30000001192092896,
+          "textured": false
+        },
+        {
+          "name": "TINT_White_lacquer",
+          "baseColorFactor": [
+            0.8799999952316284,
+            0.8650000095367432,
+            0.824999988079071,
+            1
+          ],
+          "metallicFactor": 0,
+          "roughnessFactor": 0.36000001430511475,
+          "textured": false
+        }
+      ],
+      "pivots": [
+        {
+          "node": "pivot_door_left",
+          "motion": "rotation",
+          "axis": "Y",
+          "openAmount": -1.67,
+          "restTranslation": [
+            -0.4909999966621399,
+            0,
+            0.28600001335144043
+          ],
+          "worldPosition": [
+            -0.491,
+            0.0,
+            0.286
+          ],
+          "verifiedOpenCentreDelta": [
+            -0.0315618,
+            0.0,
+            0.0599605
+          ]
+        },
+        {
+          "node": "pivot_door_right",
+          "motion": "rotation",
+          "axis": "Y",
+          "openAmount": 1.67,
+          "restTranslation": [
+            0.4909999966621399,
+            0,
+            0.28600001335144043
+          ],
+          "worldPosition": [
+            0.491,
+            0.0,
+            0.286
+          ],
+          "verifiedOpenCentreDelta": [
+            0.0468877,
+            0.0,
+            0.0738367
+          ]
+        }
+      ],
+      "triangles": 5184,
+      "meshNodes": 24,
+      "bytes": 134500,
+      "sha256": "f7b67ccc0d7695063ab41b6147b0c2996c30c6fd12ea97e25de18838d6cc60d6",
+      "embeddedImages": 0,
+      "degenerateTriangles": 0,
+      "blenderCalibrationScaleXYZ": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "dimensionsSource": "published product exterior dimensions",
+      "estimatedDetails": [
+        "This Norway SKU has 2 doors, 3 shelves, 1 rail; handles are sold separately and not invented here.",
+        "Published height is 2.364 m, not the rounded 2.36 m catalog name.",
+        "Panel thicknesses, bevel radii, fabric folds/UVs and all PBR parameters are reconstructed estimates, not official CAD or material measurements."
+      ]
+    },
+    {
+      "type": "refrigerator",
+      "model": "refrigerator.glb",
+      "thumbnail": "renders/refrigerator.png",
+      "referenceManufacturer": "LG",
+      "referenceProduct": "B502S33 top freezer refrigerator",
+      "referenceSku": "B502S33",
+      "referenceUrl": "https://www.lge.co.kr/business/refrigerators/b502s33",
+      "referenceOnly": true,
+      "measuredByAuthor": false,
+      "dimensions": [
+        0.78,
+        1.8,
+        0.73
+      ],
+      "measuredGlbDimensions": [
+        0.78,
+        1.8,
+        0.73
+      ],
+      "bounds": {
+        "min": [
+          -0.39,
+          0.0,
+          -0.365
+        ],
+        "max": [
+          0.39,
+          1.8,
+          0.365
+        ]
+      },
+      "defaultColor": "#9ca4a8",
+      "tintMaterials": [
+        "TINT_White_lacquer"
+      ],
+      "materials": [
+        {
+          "name": "Graphite_polymer",
+          "baseColorFactor": [
+            0.014999999664723873,
+            0.01899999938905239,
+            0.02199999988079071,
+            1
+          ],
+          "metallicFactor": 0,
+          "roughnessFactor": 0.41999998688697815,
+          "textured": false
+        },
+        {
+          "name": "Brushed_stainless",
+          "baseColorFactor": [
+            0.41999998688697815,
+            0.46000000834465027,
+            0.47999998927116394,
+            1
+          ],
+          "metallicFactor": 0.8500000238418579,
+          "roughnessFactor": 0.30000001192092896,
+          "textured": false
+        },
+        {
+          "name": "TINT_White_lacquer",
+          "baseColorFactor": [
+            0.8799999952316284,
+            0.8650000095367432,
+            0.824999988079071,
+            1
+          ],
+          "metallicFactor": 0,
+          "roughnessFactor": 0.36000001430511475,
+          "textured": false
+        },
+        {
+          "name": "Rubber_gasket",
+          "baseColorFactor": [
+            0.03500000014901161,
+            0.03799999877810478,
+            0.035999998450279236,
+            1
+          ],
+          "metallicFactor": 0,
+          "roughnessFactor": 0.8500000238418579,
+          "textured": false
+        },
+        {
+          "name": "Interior_shadow",
+          "baseColorFactor": [
+            0.04500000178813934,
+            0.05000000074505806,
+            0.052000001072883606,
+            1
+          ],
+          "metallicFactor": 0,
+          "roughnessFactor": 0.6399999856948853,
+          "textured": false
+        },
+        {
+          "name": "Smoked_glass",
+          "baseColorFactor": [
+            0.09000000357627869,
+            0.13500000536441803,
+            0.1599999964237213,
+            1
+          ],
+          "metallicFactor": 0,
+          "roughnessFactor": 0.11999999731779099,
+          "textured": false
+        }
+      ],
+      "pivots": [
+        {
+          "node": "pivot_door_freezer",
+          "motion": "rotation",
+          "axis": "Y",
+          "openAmount": -1.57,
+          "restTranslation": [
+            -0.38199999928474426,
+            1.5399999618530273,
+            0.3151487112045288
+          ],
+          "worldPosition": [
+            -0.382,
+            1.54,
+            0.3151487
+          ],
+          "verifiedOpenCentreDelta": [
+            -0.4109921,
+            0.0,
+            0.3981795
+          ]
+        },
+        {
+          "node": "pivot_door_fridge",
+          "motion": "rotation",
+          "axis": "Y",
+          "openAmount": -1.57,
+          "restTranslation": [
+            -0.38199999928474426,
+            0.6520000100135803,
+            0.3151487112045288
+          ],
+          "worldPosition": [
+            -0.382,
+            0.652,
+            0.3151487
+          ],
+          "verifiedOpenCentreDelta": [
+            -0.4109921,
+            0.0,
+            0.3981795
+          ]
+        }
+      ],
+      "triangles": 5268,
+      "meshNodes": 27,
+      "bytes": 139544,
+      "sha256": "c79d27bb9a4edcc5d056a97966a8667adaf668a11b378f523187f19f8558030a",
+      "embeddedImages": 0,
+      "degenerateTriangles": 0,
+      "blenderCalibrationScaleXYZ": [
+        1.0,
+        0.9871534705162048,
+        1.0
+      ],
+      "dimensionsSource": "published product exterior dimensions",
+      "estimatedDetails": [
+        "Exterior alloy composition and PBR roughness are not manufacturer measurements.",
+        "Interior shelf positions and bins are illustrative; no cooling/installation simulation.",
+        "Panel thicknesses, bevel radii, fabric folds/UVs and all PBR parameters are reconstructed estimates, not official CAD or material measurements."
+      ]
+    },
+    {
+      "type": "washingMachine",
+      "model": "washingMachine.glb",
+      "thumbnail": "renders/washingMachine.png",
+      "referenceManufacturer": "LG",
+      "referenceProduct": "F6V1010WTSE front loader",
+      "referenceSku": "F6V1010WTSE",
+      "referenceUrl": "https://www.lg.com/uk/washing-machines/f6v1010wtse/",
+      "referenceOnly": true,
+      "measuredByAuthor": false,
+      "dimensions": [
+        0.6,
+        0.85,
+        0.565
+      ],
+      "measuredGlbDimensions": [
+        0.6,
+        0.85,
+        0.565
+      ],
+      "bounds": {
+        "min": [
+          -0.3,
+          0.0,
+          -0.2825
+        ],
+        "max": [
+          0.3,
+          0.85,
+          0.2825
+        ]
+      },
+      "defaultColor": "#e9e8e3",
+      "tintMaterials": [
+        "TINT_White_lacquer"
+      ],
+      "materials": [
+        {
+          "name": "Rubber_gasket",
+          "baseColorFactor": [
+            0.03500000014901161,
+            0.03799999877810478,
+            0.035999998450279236,
+            1
+          ],
+          "metallicFactor": 0,
+          "roughnessFactor": 0.8500000238418579,
+          "textured": false
+        },
+        {
+          "name": "TINT_White_lacquer",
+          "baseColorFactor": [
+            0.8799999952316284,
+            0.8650000095367432,
+            0.824999988079071,
+            1
+          ],
+          "metallicFactor": 0,
+          "roughnessFactor": 0.36000001430511475,
+          "textured": false
+        },
+        {
+          "name": "Interior_shadow",
+          "baseColorFactor": [
+            0.04500000178813934,
+            0.05000000074505806,
+            0.052000001072883606,
+            1
+          ],
+          "metallicFactor": 0,
+          "roughnessFactor": 0.6399999856948853,
+          "textured": false
+        },
+        {
+          "name": "Graphite_polymer",
+          "baseColorFactor": [
+            0.014999999664723873,
+            0.01899999938905239,
+            0.02199999988079071,
+            1
+          ],
+          "metallicFactor": 0,
+          "roughnessFactor": 0.41999998688697815,
+          "textured": false
+        },
+        {
+          "name": "Display_standby_blue",
+          "baseColorFactor": [
+            0.017999999225139618,
+            0.04500000178813934,
+            0.0689999982714653,
+            1
+          ],
+          "metallicFactor": 0.1599999964237213,
+          "roughnessFactor": 0.18000000715255737,
+          "textured": false
+        },
+        {
+          "name": "Brushed_stainless",
+          "baseColorFactor": [
+            0.41999998688697815,
+            0.46000000834465027,
+            0.47999998927116394,
+            1
+          ],
+          "metallicFactor": 0.8500000238418579,
+          "roughnessFactor": 0.30000001192092896,
+          "textured": false
+        },
+        {
+          "name": "Smoked_glass",
+          "baseColorFactor": [
+            0.09000000357627869,
+            0.13500000536441803,
+            0.1599999964237213,
+            1
+          ],
+          "metallicFactor": 0,
+          "roughnessFactor": 0.11999999731779099,
+          "textured": false
+        }
+      ],
+      "pivots": [
+        {
+          "node": "pivot_door_left",
+          "motion": "rotation",
+          "axis": "Y",
+          "openAmount": -1.74,
+          "restTranslation": [
+            -0.22499999403953552,
+            0.4300000071525574,
+            0.24945904314517975
+          ],
+          "worldPosition": [
+            -0.225,
+            0.43,
+            0.249459
+          ],
+          "verifiedOpenCentreDelta": [
+            -0.2794392,
+            0.0,
+            0.2133772
+          ]
+        }
+      ],
+      "triangles": 19736,
+      "meshNodes": 69,
+      "bytes": 648464,
+      "sha256": "9d4962fbf59093acc18079bc3b952630a3b848a5d5cdfec8f498e8bc3d0f7911",
+      "embeddedImages": 0,
+      "degenerateTriangles": 34,
+      "blenderCalibrationScaleXYZ": [
+        1.0,
+        0.9440267086029053,
+        1.0
+      ],
+      "dimensionsSource": "published product exterior dimensions",
+      "estimatedDetails": [
+        "Door-included depth follows this specific UK SKU. Interior drum detail is illustrative.",
+        "Source notes 1.10 m depth with a 90 degree open door; the modeled hinge travel is an illustrative animation, not installation clearance certification.",
+        "Panel thicknesses, bevel radii, fabric folds/UVs and all PBR parameters are reconstructed estimates, not official CAD or material measurements."
+      ]
+    },
+    {
+      "type": "sink",
+      "model": "sink.glb",
+      "thumbnail": "renders/sink.png",
+      "referenceManufacturer": "IKEA",
+      "referenceProduct": "SUNNERSTA mini-kitchen with LAGAN",
+      "referenceSku": "791.396.88",
+      "referenceUrl": "https://www.ikea.com/gb/en/p/sunnersta-mini-kitchen-s79139688/",
+      "referenceOnly": true,
+      "measuredByAuthor": false,
+      "dimensions": [
+        1.12,
+        1.39,
+        0.56
+      ],
+      "measuredGlbDimensions": [
+        1.12,
+        1.39,
+        0.56
+      ],
+      "bounds": {
+        "min": [
+          -0.56,
+          0.0,
+          -0.28
+        ],
+        "max": [
+          0.56,
+          1.39,
+          0.28
+        ]
+      },
+      "defaultColor": "#e9e8e3",
+      "tintMaterials": [
+        "TINT_White_lacquer"
+      ],
+      "materials": [
+        {
+          "name": "Graphite_polymer",
+          "baseColorFactor": [
+            0.014999999664723873,
+            0.01899999938905239,
+            0.02199999988079071,
+            1
+          ],
+          "metallicFactor": 0,
+          "roughnessFactor": 0.41999998688697815,
+          "textured": false
+        },
+        {
+          "name": "Brushed_stainless",
+          "baseColorFactor": [
+            0.41999998688697815,
+            0.46000000834465027,
+            0.47999998927116394,
+            1
+          ],
+          "metallicFactor": 0.8500000238418579,
+          "roughnessFactor": 0.30000001192092896,
+          "textured": false
+        },
+        {
+          "name": "Interior_shadow",
+          "baseColorFactor": [
+            0.04500000178813934,
+            0.05000000074505806,
+            0.052000001072883606,
+            1
+          ],
+          "metallicFactor": 0,
+          "roughnessFactor": 0.6399999856948853,
+          "textured": false
+        },
+        {
+          "name": "Polished_chrome",
+          "baseColorFactor": [
+            0.6000000238418579,
+            0.6299999952316284,
+            0.6700000166893005,
+            1
+          ],
+          "metallicFactor": 0.949999988079071,
+          "roughnessFactor": 0.12999999523162842,
+          "textured": false
+        },
+        {
+          "name": "TINT_White_lacquer",
+          "baseColorFactor": [
+            0.8799999952316284,
+            0.8650000095367432,
+            0.824999988079071,
+            1
+          ],
+          "metallicFactor": 0,
+          "roughnessFactor": 0.36000001430511475,
+          "textured": false
+        }
+      ],
+      "pivots": [],
+      "triangles": 13532,
+      "meshNodes": 46,
+      "bytes": 337200,
+      "sha256": "cb310685f52e1dfe880214a9be293fc68f3a5b97afb29ade721d3083457ccb38",
+      "embeddedImages": 0,
+      "degenerateTriangles": 64,
+      "blenderCalibrationScaleXYZ": [
+        0.9943450093269348,
+        1.0,
+        1.0
+      ],
+      "dimensionsSource": "published product exterior dimensions",
+      "estimatedDetails": [
+        "1.39 m is the rear hanging-rail height; worktop height and basin internals are estimates.",
+        "The referenced SUNNERSTA has an open frame and no cabinet doors.",
+        "Panel thicknesses, bevel radii, fabric folds/UVs and all PBR parameters are reconstructed estimates, not official CAD or material measurements."
+      ]
+    },
+    {
+      "type": "cooktop",
+      "model": "cooktop.glb",
+      "thumbnail": "renders/cooktop.png",
+      "referenceManufacturer": "IKEA",
+      "referenceProduct": "MATMASSIG induction hob IKEA 300",
+      "referenceSku": "104.670.93",
+      "referenceUrl": "https://www.ikea.com/de/en/p/matmaessig-induction-hob-ikea-300-black-10467093/",
+      "referenceOnly": true,
+      "measuredByAuthor": false,
+      "dimensions": [
+        0.59,
+        0.049,
+        0.52
+      ],
+      "measuredGlbDimensions": [
+        0.59,
+        0.049,
+        0.52
+      ],
+      "bounds": {
+        "min": [
+          -0.295,
+          0.0,
+          -0.26
+        ],
+        "max": [
+          0.295,
+          0.049,
+          0.26
+        ]
+      },
+      "defaultColor": "#171c20",
+      "tintMaterials": [],
+      "materials": [
+        {
+          "name": "Graphite_polymer",
+          "baseColorFactor": [
+            0.014999999664723873,
+            0.01899999938905239,
+            0.02199999988079071,
+            1
+          ],
+          "metallicFactor": 0,
+          "roughnessFactor": 0.41999998688697815,
+          "textured": false
+        },
+        {
+          "name": "Induction_zone_print",
+          "baseColorFactor": [
+            0.33000001311302185,
+            0.3400000035762787,
+            0.3400000035762787,
+            1
+          ],
+          "metallicFactor": 0,
+          "roughnessFactor": 0.41999998688697815,
+          "textured": false
+        }
+      ],
+      "pivots": [],
+      "triangles": 6116,
+      "meshNodes": 12,
+      "bytes": 345784,
+      "sha256": "5667c786102ee6cca918f2bb3837bc342da2b1627c63ceca8b0b434429ec666a",
+      "embeddedImages": 0,
+      "degenerateTriangles": 0,
+      "blenderCalibrationScaleXYZ": [
+        1.0,
+        1.0,
+        0.9767622351646423
+      ],
+      "dimensionsSource": "published product exterior dimensions",
+      "estimatedDetails": [
+        "0.049 m includes the recessed body. Built-in placement should put the glass near worktop height, not the entire body above it.",
+        "Published zone diameters: front-left .210 m, front-right .145 m, rear .180 m each.",
+        "Panel thicknesses, bevel radii, fabric folds/UVs and all PBR parameters are reconstructed estimates, not official CAD or material measurements."
+      ]
+    },
+    {
+      "type": "bathtub",
+      "model": "bathtub.glb",
+      "thumbnail": "renders/bathtub.png",
+      "referenceManufacturer": "KOHLER",
+      "referenceProduct": "Evok 2.0 Seamless Oval 1700",
+      "referenceSku": "25165A-0",
+      "referenceUrl": "https://kohler.co.nz/content/KOHLER_NZ_Catalogue_Apr25_eBook.pdf",
+      "referenceOnly": true,
+      "measuredByAuthor": false,
+      "dimensions": [
+        1.7,
+        0.61,
+        0.75
+      ],
+      "measuredGlbDimensions": [
+        1.7,
+        0.61,
+        0.75
+      ],
+      "bounds": {
+        "min": [
+          -0.85,
+          0.0,
+          -0.375
+        ],
+        "max": [
+          0.85,
+          0.61,
+          0.375
+        ]
+      },
+      "defaultColor": "#f2f2ed",
+      "tintMaterials": [],
+      "materials": [
+        {
+          "name": "Gloss_white_acrylic",
+          "baseColorFactor": [
+            0.8999999761581421,
+            0.9200000166893005,
+            0.8999999761581421,
+            1
+          ],
+          "metallicFactor": 0,
+          "roughnessFactor": 0.18000000715255737,
+          "textured": false
+        },
+        {
+          "name": "Polished_chrome",
+          "baseColorFactor": [
+            0.6000000238418579,
+            0.6299999952316284,
+            0.6700000166893005,
+            1
+          ],
+          "metallicFactor": 0.949999988079071,
+          "roughnessFactor": 0.12999999523162842,
+          "textured": false
+        },
+        {
+          "name": "Interior_shadow",
+          "baseColorFactor": [
+            0.04500000178813934,
+            0.05000000074505806,
+            0.052000001072883606,
+            1
+          ],
+          "metallicFactor": 0,
+          "roughnessFactor": 0.6399999856948853,
+          "textured": false
+        }
+      ],
+      "pivots": [],
+      "triangles": 2292,
+      "meshNodes": 3,
+      "bytes": 57212,
+      "sha256": "3f08076690083b29b44c7aada22a1e0e29e9c8bc4a926aeb8eecd30a29541daa",
+      "embeddedImages": 0,
+      "degenerateTriangles": 64,
+      "blenderCalibrationScaleXYZ": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "dimensionsSource": "published product exterior dimensions",
+      "estimatedDetails": [
+        "Official catalog printed page 053. Acrylic, not porcelain.",
+        "Outer dimensions and internal .410 m depth/.025 m rim/.1.127 m base length inform the model; curves are reconstructed, not CAD.",
+        "Panel thicknesses, bevel radii, fabric folds/UVs and all PBR parameters are reconstructed estimates, not official CAD or material measurements."
+      ]
+    },
+    {
+      "type": "toilet",
+      "model": "toilet.glb",
+      "thumbnail": "renders/toilet.png",
+      "referenceManufacturer": "Daelim Bath",
+      "referenceProduct": "CC-720N two-piece toilet",
+      "referenceSku": "CC-720N",
+      "referenceUrl": "https://www.daelimbath.com/upload/product/CC-720N_do.pdf",
+      "referenceOnly": true,
+      "measuredByAuthor": false,
+      "dimensions": [
+        0.42,
+        0.74,
+        0.72
+      ],
+      "measuredGlbDimensions": [
+        0.42,
+        0.74,
+        0.72
+      ],
+      "bounds": {
+        "min": [
+          -0.21,
+          0.0,
+          -0.36
+        ],
+        "max": [
+          0.21,
+          0.74,
+          0.36
+        ]
+      },
+      "defaultColor": "#f2f2ed",
+      "tintMaterials": [
+        "TINT_White_lacquer"
+      ],
+      "materials": [
+        {
+          "name": "Glazed_porcelain",
+          "baseColorFactor": [
+            0.9200000166893005,
+            0.9399999976158142,
+            0.925000011920929,
+            1
+          ],
+          "metallicFactor": 0,
+          "roughnessFactor": 0.17000000178813934,
+          "textured": false
+        },
+        {
+          "name": "TINT_White_lacquer",
+          "baseColorFactor": [
+            0.8799999952316284,
+            0.8650000095367432,
+            0.824999988079071,
+            1
+          ],
+          "metallicFactor": 0,
+          "roughnessFactor": 0.36000001430511475,
+          "textured": false
+        },
+        {
+          "name": "Polished_chrome",
+          "baseColorFactor": [
+            0.6000000238418579,
+            0.6299999952316284,
+            0.6700000166893005,
+            1
+          ],
+          "metallicFactor": 0.949999988079071,
+          "roughnessFactor": 0.12999999523162842,
+          "textured": false
+        }
+      ],
+      "pivots": [
+        {
+          "node": "pivot_lid",
+          "motion": "rotation",
+          "axis": "X",
+          "openAmount": -1.7,
+          "restTranslation": [
+            0.0014893646584823728,
+            0.4050000011920929,
+            -0.12000001221895218
+          ],
+          "worldPosition": [
+            0.0014894,
+            0.405,
+            -0.12
+          ],
+          "verifiedOpenCentreDelta": [
+            0.0,
+            0.2285258,
+            -0.2692451
+          ]
+        }
+      ],
+      "triangles": 5912,
+      "meshNodes": 12,
+      "bytes": 187616,
+      "sha256": "3ca050c4c069c66697d9e04544b1842c640ecb5a4186cd7a442262c3c8a688a3",
+      "embeddedImages": 0,
+      "degenerateTriangles": 72,
+      "blenderCalibrationScaleXYZ": [
+        0.9929077625274658,
+        1.0,
+        1.0
+      ],
+      "dimensionsSource": "published product exterior dimensions",
+      "estimatedDetails": [
+        "Dimensions from the official one-page drawing. Side flush lever, separate tank and resin seat are modeled.",
+        "Hidden trap plumbing omitted; this is not a plumbing-installation model.",
+        "Panel thicknesses, bevel radii, fabric folds/UVs and all PBR parameters are reconstructed estimates, not official CAD or material measurements."
+      ]
+    },
+    {
+      "type": "shower",
+      "model": "shower.glb",
+      "thumbnail": "renders/shower.png",
+      "referenceManufacturer": "hansgrohe + custom enclosure",
+      "referenceProduct": "Crometta E 240 in custom shower zone",
+      "referenceSku": "27271000",
+      "referenceUrl": "https://www.hansgrohe.co.uk/articledetail-crometta-e-showerpipe-240-1jet-with-thermostatic-shower-mixer-27271000",
+      "referenceOnly": true,
+      "measuredByAuthor": false,
+      "dimensions": [
+        0.9,
+        2.35,
+        0.9
+      ],
+      "measuredGlbDimensions": [
+        0.9,
+        2.3499999,
+        0.9
+      ],
+      "bounds": {
+        "min": [
+          -0.45,
+          0.0,
+          -0.45
+        ],
+        "max": [
+          0.45,
+          2.3499999,
+          0.45
+        ]
+      },
+      "defaultColor": "#bacbd0",
+      "tintMaterials": [
+        "TINT_White_lacquer"
+      ],
+      "materials": [
+        {
+          "name": "Polished_chrome",
+          "baseColorFactor": [
+            0.6000000238418579,
+            0.6299999952316284,
+            0.6700000166893005,
+            1
+          ],
+          "metallicFactor": 0.949999988079071,
+          "roughnessFactor": 0.12999999523162842,
+          "textured": false
+        },
+        {
+          "name": "TINT_White_lacquer",
+          "baseColorFactor": [
+            0.8799999952316284,
+            0.8650000095367432,
+            0.824999988079071,
+            1
+          ],
+          "metallicFactor": 0,
+          "roughnessFactor": 0.36000001430511475,
+          "textured": false
+        },
+        {
+          "name": "Interior_shadow",
+          "baseColorFactor": [
+            0.04500000178813934,
+            0.05000000074505806,
+            0.052000001072883606,
+            1
+          ],
+          "metallicFactor": 0,
+          "roughnessFactor": 0.6399999856948853,
+          "textured": false
+        },
+        {
+          "name": "Glazed_porcelain",
+          "baseColorFactor": [
+            0.9200000166893005,
+            0.9399999976158142,
+            0.925000011920929,
+            1
+          ],
+          "metallicFactor": 0,
+          "roughnessFactor": 0.17000000178813934,
+          "textured": false
+        },
+        {
+          "name": "Clear_safety_glass",
+          "baseColorFactor": [
+            0.7200000286102295,
+            0.8799999952316284,
+            0.8999999761581421,
+            0.07500000298023224
+          ],
+          "metallicFactor": 0,
+          "roughnessFactor": 0.10000000149011612,
+          "textured": false
+        },
+        {
+          "name": "Brushed_stainless",
+          "baseColorFactor": [
+            0.41999998688697815,
+            0.46000000834465027,
+            0.47999998927116394,
+            1
+          ],
+          "metallicFactor": 0.8500000238418579,
+          "roughnessFactor": 0.30000001192092896,
+          "textured": false
+        }
+      ],
+      "pivots": [
+        {
+          "node": "Crometta_fixture_mount",
+          "motion": "fixed",
+          "axis": "Y",
+          "openAmount": 0,
+          "restTranslation": [
+            0,
+            1.100000023841858,
+            -0.40786266326904297
+          ],
+          "worldPosition": [
+            0.0,
+            1.1,
+            -0.4078627
+          ]
+        },
+        {
+          "node": "pivot_door_left",
+          "motion": "rotation",
+          "axis": "Y",
+          "openAmount": -1.57,
+          "restTranslation": [
+            -0.43799999356269836,
+            0.07999999821186066,
+            0.3849073350429535
+          ],
+          "worldPosition": [
+            -0.438,
+            0.08,
+            0.3849073
+          ],
+          "verifiedOpenCentreDelta": [
+            -0.4300806,
+            0.0,
+            0.3961476
+          ]
+        }
+      ],
+      "triangles": 24492,
+      "meshNodes": 104,
+      "bytes": 658928,
+      "sha256": "a34c2ee7a722ec765809a3ac557ab6ed377980220b68c59d8086a14fd2e76f70",
+      "embeddedImages": 0,
+      "degenerateTriangles": 80,
+      "blenderCalibrationScaleXYZ": [
+        1.0,
+        0.9799381494522095,
+        1.0
+      ],
+      "dimensionsSource": "custom shower enclosure; fixture dimensions separate",
+      "estimatedDetails": [
+        "IMPORTANT: .90 x .90 x 2.35 m is our own shower enclosure design, NOT a hansgrohe product dimension.",
+        "Referenced fixture: mixer width .295 m, head .240 x .240 m, wall-to-head front .470 m, mixer-to-top 1.201 m.",
+        "Mixer installed at floor +1.100 m (artistic choice), yielding a fixture top near +2.301 m. Hose shape and glass enclosure are estimated.",
+        "Panel thicknesses, bevel radii, fabric folds/UVs and all PBR parameters are reconstructed estimates, not official CAD or material measurements."
+      ]
+    },
+    {
+      "type": "armchair",
+      "model": "armchair.glb",
+      "thumbnail": "renders/armchair.png",
+      "referenceManufacturer": "IKEA",
+      "referenceProduct": "POANG bentwood armchair",
+      "referenceSku": "896.252.59",
+      "referenceUrl": "https://www.ikea.com/kr/ko/p/poaeng-armchair-black-kelinge-grey-blue-s89625259/",
+      "referenceOnly": true,
+      "measuredByAuthor": false,
+      "dimensions": [
+        0.68,
+        1,
+        0.82
+      ],
+      "measuredGlbDimensions": [
+        0.68,
+        1.0,
+        0.82
+      ],
+      "bounds": {
+        "min": [
+          -0.34,
+          0.0,
+          -0.41
+        ],
+        "max": [
+          0.34,
+          1.0,
+          0.41
+        ]
+      },
+      "defaultColor": "#768f9c",
+      "tintMaterials": [
+        "TINT_Kelinge_corduroy"
+      ],
+      "materials": [
+        {
+          "name": "TINT_Kelinge_corduroy",
+          "baseColorFactor": [
+            0.18000000715255737,
+            0.27000001072883606,
+            0.3199999928474426,
+            1
+          ],
+          "metallicFactor": 0,
+          "roughnessFactor": 0.9399999976158142,
+          "textured": false
+        },
+        {
+          "name": "Black_stained_bent_birch",
+          "baseColorFactor": [
+            0.024000000208616257,
+            0.02500000037252903,
+            0.027000000700354576,
+            1
+          ],
+          "metallicFactor": 0,
+          "roughnessFactor": 0.3400000035762787,
+          "textured": false
+        },
+        {
+          "name": "Brushed_stainless",
+          "baseColorFactor": [
+            0.41999998688697815,
+            0.46000000834465027,
+            0.47999998927116394,
+            1
+          ],
+          "metallicFactor": 0.8500000238418579,
+          "roughnessFactor": 0.30000001192092896,
+          "textured": false
+        }
+      ],
+      "pivots": [],
+      "triangles": 11532,
+      "meshNodes": 17,
+      "bytes": 249000,
+      "sha256": "4de56d24422df066c6331a96d7a0209030285b2d18d8f60b6c5f4e8ab80852d8",
+      "embeddedImages": 0,
+      "degenerateTriangles": 11,
+      "blenderCalibrationScaleXYZ": [
+        0.9912535548210144,
+        1.08790922164917,
+        0.9949312806129456
+      ],
+      "dimensionsSource": "published product exterior dimensions",
+      "estimatedDetails": [
+        "Panel thicknesses, bevel radii, fabric folds/UVs and all PBR parameters are reconstructed estimates, not official CAD or material measurements."
+      ]
+    },
+    {
+      "type": "floorLamp",
+      "model": "floorLamp.glb",
+      "thumbnail": "renders/floorLamp.png",
+      "referenceManufacturer": "IKEA",
+      "referenceProduct": "LAUTERS ash floor lamp",
+      "referenceSku": "804.050.54",
+      "referenceUrl": "https://www.ikea.com/kr/ko/p/lauters-floor-lamp-ash-white-80405054/",
+      "referenceOnly": true,
+      "measuredByAuthor": false,
+      "dimensions": [
+        0.62,
+        1.51,
+        0.62
+      ],
+      "measuredGlbDimensions": [
+        0.62,
+        1.5099999,
+        0.62
+      ],
+      "bounds": {
+        "min": [
+          -0.31,
+          0.0,
+          -0.31
+        ],
+        "max": [
+          0.31,
+          1.5099999,
+          0.31
+        ]
+      },
+      "defaultColor": "#ddd7c8",
+      "tintMaterials": [
+        "TINT_White_linen_lampshade",
+        "TINT_White_lacquer"
+      ],
+      "materials": [
+        {
+          "name": "Graphite_polymer",
+          "baseColorFactor": [
+            0.014999999664723873,
+            0.01899999938905239,
+            0.02199999988079071,
+            1
+          ],
+          "metallicFactor": 0,
+          "roughnessFactor": 0.41999998688697815,
+          "textured": false
+        },
+        {
+          "name": "Ash_veneer_procedural",
+          "baseColorFactor": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "metallicFactor": 0,
+          "roughnessFactor": 0.3799999952316284,
+          "textured": true
+        },
+        {
+          "name": "TINT_White_linen_lampshade",
+          "baseColorFactor": [
+            0.8399999737739563,
+            0.8100000023841858,
+            0.7400000095367432,
+            1
+          ],
+          "metallicFactor": 0,
+          "roughnessFactor": 0.8999999761581421,
+          "textured": false
+        },
+        {
+          "name": "TINT_White_lacquer",
+          "baseColorFactor": [
+            0.8799999952316284,
+            0.8650000095367432,
+            0.824999988079071,
+            1
+          ],
+          "metallicFactor": 0,
+          "roughnessFactor": 0.36000001430511475,
+          "textured": false
+        },
+        {
+          "name": "Warm_frosted_lamp",
+          "baseColorFactor": [
+            0.9200000166893005,
+            0.7400000095367432,
+            0.4000000059604645,
+            1
+          ],
+          "metallicFactor": 0,
+          "roughnessFactor": 0.5,
+          "textured": false
+        }
+      ],
+      "pivots": [],
+      "triangles": 5976,
+      "meshNodes": 11,
+      "bytes": 303776,
+      "sha256": "523895f2d1921bc5dad4d29350c9ed8c5ed6c0810f5a1a8325831f7d3cb160f5",
+      "embeddedImages": 1,
+      "degenerateTriangles": 72,
+      "blenderCalibrationScaleXYZ": [
+        1.1205729246139526,
+        1.1889859437942505,
+        1.0041093826293945
+      ],
+      "dimensionsSource": "published diameter occupancy envelope",
+      "estimatedDetails": [
+        "The published .620 m base diameter is a conservative occupancy envelope, not a measured axis-aligned triangular-leg bound.",
+        "Tripod frame and light level are a reference-inspired reconstruction; illumination is artistic, not photometric data.",
+        "Panel thicknesses, bevel radii, fabric folds/UVs and all PBR parameters are reconstructed estimates, not official CAD or material measurements."
+      ]
+    },
+    {
+      "type": "tableLamp",
+      "model": "tableLamp.glb",
+      "thumbnail": "renders/tableLamp.png",
+      "referenceManufacturer": "IKEA",
+      "referenceProduct": "FADO opal table lamp",
+      "referenceSku": "302.838.99",
+      "referenceUrl": "https://www.ikea.com/kr/ko/p/fado-table-lamp-white-30283899/",
+      "referenceOnly": true,
+      "measuredByAuthor": false,
+      "dimensions": [
+        0.25,
+        0.24,
+        0.25
+      ],
+      "measuredGlbDimensions": [
+        0.25,
+        0.24,
+        0.25
+      ],
+      "bounds": {
+        "min": [
+          -0.125,
+          0.0,
+          -0.125
+        ],
+        "max": [
+          0.125,
+          0.24,
+          0.125
+        ]
+      },
+      "defaultColor": "#eeebe0",
+      "tintMaterials": [
+        "TINT_White_lacquer",
+        "TINT_Frosted_opal_globe"
+      ],
+      "materials": [
+        {
+          "name": "TINT_White_lacquer",
+          "baseColorFactor": [
+            0.8799999952316284,
+            0.8650000095367432,
+            0.824999988079071,
+            1
+          ],
+          "metallicFactor": 0,
+          "roughnessFactor": 0.36000001430511475,
+          "textured": false
+        },
+        {
+          "name": "TINT_Frosted_opal_globe",
+          "baseColorFactor": [
+            0.9100000262260437,
+            0.8999999761581421,
+            0.8299999833106995,
+            1
+          ],
+          "metallicFactor": 0,
+          "roughnessFactor": 0.3799999952316284,
+          "textured": false
+        }
+      ],
+      "pivots": [],
+      "triangles": 4744,
+      "meshNodes": 2,
+      "bytes": 110572,
+      "sha256": "99fb8dcb46c739081ff2419301c1da441a8ebd0a4c9e7609fd8d184c3a1c068e",
+      "embeddedImages": 0,
+      "degenerateTriangles": 142,
+      "blenderCalibrationScaleXYZ": [
+        1.000679612159729,
+        1.000679612159729,
+        1.0
+      ],
+      "dimensionsSource": "published product exterior dimensions",
+      "estimatedDetails": [
+        "Power cable excluded from dimensions and mesh. Glow is illustrative, not measured photometry.",
+        "Panel thicknesses, bevel radii, fabric folds/UVs and all PBR parameters are reconstructed estimates, not official CAD or material measurements."
+      ]
+    },
+    {
+      "type": "pendantLamp",
+      "model": "pendantLamp.glb",
+      "thumbnail": "renders/pendantLamp.png",
+      "referenceManufacturer": "IKEA",
+      "referenceProduct": "SINNERLIG bamboo pendant",
+      "referenceSku": "503.421.95",
+      "referenceUrl": "https://www.ikea.com/kr/ko/p/sinnerlig-pendant-lamp-bamboo-handmade-50342195/",
+      "referenceOnly": true,
+      "measuredByAuthor": false,
+      "dimensions": [
+        0.5,
+        0.54,
+        0.5
+      ],
+      "measuredGlbDimensions": [
+        0.5,
+        0.54,
+        0.5
+      ],
+      "bounds": {
+        "min": [
+          -0.25,
+          0.0,
+          -0.25
+        ],
+        "max": [
+          0.25,
+          0.54,
+          0.25
+        ]
+      },
+      "defaultColor": "#c2a275",
+      "tintMaterials": [],
+      "materials": [
+        {
+          "name": "Ash_veneer_procedural",
+          "baseColorFactor": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "metallicFactor": 0,
+          "roughnessFactor": 0.3799999952316284,
+          "textured": true
+        },
+        {
+          "name": "Graphite_polymer",
+          "baseColorFactor": [
+            0.014999999664723873,
+            0.01899999938905239,
+            0.02199999988079071,
+            1
+          ],
+          "metallicFactor": 0,
+          "roughnessFactor": 0.41999998688697815,
+          "textured": false
+        },
+        {
+          "name": "Warm_pendant_bulb",
+          "baseColorFactor": [
+            0.949999988079071,
+            0.7799999713897705,
+            0.44999998807907104,
+            1
+          ],
+          "metallicFactor": 0,
+          "roughnessFactor": 0.4000000059604645,
+          "textured": false
+        }
+      ],
+      "pivots": [
+        {
+          "node": "mount_ceiling_anchor",
+          "motion": "fixed",
+          "axis": "Y",
+          "openAmount": 0,
+          "restTranslation": [
+            0,
+            0.5400000214576721,
+            0
+          ],
+          "worldPosition": [
+            0.0,
+            0.54,
+            0.0
+          ]
+        }
+      ],
+      "triangles": 30220,
+      "meshNodes": 59,
+      "bytes": 1384836,
+      "sha256": "a6c53687ac7db7da828466e60c39cb06740d8647a10cd182ebad9ff3e99eabe4",
+      "embeddedImages": 1,
+      "degenerateTriangles": 72,
+      "blenderCalibrationScaleXYZ": [
+        0.9842519164085388,
+        0.9842519164085388,
+        1.0154112577438354
+      ],
+      "dimensionsSource": "published product exterior dimensions",
+      "estimatedDetails": [
+        "Published body height .540 m excludes its 1.100 m cord.",
+        "mount_ceiling_anchor is at the top of the body. Cord/drop is a separate placement parameter.",
+        "Bamboo strip count, weave topology and bulb are artistic estimates.",
+        "Panel thicknesses, bevel radii, fabric folds/UVs and all PBR parameters are reconstructed estimates, not official CAD or material measurements."
+      ]
+    }
+  ]
+}

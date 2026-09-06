@@ -5,6 +5,7 @@ import {
   degreesToRadians,
   fromDisplayValue,
   getObjectLabel,
+  getObjectDefinition,
   isObjectOpenable,
   radiansToDegrees,
   toDisplayValue,
@@ -21,9 +22,11 @@ const PropertiesPanel = ({ isMobile = false, onClose }) => {
   const unitSystem = useStore((state) => state.unitSystem);
 
   const selectedObject = objects.find((obj) => obj.id === selectedId);
+  const definition = selectedObject ? getObjectDefinition(selectedObject.type) : null;
+  const reference = definition?.reference;
   const unit = UNIT_SYSTEMS[unitSystem] ?? UNIT_SYSTEMS.m;
   const positionAxes =
-    selectedObject?.type === 'ceilingPanel'
+    selectedObject?.type === 'ceilingPanel' || reference?.elevated
       ? [
           ['X', 0],
           ['Y', 1],
@@ -130,6 +133,18 @@ const PropertiesPanel = ({ isMobile = false, onClose }) => {
   return (
     <div style={containerStyle}>
       {header}
+
+      {reference && <section style={{padding:'14px',marginBottom:20,border:'1px solid #506354',borderRadius:8,background:'#1e2b23'}}>
+        <small style={{color:'#b5c5b3'}}>{reference.brand} · {reference.sku}</small>
+        <h3 style={{margin:'7px 0'}}>{reference.product}</h3>
+        <p style={{fontSize:12,lineHeight:1.6,color:'#d5dccf'}}>
+          {reference.customEnvelope ? '샤워존은 자체 설계이며 수전만 실존 제품을 참고했습니다.' : '공개 제품 치수를 참고해 Blender로 새로 제작한 비공식 모델입니다.'}
+          <br />W × H × D: {reference.dimensions.map(v => `${Math.round(v*10000)/10}`).join(' × ')} mm
+        </p>
+        <p style={{fontSize:12,color:'#e1c690'}}>{selectedObject.dimensions.some((v,i)=>Math.abs(v-reference.dimensions[i])>.0001) ? '사용자 변형 치수 · 실제 제품 크기와 다름' : reference.customEnvelope ? '자체 설계 샤워존 치수' : '제품 기본 치수'}</p>
+        <a href={reference.url} target="_blank" rel="noreferrer" style={{color:'#d5e4ca',fontSize:12}}>제조사 치수·디자인 출처 ↗</a>
+        <button style={{display:'block',marginTop:12,fontSize:12}} onClick={()=>updateObject(selectedId,{dimensions:[...reference.dimensions],color:definition.color})}>기본 크기·마감 복원</button>
+      </section>}
 
       <div style={{ marginBottom: '20px' }}>
         <label style={{ display: 'block', marginBottom: '5px', color: '#aaa', fontSize: '12px' }}>
@@ -253,10 +268,12 @@ const PropertiesPanel = ({ isMobile = false, onClose }) => {
         </label>
         <input
           type="color"
+          disabled={Boolean(reference && !reference.tintable)}
           value={selectedObject.color}
           onChange={(e) => handleChange('color', e.target.value)}
           style={{ width: '100%', height: '44px', border: 'none', borderRadius: '8px', cursor: 'pointer', background: '#1a212c' }}
         />
+        {reference && <p style={{fontSize:11,color:'#adbaa8',lineHeight:1.5}}>{reference.tintable ? '패브릭·도장 부품만 변경됩니다. 원목·금속·유리는 원래 마감을 유지합니다.' : '이 모델은 원목·금속·유리 등 고유 마감을 유지하며 색상을 변경하지 않습니다.'}</p>}
       </div>
 
       {isObjectOpenable(selectedObject.type) ? (

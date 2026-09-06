@@ -1,0 +1,1155 @@
+{
+  "passed": true,
+  "assetCount": 19,
+  "passedCount": 19,
+  "comparison": "Direct Buffer.equals for unpacked geometry/index accessor payloads and embedded images; semantic node/hierarchy/motion/material/sampler equality after type__ node-prefix normalization.",
+  "totalAccessorPayloadBytesCompared": 5550760,
+  "totalEmbeddedImageBytesCompared": 399339,
+  "results": [
+    {
+      "type": "sofa",
+      "passed": true,
+      "geometryAccessorBytes": true,
+      "hierarchy": true,
+      "transforms": true,
+      "motionAndNodeExtras": true,
+      "materialPropertiesAndTextureBindings": true,
+      "embeddedImageBytes": true,
+      "meshMetadata": true,
+      "nodes": 15,
+      "meshes": 14,
+      "primitives": 14,
+      "accessorReferencesCompared": 56,
+      "accessorPayloadBytesCompared": 231808,
+      "embeddedImages": 1,
+      "embeddedImageBytesCompared": 23084,
+      "uniqueAccessorsCompared": 48,
+      "uniqueAccessorPayloadBytesCompared": 194560,
+      "fileBytesIdentical": false,
+      "releaseFileBytes": 229632,
+      "reexportFileBytes": 229592,
+      "normalizedNodePrefixChanges": 15,
+      "differences": [],
+      "operationalMetadataDifferences": [
+        {
+          "path": "assetAndSceneMetadata",
+          "release": {
+            "asset": {
+              "generator": "Khronos glTF Blender I/O v4.5.51",
+              "version": "2.0"
+            },
+            "scenes": [
+              {
+                "extras": {
+                  "last_asset": "shower",
+                  "asset_batch": "sofa,chair,table,desk,bed,cabinet,wardrobe,tv,refrigerator,washingMachine,sink,cooktop,bathtub,toilet,shower,armchair,floorLamp,tableLamp,pendantLamp"
+                },
+                "name": "Codex MCP Workspace"
+              }
+            ]
+          },
+          "reexport": {
+            "asset": {
+              "generator": "Khronos glTF Blender I/O v4.5.51",
+              "version": "2.0"
+            },
+            "scenes": [
+              {
+                "extras": {
+                  "last_asset": "floorLamp",
+                  "asset_batch": "toilet,floorLamp"
+                },
+                "name": "Codex MCP Workspace"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "type": "bed",
+      "passed": true,
+      "geometryAccessorBytes": true,
+      "hierarchy": true,
+      "transforms": true,
+      "motionAndNodeExtras": true,
+      "materialPropertiesAndTextureBindings": true,
+      "embeddedImageBytes": true,
+      "meshMetadata": true,
+      "nodes": 26,
+      "meshes": 25,
+      "primitives": 25,
+      "accessorReferencesCompared": 100,
+      "accessorPayloadBytesCompared": 267024,
+      "embeddedImages": 1,
+      "embeddedImageBytesCompared": 75251,
+      "uniqueAccessorsCompared": 82,
+      "uniqueAccessorPayloadBytesCompared": 216168,
+      "fileBytesIdentical": false,
+      "releaseFileBytes": 311652,
+      "reexportFileBytes": 311656,
+      "normalizedNodePrefixChanges": 26,
+      "differences": [],
+      "operationalMetadataDifferences": [
+        {
+          "path": "assetAndSceneMetadata",
+          "release": {
+            "asset": {
+              "generator": "Khronos glTF Blender I/O v4.5.51",
+              "version": "2.0"
+            },
+            "scenes": [
+              {
+                "extras": {
+                  "last_asset": "desk",
+                  "asset_batch": "sofa,chair,table,desk,bed,cabinet,wardrobe,tv,refrigerator,washingMachine,sink,cooktop,bathtub,toilet,shower,armchair,floorLamp,tableLamp,pendantLamp"
+                },
+                "name": "Codex MCP Workspace"
+              }
+            ]
+          },
+          "reexport": {
+            "asset": {
+              "generator": "Khronos glTF Blender I/O v4.5.51",
+              "version": "2.0"
+            },
+            "scenes": [
+              {
+                "extras": {
+                  "last_asset": "floorLamp",
+                  "asset_batch": "toilet,floorLamp"
+                },
+                "name": "Codex MCP Workspace"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "type": "chair",
+      "passed": true,
+      "geometryAccessorBytes": true,
+      "hierarchy": true,
+      "transforms": true,
+      "motionAndNodeExtras": true,
+      "materialPropertiesAndTextureBindings": true,
+      "embeddedImageBytes": true,
+      "meshMetadata": true,
+      "nodes": 9,
+      "meshes": 8,
+      "primitives": 8,
+      "accessorReferencesCompared": 32,
+      "accessorPayloadBytesCompared": 155344,
+      "embeddedImages": 1,
+      "embeddedImageBytesCompared": 75251,
+      "uniqueAccessorsCompared": 27,
+      "uniqueAccessorPayloadBytesCompared": 146824,
+      "fileBytesIdentical": false,
+      "releaseFileBytes": 229116,
+      "reexportFileBytes": 229052,
+      "normalizedNodePrefixChanges": 9,
+      "differences": [],
+      "operationalMetadataDifferences": [
+        {
+          "path": "assetAndSceneMetadata",
+          "release": {
+            "asset": {
+              "generator": "Khronos glTF Blender I/O v4.5.51",
+              "version": "2.0"
+            },
+            "scenes": [
+              {
+                "extras": {
+                  "last_asset": "sofa",
+                  "asset_batch": "sofa,chair,table,desk,bed,cabinet,wardrobe,tv,refrigerator,washingMachine,sink,cooktop,bathtub,toilet,shower,armchair,floorLamp,tableLamp,pendantLamp"
+                },
+                "name": "Codex MCP Workspace"
+              }
+            ]
+          },
+          "reexport": {
+            "asset": {
+              "generator": "Khronos glTF Blender I/O v4.5.51",
+              "version": "2.0"
+            },
+            "scenes": [
+              {
+                "extras": {
+                  "last_asset": "floorLamp",
+                  "asset_batch": "toilet,floorLamp"
+                },
+                "name": "Codex MCP Workspace"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "type": "table",
+      "passed": true,
+      "geometryAccessorBytes": true,
+      "hierarchy": true,
+      "transforms": true,
+      "motionAndNodeExtras": true,
+      "materialPropertiesAndTextureBindings": true,
+      "embeddedImageBytes": true,
+      "meshMetadata": true,
+      "nodes": 11,
+      "meshes": 10,
+      "primitives": 10,
+      "accessorReferencesCompared": 40,
+      "accessorPayloadBytesCompared": 60784,
+      "embeddedImages": 1,
+      "embeddedImageBytesCompared": 75251,
+      "uniqueAccessorsCompared": 34,
+      "uniqueAccessorPayloadBytesCompared": 52288,
+      "fileBytesIdentical": false,
+      "releaseFileBytes": 135944,
+      "reexportFileBytes": 135892,
+      "normalizedNodePrefixChanges": 11,
+      "differences": [],
+      "operationalMetadataDifferences": [
+        {
+          "path": "assetAndSceneMetadata",
+          "release": {
+            "asset": {
+              "generator": "Khronos glTF Blender I/O v4.5.51",
+              "version": "2.0"
+            },
+            "scenes": [
+              {
+                "extras": {
+                  "last_asset": "chair",
+                  "asset_batch": "sofa,chair,table,desk,bed,cabinet,wardrobe,tv,refrigerator,washingMachine,sink,cooktop,bathtub,toilet,shower,armchair,floorLamp,tableLamp,pendantLamp"
+                },
+                "name": "Codex MCP Workspace"
+              }
+            ]
+          },
+          "reexport": {
+            "asset": {
+              "generator": "Khronos glTF Blender I/O v4.5.51",
+              "version": "2.0"
+            },
+            "scenes": [
+              {
+                "extras": {
+                  "last_asset": "floorLamp",
+                  "asset_batch": "toilet,floorLamp"
+                },
+                "name": "Codex MCP Workspace"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "type": "desk",
+      "passed": true,
+      "geometryAccessorBytes": true,
+      "hierarchy": true,
+      "transforms": true,
+      "motionAndNodeExtras": true,
+      "materialPropertiesAndTextureBindings": true,
+      "embeddedImageBytes": true,
+      "meshMetadata": true,
+      "nodes": 23,
+      "meshes": 20,
+      "primitives": 20,
+      "accessorReferencesCompared": 80,
+      "accessorPayloadBytesCompared": 108320,
+      "embeddedImages": 0,
+      "embeddedImageBytesCompared": 0,
+      "uniqueAccessorsCompared": 72,
+      "uniqueAccessorPayloadBytesCompared": 98144,
+      "fileBytesIdentical": false,
+      "releaseFileBytes": 114896,
+      "reexportFileBytes": 114904,
+      "normalizedNodePrefixChanges": 23,
+      "differences": [],
+      "operationalMetadataDifferences": [
+        {
+          "path": "assetAndSceneMetadata",
+          "release": {
+            "asset": {
+              "generator": "Khronos glTF Blender I/O v4.5.51",
+              "version": "2.0"
+            },
+            "scenes": [
+              {
+                "extras": {
+                  "last_asset": "table",
+                  "asset_batch": "sofa,chair,table,desk,bed,cabinet,wardrobe,tv,refrigerator,washingMachine,sink,cooktop,bathtub,toilet,shower,armchair,floorLamp,tableLamp,pendantLamp"
+                },
+                "name": "Codex MCP Workspace"
+              }
+            ]
+          },
+          "reexport": {
+            "asset": {
+              "generator": "Khronos glTF Blender I/O v4.5.51",
+              "version": "2.0"
+            },
+            "scenes": [
+              {
+                "extras": {
+                  "last_asset": "floorLamp",
+                  "asset_batch": "toilet,floorLamp"
+                },
+                "name": "Codex MCP Workspace"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "type": "tv",
+      "passed": true,
+      "geometryAccessorBytes": true,
+      "hierarchy": true,
+      "transforms": true,
+      "motionAndNodeExtras": true,
+      "materialPropertiesAndTextureBindings": true,
+      "embeddedImageBytes": true,
+      "meshMetadata": true,
+      "nodes": 10,
+      "meshes": 9,
+      "primitives": 9,
+      "accessorReferencesCompared": 36,
+      "accessorPayloadBytesCompared": 46696,
+      "embeddedImages": 0,
+      "embeddedImageBytesCompared": 0,
+      "uniqueAccessorsCompared": 33,
+      "uniqueAccessorPayloadBytesCompared": 43312,
+      "fileBytesIdentical": false,
+      "releaseFileBytes": 51728,
+      "reexportFileBytes": 51636,
+      "normalizedNodePrefixChanges": 10,
+      "differences": [],
+      "operationalMetadataDifferences": [
+        {
+          "path": "assetAndSceneMetadata",
+          "release": {
+            "asset": {
+              "generator": "Khronos glTF Blender I/O v4.5.51",
+              "version": "2.0"
+            },
+            "scenes": [
+              {
+                "extras": {
+                  "last_asset": "wardrobe",
+                  "asset_batch": "sofa,chair,table,desk,bed,cabinet,wardrobe,tv,refrigerator,washingMachine,sink,cooktop,bathtub,toilet,shower,armchair,floorLamp,tableLamp,pendantLamp"
+                },
+                "name": "Codex MCP Workspace"
+              }
+            ]
+          },
+          "reexport": {
+            "asset": {
+              "generator": "Khronos glTF Blender I/O v4.5.51",
+              "version": "2.0"
+            },
+            "scenes": [
+              {
+                "extras": {
+                  "last_asset": "floorLamp",
+                  "asset_batch": "toilet,floorLamp"
+                },
+                "name": "Codex MCP Workspace"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "type": "cabinet",
+      "passed": true,
+      "geometryAccessorBytes": true,
+      "hierarchy": true,
+      "transforms": true,
+      "motionAndNodeExtras": true,
+      "materialPropertiesAndTextureBindings": true,
+      "embeddedImageBytes": true,
+      "meshMetadata": true,
+      "nodes": 34,
+      "meshes": 29,
+      "primitives": 29,
+      "accessorReferencesCompared": 116,
+      "accessorPayloadBytesCompared": 140360,
+      "embeddedImages": 0,
+      "embeddedImageBytesCompared": 0,
+      "uniqueAccessorsCompared": 95,
+      "uniqueAccessorPayloadBytesCompared": 116672,
+      "fileBytesIdentical": false,
+      "releaseFileBytes": 139244,
+      "reexportFileBytes": 139424,
+      "normalizedNodePrefixChanges": 34,
+      "differences": [],
+      "operationalMetadataDifferences": [
+        {
+          "path": "assetAndSceneMetadata",
+          "release": {
+            "asset": {
+              "generator": "Khronos glTF Blender I/O v4.5.51",
+              "version": "2.0"
+            },
+            "scenes": [
+              {
+                "extras": {
+                  "last_asset": "bed",
+                  "asset_batch": "sofa,chair,table,desk,bed,cabinet,wardrobe,tv,refrigerator,washingMachine,sink,cooktop,bathtub,toilet,shower,armchair,floorLamp,tableLamp,pendantLamp"
+                },
+                "name": "Codex MCP Workspace"
+              }
+            ]
+          },
+          "reexport": {
+            "asset": {
+              "generator": "Khronos glTF Blender I/O v4.5.51",
+              "version": "2.0"
+            },
+            "scenes": [
+              {
+                "extras": {
+                  "last_asset": "floorLamp",
+                  "asset_batch": "toilet,floorLamp"
+                },
+                "name": "Codex MCP Workspace"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "type": "wardrobe",
+      "passed": true,
+      "geometryAccessorBytes": true,
+      "hierarchy": true,
+      "transforms": true,
+      "motionAndNodeExtras": true,
+      "materialPropertiesAndTextureBindings": true,
+      "embeddedImageBytes": true,
+      "meshMetadata": true,
+      "nodes": 27,
+      "meshes": 24,
+      "primitives": 24,
+      "accessorReferencesCompared": 96,
+      "accessorPayloadBytesCompared": 138112,
+      "embeddedImages": 0,
+      "embeddedImageBytesCompared": 0,
+      "uniqueAccessorsCompared": 79,
+      "uniqueAccessorPayloadBytesCompared": 115480,
+      "fileBytesIdentical": false,
+      "releaseFileBytes": 134500,
+      "reexportFileBytes": 134640,
+      "normalizedNodePrefixChanges": 27,
+      "differences": [],
+      "operationalMetadataDifferences": [
+        {
+          "path": "assetAndSceneMetadata",
+          "release": {
+            "asset": {
+              "generator": "Khronos glTF Blender I/O v4.5.51",
+              "version": "2.0"
+            },
+            "scenes": [
+              {
+                "extras": {
+                  "last_asset": "cabinet",
+                  "asset_batch": "sofa,chair,table,desk,bed,cabinet,wardrobe,tv,refrigerator,washingMachine,sink,cooktop,bathtub,toilet,shower,armchair,floorLamp,tableLamp,pendantLamp"
+                },
+                "name": "Codex MCP Workspace"
+              }
+            ]
+          },
+          "reexport": {
+            "asset": {
+              "generator": "Khronos glTF Blender I/O v4.5.51",
+              "version": "2.0"
+            },
+            "scenes": [
+              {
+                "extras": {
+                  "last_asset": "floorLamp",
+                  "asset_batch": "toilet,floorLamp"
+                },
+                "name": "Codex MCP Workspace"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "type": "refrigerator",
+      "passed": true,
+      "geometryAccessorBytes": true,
+      "hierarchy": true,
+      "transforms": true,
+      "motionAndNodeExtras": true,
+      "materialPropertiesAndTextureBindings": true,
+      "embeddedImageBytes": true,
+      "meshMetadata": true,
+      "nodes": 30,
+      "meshes": 27,
+      "primitives": 27,
+      "accessorReferencesCompared": 108,
+      "accessorPayloadBytesCompared": 136824,
+      "embeddedImages": 0,
+      "embeddedImageBytesCompared": 0,
+      "uniqueAccessorsCompared": 91,
+      "uniqueAccessorPayloadBytesCompared": 117072,
+      "fileBytesIdentical": false,
+      "releaseFileBytes": 139544,
+      "reexportFileBytes": 139840,
+      "normalizedNodePrefixChanges": 30,
+      "differences": [],
+      "operationalMetadataDifferences": [
+        {
+          "path": "assetAndSceneMetadata",
+          "release": {
+            "asset": {
+              "generator": "Khronos glTF Blender I/O v4.5.51",
+              "version": "2.0"
+            },
+            "scenes": [
+              {
+                "extras": {
+                  "last_asset": "tv",
+                  "asset_batch": "sofa,chair,table,desk,bed,cabinet,wardrobe,tv,refrigerator,washingMachine,sink,cooktop,bathtub,toilet,shower,armchair,floorLamp,tableLamp,pendantLamp"
+                },
+                "name": "Codex MCP Workspace"
+              }
+            ]
+          },
+          "reexport": {
+            "asset": {
+              "generator": "Khronos glTF Blender I/O v4.5.51",
+              "version": "2.0"
+            },
+            "scenes": [
+              {
+                "extras": {
+                  "last_asset": "floorLamp",
+                  "asset_batch": "toilet,floorLamp"
+                },
+                "name": "Codex MCP Workspace"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "type": "washingMachine",
+      "passed": true,
+      "geometryAccessorBytes": true,
+      "hierarchy": true,
+      "transforms": true,
+      "motionAndNodeExtras": true,
+      "materialPropertiesAndTextureBindings": true,
+      "embeddedImageBytes": true,
+      "meshMetadata": true,
+      "nodes": 71,
+      "meshes": 69,
+      "primitives": 69,
+      "accessorReferencesCompared": 276,
+      "accessorPayloadBytesCompared": 667568,
+      "embeddedImages": 0,
+      "embeddedImageBytesCompared": 0,
+      "uniqueAccessorsCompared": 222,
+      "uniqueAccessorPayloadBytesCompared": 595904,
+      "fileBytesIdentical": false,
+      "releaseFileBytes": 648464,
+      "reexportFileBytes": 649464,
+      "normalizedNodePrefixChanges": 71,
+      "differences": [],
+      "operationalMetadataDifferences": [
+        {
+          "path": "assetAndSceneMetadata",
+          "release": {
+            "asset": {
+              "generator": "Khronos glTF Blender I/O v4.5.51",
+              "version": "2.0"
+            },
+            "scenes": [
+              {
+                "extras": {
+                  "last_asset": "refrigerator",
+                  "asset_batch": "sofa,chair,table,desk,bed,cabinet,wardrobe,tv,refrigerator,washingMachine,sink,cooktop,bathtub,toilet,shower,armchair,floorLamp,tableLamp,pendantLamp"
+                },
+                "name": "Codex MCP Workspace"
+              }
+            ]
+          },
+          "reexport": {
+            "asset": {
+              "generator": "Khronos glTF Blender I/O v4.5.51",
+              "version": "2.0"
+            },
+            "scenes": [
+              {
+                "extras": {
+                  "last_asset": "floorLamp",
+                  "asset_batch": "toilet,floorLamp"
+                },
+                "name": "Codex MCP Workspace"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "type": "sink",
+      "passed": true,
+      "geometryAccessorBytes": true,
+      "hierarchy": true,
+      "transforms": true,
+      "motionAndNodeExtras": true,
+      "materialPropertiesAndTextureBindings": true,
+      "embeddedImageBytes": true,
+      "meshMetadata": true,
+      "nodes": 47,
+      "meshes": 46,
+      "primitives": 46,
+      "accessorReferencesCompared": 184,
+      "accessorPayloadBytesCompared": 359112,
+      "embeddedImages": 0,
+      "embeddedImageBytesCompared": 0,
+      "uniqueAccessorsCompared": 150,
+      "uniqueAccessorPayloadBytesCompared": 301800,
+      "fileBytesIdentical": false,
+      "releaseFileBytes": 337200,
+      "reexportFileBytes": 337344,
+      "normalizedNodePrefixChanges": 47,
+      "differences": [],
+      "operationalMetadataDifferences": [
+        {
+          "path": "assetAndSceneMetadata",
+          "release": {
+            "asset": {
+              "generator": "Khronos glTF Blender I/O v4.5.51",
+              "version": "2.0"
+            },
+            "scenes": [
+              {
+                "extras": {
+                  "last_asset": "washingMachine",
+                  "asset_batch": "sofa,chair,table,desk,bed,cabinet,wardrobe,tv,refrigerator,washingMachine,sink,cooktop,bathtub,toilet,shower,armchair,floorLamp,tableLamp,pendantLamp"
+                },
+                "name": "Codex MCP Workspace"
+              }
+            ]
+          },
+          "reexport": {
+            "asset": {
+              "generator": "Khronos glTF Blender I/O v4.5.51",
+              "version": "2.0"
+            },
+            "scenes": [
+              {
+                "extras": {
+                  "last_asset": "floorLamp",
+                  "asset_batch": "toilet,floorLamp"
+                },
+                "name": "Codex MCP Workspace"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "type": "cooktop",
+      "passed": true,
+      "geometryAccessorBytes": true,
+      "hierarchy": true,
+      "transforms": true,
+      "motionAndNodeExtras": true,
+      "materialPropertiesAndTextureBindings": true,
+      "embeddedImageBytes": true,
+      "meshMetadata": true,
+      "nodes": 13,
+      "meshes": 12,
+      "primitives": 12,
+      "accessorReferencesCompared": 48,
+      "accessorPayloadBytesCompared": 339800,
+      "embeddedImages": 0,
+      "embeddedImageBytesCompared": 0,
+      "uniqueAccessorsCompared": 44,
+      "uniqueAccessorPayloadBytesCompared": 335288,
+      "fileBytesIdentical": false,
+      "releaseFileBytes": 345784,
+      "reexportFileBytes": 345776,
+      "normalizedNodePrefixChanges": 13,
+      "differences": [],
+      "operationalMetadataDifferences": [
+        {
+          "path": "assetAndSceneMetadata",
+          "release": {
+            "asset": {
+              "generator": "Khronos glTF Blender I/O v4.5.51",
+              "version": "2.0"
+            },
+            "scenes": [
+              {
+                "extras": {
+                  "last_asset": "sink",
+                  "asset_batch": "sofa,chair,table,desk,bed,cabinet,wardrobe,tv,refrigerator,washingMachine,sink,cooktop,bathtub,toilet,shower,armchair,floorLamp,tableLamp,pendantLamp"
+                },
+                "name": "Codex MCP Workspace"
+              }
+            ]
+          },
+          "reexport": {
+            "asset": {
+              "generator": "Khronos glTF Blender I/O v4.5.51",
+              "version": "2.0"
+            },
+            "scenes": [
+              {
+                "extras": {
+                  "last_asset": "floorLamp",
+                  "asset_batch": "toilet,floorLamp"
+                },
+                "name": "Codex MCP Workspace"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "type": "bathtub",
+      "passed": true,
+      "geometryAccessorBytes": true,
+      "hierarchy": true,
+      "transforms": true,
+      "motionAndNodeExtras": true,
+      "materialPropertiesAndTextureBindings": true,
+      "embeddedImageBytes": true,
+      "meshMetadata": true,
+      "nodes": 4,
+      "meshes": 3,
+      "primitives": 3,
+      "accessorReferencesCompared": 12,
+      "accessorPayloadBytesCompared": 53432,
+      "embeddedImages": 0,
+      "embeddedImageBytesCompared": 0,
+      "uniqueAccessorsCompared": 12,
+      "uniqueAccessorPayloadBytesCompared": 53432,
+      "fileBytesIdentical": false,
+      "releaseFileBytes": 57212,
+      "reexportFileBytes": 57116,
+      "normalizedNodePrefixChanges": 4,
+      "differences": [],
+      "operationalMetadataDifferences": [
+        {
+          "path": "assetAndSceneMetadata",
+          "release": {
+            "asset": {
+              "generator": "Khronos glTF Blender I/O v4.5.51",
+              "version": "2.0"
+            },
+            "scenes": [
+              {
+                "extras": {
+                  "last_asset": "cooktop",
+                  "asset_batch": "sofa,chair,table,desk,bed,cabinet,wardrobe,tv,refrigerator,washingMachine,sink,cooktop,bathtub,toilet,shower,armchair,floorLamp,tableLamp,pendantLamp"
+                },
+                "name": "Codex MCP Workspace"
+              }
+            ]
+          },
+          "reexport": {
+            "asset": {
+              "generator": "Khronos glTF Blender I/O v4.5.51",
+              "version": "2.0"
+            },
+            "scenes": [
+              {
+                "extras": {
+                  "last_asset": "floorLamp",
+                  "asset_batch": "toilet,floorLamp"
+                },
+                "name": "Codex MCP Workspace"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "type": "toilet",
+      "passed": true,
+      "geometryAccessorBytes": true,
+      "hierarchy": true,
+      "transforms": true,
+      "motionAndNodeExtras": true,
+      "materialPropertiesAndTextureBindings": true,
+      "embeddedImageBytes": true,
+      "meshMetadata": true,
+      "nodes": 14,
+      "meshes": 12,
+      "primitives": 12,
+      "accessorReferencesCompared": 48,
+      "accessorPayloadBytesCompared": 180016,
+      "embeddedImages": 0,
+      "embeddedImageBytesCompared": 0,
+      "uniqueAccessorsCompared": 46,
+      "uniqueAccessorPayloadBytesCompared": 176608,
+      "fileBytesIdentical": false,
+      "releaseFileBytes": 187616,
+      "reexportFileBytes": 187724,
+      "normalizedNodePrefixChanges": 14,
+      "differences": [],
+      "operationalMetadataDifferences": [
+        {
+          "path": "assetAndSceneMetadata",
+          "release": {
+            "asset": {
+              "generator": "Khronos glTF Blender I/O v4.5.51",
+              "version": "2.0"
+            },
+            "scenes": [
+              {
+                "extras": {
+                  "last_asset": "pendantLamp",
+                  "asset_batch": "toilet,floorLamp"
+                },
+                "name": "Codex MCP Workspace"
+              }
+            ]
+          },
+          "reexport": {
+            "asset": {
+              "generator": "Khronos glTF Blender I/O v4.5.51",
+              "version": "2.0"
+            },
+            "scenes": [
+              {
+                "extras": {
+                  "last_asset": "floorLamp",
+                  "asset_batch": "toilet,floorLamp"
+                },
+                "name": "Codex MCP Workspace"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "type": "shower",
+      "passed": true,
+      "geometryAccessorBytes": true,
+      "hierarchy": true,
+      "transforms": true,
+      "motionAndNodeExtras": true,
+      "materialPropertiesAndTextureBindings": true,
+      "embeddedImageBytes": true,
+      "meshMetadata": true,
+      "nodes": 107,
+      "meshes": 104,
+      "primitives": 104,
+      "accessorReferencesCompared": 416,
+      "accessorPayloadBytesCompared": 707464,
+      "embeddedImages": 0,
+      "embeddedImageBytesCompared": 0,
+      "uniqueAccessorsCompared": 325,
+      "uniqueAccessorPayloadBytesCompared": 582136,
+      "fileBytesIdentical": false,
+      "releaseFileBytes": 658928,
+      "reexportFileBytes": 659652,
+      "normalizedNodePrefixChanges": 107,
+      "differences": [],
+      "operationalMetadataDifferences": [
+        {
+          "path": "assetAndSceneMetadata",
+          "release": {
+            "asset": {
+              "generator": "Khronos glTF Blender I/O v4.5.51",
+              "version": "2.0"
+            },
+            "scenes": [
+              {
+                "extras": {
+                  "last_asset": "toilet",
+                  "asset_batch": "sofa,chair,table,desk,bed,cabinet,wardrobe,tv,refrigerator,washingMachine,sink,cooktop,bathtub,toilet,shower,armchair,floorLamp,tableLamp,pendantLamp"
+                },
+                "name": "Codex MCP Workspace"
+              }
+            ]
+          },
+          "reexport": {
+            "asset": {
+              "generator": "Khronos glTF Blender I/O v4.5.51",
+              "version": "2.0"
+            },
+            "scenes": [
+              {
+                "extras": {
+                  "last_asset": "floorLamp",
+                  "asset_batch": "toilet,floorLamp"
+                },
+                "name": "Codex MCP Workspace"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "type": "armchair",
+      "passed": true,
+      "geometryAccessorBytes": true,
+      "hierarchy": true,
+      "transforms": true,
+      "motionAndNodeExtras": true,
+      "materialPropertiesAndTextureBindings": true,
+      "embeddedImageBytes": true,
+      "meshMetadata": true,
+      "nodes": 18,
+      "meshes": 17,
+      "primitives": 17,
+      "accessorReferencesCompared": 68,
+      "accessorPayloadBytesCompared": 272296,
+      "embeddedImages": 0,
+      "embeddedImageBytesCompared": 0,
+      "uniqueAccessorsCompared": 57,
+      "uniqueAccessorPayloadBytesCompared": 234712,
+      "fileBytesIdentical": false,
+      "releaseFileBytes": 249000,
+      "reexportFileBytes": 249048,
+      "normalizedNodePrefixChanges": 18,
+      "differences": [],
+      "operationalMetadataDifferences": [
+        {
+          "path": "assetAndSceneMetadata",
+          "release": {
+            "asset": {
+              "generator": "Khronos glTF Blender I/O v4.5.51",
+              "version": "2.0"
+            },
+            "scenes": [
+              {
+                "extras": {
+                  "last_asset": "shower",
+                  "asset_batch": "sofa,chair,table,desk,bed,cabinet,wardrobe,tv,refrigerator,washingMachine,sink,cooktop,bathtub,toilet,shower,armchair,floorLamp,tableLamp,pendantLamp"
+                },
+                "name": "Codex MCP Workspace"
+              }
+            ]
+          },
+          "reexport": {
+            "asset": {
+              "generator": "Khronos glTF Blender I/O v4.5.51",
+              "version": "2.0"
+            },
+            "scenes": [
+              {
+                "extras": {
+                  "last_asset": "floorLamp",
+                  "asset_batch": "toilet,floorLamp"
+                },
+                "name": "Codex MCP Workspace"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "type": "floorLamp",
+      "passed": true,
+      "geometryAccessorBytes": true,
+      "hierarchy": true,
+      "transforms": true,
+      "motionAndNodeExtras": true,
+      "materialPropertiesAndTextureBindings": true,
+      "embeddedImageBytes": true,
+      "meshMetadata": true,
+      "nodes": 12,
+      "meshes": 11,
+      "primitives": 11,
+      "accessorReferencesCompared": 44,
+      "accessorPayloadBytesCompared": 226736,
+      "embeddedImages": 1,
+      "embeddedImageBytesCompared": 75251,
+      "uniqueAccessorsCompared": 39,
+      "uniqueAccessorPayloadBytesCompared": 218216,
+      "fileBytesIdentical": false,
+      "releaseFileBytes": 303776,
+      "reexportFileBytes": 303780,
+      "normalizedNodePrefixChanges": 0,
+      "differences": [],
+      "operationalMetadataDifferences": [
+        {
+          "path": "assetAndSceneMetadata",
+          "release": {
+            "asset": {
+              "generator": "Khronos glTF Blender I/O v4.5.51",
+              "version": "2.0"
+            },
+            "scenes": [
+              {
+                "extras": {
+                  "last_asset": "toilet",
+                  "asset_batch": "toilet,floorLamp"
+                },
+                "name": "Codex MCP Workspace"
+              }
+            ]
+          },
+          "reexport": {
+            "asset": {
+              "generator": "Khronos glTF Blender I/O v4.5.51",
+              "version": "2.0"
+            },
+            "scenes": [
+              {
+                "extras": {
+                  "last_asset": "floorLamp",
+                  "asset_batch": "toilet,floorLamp"
+                },
+                "name": "Codex MCP Workspace"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "type": "tableLamp",
+      "passed": true,
+      "geometryAccessorBytes": true,
+      "hierarchy": true,
+      "transforms": true,
+      "motionAndNodeExtras": true,
+      "materialPropertiesAndTextureBindings": true,
+      "embeddedImageBytes": true,
+      "meshMetadata": true,
+      "nodes": 3,
+      "meshes": 2,
+      "primitives": 2,
+      "accessorReferencesCompared": 8,
+      "accessorPayloadBytesCompared": 107696,
+      "embeddedImages": 0,
+      "embeddedImageBytesCompared": 0,
+      "uniqueAccessorsCompared": 8,
+      "uniqueAccessorPayloadBytesCompared": 107696,
+      "fileBytesIdentical": false,
+      "releaseFileBytes": 110572,
+      "reexportFileBytes": 110472,
+      "normalizedNodePrefixChanges": 3,
+      "differences": [],
+      "operationalMetadataDifferences": [
+        {
+          "path": "assetAndSceneMetadata",
+          "release": {
+            "asset": {
+              "generator": "Khronos glTF Blender I/O v4.5.51",
+              "version": "2.0"
+            },
+            "scenes": [
+              {
+                "extras": {
+                  "last_asset": "floorLamp",
+                  "asset_batch": "sofa,chair,table,desk,bed,cabinet,wardrobe,tv,refrigerator,washingMachine,sink,cooktop,bathtub,toilet,shower,armchair,floorLamp,tableLamp,pendantLamp"
+                },
+                "name": "Codex MCP Workspace"
+              }
+            ]
+          },
+          "reexport": {
+            "asset": {
+              "generator": "Khronos glTF Blender I/O v4.5.51",
+              "version": "2.0"
+            },
+            "scenes": [
+              {
+                "extras": {
+                  "last_asset": "floorLamp",
+                  "asset_batch": "toilet,floorLamp"
+                },
+                "name": "Codex MCP Workspace"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "type": "pendantLamp",
+      "passed": true,
+      "geometryAccessorBytes": true,
+      "hierarchy": true,
+      "transforms": true,
+      "motionAndNodeExtras": true,
+      "materialPropertiesAndTextureBindings": true,
+      "embeddedImageBytes": true,
+      "meshMetadata": true,
+      "nodes": 61,
+      "meshes": 59,
+      "primitives": 59,
+      "accessorReferencesCompared": 236,
+      "accessorPayloadBytesCompared": 1351368,
+      "embeddedImages": 1,
+      "embeddedImageBytesCompared": 75251,
+      "uniqueAccessorsCompared": 194,
+      "uniqueAccessorPayloadBytesCompared": 1262016,
+      "fileBytesIdentical": false,
+      "releaseFileBytes": 1384836,
+      "reexportFileBytes": 1385496,
+      "normalizedNodePrefixChanges": 61,
+      "differences": [],
+      "operationalMetadataDifferences": [
+        {
+          "path": "assetAndSceneMetadata",
+          "release": {
+            "asset": {
+              "generator": "Khronos glTF Blender I/O v4.5.51",
+              "version": "2.0"
+            },
+            "scenes": [
+              {
+                "extras": {
+                  "last_asset": "tableLamp",
+                  "asset_batch": "sofa,chair,table,desk,bed,cabinet,wardrobe,tv,refrigerator,washingMachine,sink,cooktop,bathtub,toilet,shower,armchair,floorLamp,tableLamp,pendantLamp"
+                },
+                "name": "Codex MCP Workspace"
+              }
+            ]
+          },
+          "reexport": {
+            "asset": {
+              "generator": "Khronos glTF Blender I/O v4.5.51",
+              "version": "2.0"
+            },
+            "scenes": [
+              {
+                "extras": {
+                  "last_asset": "floorLamp",
+                  "asset_batch": "toilet,floorLamp"
+                },
+                "name": "Codex MCP Workspace"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "limitations": [
+    "Saved-master re-export, not fresh procedural regeneration.",
+    "No browser or new render check.",
+    "Whole-file identity not required: node names have collection prefixes, exporter ordering may differ, and operational scene extras are reported separately."
+  ]
+}

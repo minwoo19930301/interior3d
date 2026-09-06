@@ -1,4 +1,4 @@
-import { normalizeObject, roundNumber, UNIT_SYSTEMS } from './objectCatalog';
+import { normalizeObject, roundNumber, UNIT_SYSTEMS } from './objectCatalog.js';
 
 const SCENE_QUERY_KEY = 'scene';
 
@@ -29,9 +29,9 @@ function decodeBase64Url(value) {
 function compactObject(object) {
   return {
     t: object.type,
-    p: object.position.map((value) => roundNumber(value, 2)),
+    p: object.position.map((value) => roundNumber(value, 4)),
     r: object.rotation.map((value) => roundNumber(value, 3)),
-    d: object.dimensions.map((value) => roundNumber(value, 2)),
+    d: object.dimensions.map((value) => roundNumber(value, 4)),
     c: object.color,
     x: object.isOpen ? 1 : 0,
     s: object.swing,
@@ -39,7 +39,7 @@ function compactObject(object) {
 }
 
 function normalizeUnitSystem(unitSystem) {
-  return UNIT_SYSTEMS[unitSystem] ? unitSystem : 'm';
+  return Object.hasOwn(UNIT_SYSTEMS, unitSystem) ? unitSystem : 'm';
 }
 
 export function serializeScene({ objects, unitSystem }) {
@@ -60,7 +60,8 @@ export function parseSceneParam(rawScene) {
   try {
     const payload = JSON.parse(decodeBase64Url(rawScene));
 
-    if (!Array.isArray(payload.o)) {
+    if (!payload || payload.v !== 1 || !Array.isArray(payload.o) ||
+        payload.o.some((item) => !item || typeof item !== 'object' || Array.isArray(item))) {
       return null;
     }
 
@@ -99,14 +100,8 @@ export function buildSceneUrl({ objects, unitSystem }) {
 
   const url = new URL(window.location.href);
 
-  if (objects.length === 0 && normalizeUnitSystem(unitSystem) === 'm') {
-    url.searchParams.delete(SCENE_QUERY_KEY);
-  } else {
-    url.searchParams.set(
-      SCENE_QUERY_KEY,
-      serializeScene({ objects, unitSystem }),
-    );
-  }
+  // An explicitly empty design must not reload the default furnished room.
+  url.searchParams.set(SCENE_QUERY_KEY, serializeScene({ objects, unitSystem }));
 
   return url.toString();
 }
@@ -119,6 +114,13 @@ export function syncSceneToUrl(sceneState) {
   const nextUrl = buildSceneUrl(sceneState);
 
   if (nextUrl && nextUrl !== window.location.href) {
-    window.history.replaceState({}, '', nextUrl);
+    try {
+      window.history.replaceState(window.history.state, '', nextUrl);
+    } catch {
+      // Browser URL size/rate limits must not interrupt editing. Explicit sharing
+      // still serializes the latest in-memory scene, even if autosync is refused.
+      return false;
+    }
   }
+  return true;
 }

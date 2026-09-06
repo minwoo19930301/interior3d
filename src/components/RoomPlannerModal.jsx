@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
   UNIT_SYSTEMS,
   fromDisplayValue,
@@ -249,6 +249,13 @@ const RoomPlannerModal = ({
   onCreate,
 }) => {
   const locale = getBrowserLocale();
+  const dialogRef = useRef(null);
+  useEffect(() => {
+    if (!isOpen) return;
+    const previousFocus = document.activeElement;
+    dialogRef.current?.querySelector('button')?.focus();
+    return () => previousFocus?.focus?.();
+  }, [isOpen]);
   const [plannerState, setPlannerState] = useState(() =>
     createPlannerState(HOUSE_TEMPLATES[0].id),
   );
@@ -452,6 +459,23 @@ const RoomPlannerModal = ({
 
   return (
     <div
+      ref={dialogRef}
+      role="dialog"
+      aria-modal="true"
+      aria-label={t('ui_template_house', locale)}
+      onKeyDown={(event) => {
+        if (event.key !== 'Tab') return;
+        const controls = [...dialogRef.current.querySelectorAll('button:not(:disabled), input:not(:disabled), select:not(:disabled)')];
+        const first = controls[0];
+        const last = controls[controls.length - 1];
+        if (event.shiftKey && document.activeElement === first) {
+          event.preventDefault();
+          last?.focus();
+        } else if (!event.shiftKey && document.activeElement === last) {
+          event.preventDefault();
+          first?.focus();
+        }
+      }}
       style={{
         position: 'absolute',
         inset: 0,

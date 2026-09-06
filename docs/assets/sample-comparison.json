@@ -1,0 +1,62 @@
+{
+  "passed": true,
+  "sampleCount": 5,
+  "results": [
+    {
+      "type": "sofa",
+      "passed": true,
+      "nodes": 15,
+      "meshes": 14,
+      "exactGeometryAccessorBytes": true,
+      "nodeTransformsAndMotionEqual": true,
+      "materialsEqual": true,
+      "embeddedImageBytesEqual": true,
+      "fileBytesIdentical": false
+    },
+    {
+      "type": "cabinet",
+      "passed": true,
+      "nodes": 34,
+      "meshes": 29,
+      "exactGeometryAccessorBytes": true,
+      "nodeTransformsAndMotionEqual": true,
+      "materialsEqual": true,
+      "embeddedImageBytesEqual": true,
+      "fileBytesIdentical": false
+    },
+    {
+      "type": "toilet",
+      "passed": true,
+      "nodes": 14,
+      "meshes": 12,
+      "exactGeometryAccessorBytes": true,
+      "nodeTransformsAndMotionEqual": true,
+      "materialsEqual": true,
+      "embeddedImageBytesEqual": true,
+      "fileBytesIdentical": false
+    },
+    {
+      "type": "floorLamp",
+      "passed": true,
+      "nodes": 12,
+      "meshes": 11,
+      "exactGeometryAccessorBytes": true,
+      "nodeTransformsAndMotionEqual": true,
+      "materialsEqual": true,
+      "embeddedImageBytesEqual": true,
+      "fileBytesIdentical": false
+    },
+    {
+      "type": "shower",
+      "passed": true,
+      "nodes": 107,
+      "meshes": 104,
+      "exactGeometryAccessorBytes": true,
+      "nodeTransformsAndMotionEqual": true,
+      "materialsEqual": true,
+      "embeddedImageBytesEqual": true,
+      "fileBytesIdentical": false
+    }
+  ],
+  "limitation": "This is a 5-asset saved-master re-export comparison, not a new code-generated all-19 rebuild or browser-render check"
+}

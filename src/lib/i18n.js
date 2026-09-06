@@ -1,6 +1,6 @@
 const MESSAGES = {
   en: {
-    app_title: 'interior3d House Templates',
+    app_title: 'interior3d · Reference Design Studio',
     ui_mode: 'Mode',
     ui_camera: 'Camera',
     ui_camera_orbit: 'Orbit',
@@ -12,6 +12,7 @@ const MESSAGES = {
     ui_copy: 'Copy',
     ui_paste: 'Paste',
     ui_undo: 'Undo',
+    ui_redo: 'Redo',
     ui_link_copied: 'Link copied',
     ui_copy_failed: 'Copy failed',
     ui_copy_share_link: 'Copy share link',
@@ -78,7 +79,7 @@ const MESSAGES = {
     ui_error_title: 'Something went wrong.',
   },
   ko: {
-    app_title: 'interior3d 집 템플릿',
+    app_title: 'interior3d · 실존 디자인 스튜디오',
     ui_mode: '모드',
     ui_camera: '카메라',
     ui_camera_orbit: '회전',
@@ -90,6 +91,7 @@ const MESSAGES = {
     ui_copy: '복사',
     ui_paste: '붙여넣기',
     ui_undo: '되돌리기',
+    ui_redo: '다시 실행',
     ui_link_copied: '링크 복사됨',
     ui_copy_failed: '복사 실패',
     ui_copy_share_link: '공유 링크 복사',

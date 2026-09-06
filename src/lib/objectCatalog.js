@@ -1,11 +1,12 @@
-import { localizeText } from './i18n';
+import { localizeText } from './i18n.js';
+import { getReferenceDesign } from './referenceDesigns.js';
 
 const GENERIC_MIN_DIMENSIONS = [0.2, 0.2, 0.05];
 
 export const UNIT_SYSTEMS = {
-  m: { label: 'm', factor: 1, step: 0.05, precision: 2 },
-  cm: { label: 'cm', factor: 100, step: 5, precision: 0 },
-  ft: { label: 'ft', factor: 3.28084, step: 0.25, precision: 2 },
+  m: { label: 'm', factor: 1, step: 0.005, precision: 4 },
+  cm: { label: 'cm', factor: 100, step: 0.5, precision: 2 },
+  ft: { label: 'ft', factor: 3.28084, step: 0.01, precision: 3 },
 };
 
 export const OBJECT_GROUPS = [
@@ -31,7 +32,8 @@ export const OBJECT_CATALOG = [
     label: { en: 'Wall', ko: '벽' },
     group: 'structure',
     dimensions: [3.2, 2.4, 0.08],
-    minDimensions: [0.6, 1.4, 0.05],
+    // Template walls run along either axis; X can be thickness, not length.
+    minDimensions: [0.05, 1.4, 0.05],
     color: '#ece5da',
   },
   {
@@ -39,7 +41,7 @@ export const OBJECT_CATALOG = [
     label: { en: 'Floor', ko: '바닥' },
     group: 'structure',
     dimensions: [3.2, 0.12, 3.2],
-    minDimensions: [1, 0.05, 1],
+    minDimensions: [0.05, 0.02, 0.05],
     color: '#c9a87c',
   },
   {
@@ -47,7 +49,7 @@ export const OBJECT_CATALOG = [
     label: { en: 'Ceiling', ko: '천장' },
     group: 'structure',
     dimensions: [3.2, 0.12, 3.2],
-    minDimensions: [1, 0.05, 1],
+    minDimensions: [0.05, 0.02, 0.05],
     color: '#f4f0e8',
   },
   {
@@ -191,12 +193,30 @@ export const OBJECT_CATALOG = [
   },
 ];
 
+OBJECT_CATALOG.push(
+  { id:'armchair', label:{en:'Armchair',ko:'암체어'}, group:'living', dimensions:[.68,1,.82], minDimensions:[.3,.4,.3], color:'#96aeba' },
+  { id:'floorLamp', label:{en:'Floor lamp',ko:'플로어 조명'}, group:'living', dimensions:[.62,1.51,.62], minDimensions:[.2,.6,.2], color:'#f2eee6' },
+  { id:'tableLamp', label:{en:'Table lamp',ko:'탁상 조명'}, group:'living', dimensions:[.25,.24,.25], minDimensions:[.1,.1,.1], color:'#f2eee6' },
+  { id:'pendantLamp', label:{en:'Pendant lamp',ko:'펜던트 조명'}, group:'living', dimensions:[.5,.54,.5], minDimensions:[.2,.2,.2], color:'#c2a275' },
+);
+
+// Keep legacy type identifiers and custom dimensions compatible with shared scenes.
+for (const item of OBJECT_CATALOG) {
+  const reference = getReferenceDesign(item.id);
+  if (!reference) continue;
+  item.reference = reference;
+  item.color = reference.defaultColor;
+  item.dimensions = [...reference.dimensions];
+  item.minDimensions = item.minDimensions.map((value,index) => Math.min(value, reference.dimensions[index] * .5));
+  item.openable = Boolean(reference.openable);
+}
+
 const OBJECT_CATALOG_BY_ID = Object.fromEntries(
   OBJECT_CATALOG.map((item) => [item.id, item]),
 );
 
 const COLOR_PATTERN = /^#[0-9a-f]{6}$/i;
-const FREE_Y_POSITION_TYPES = new Set(['ceilingPanel', 'floorPanel']);
+const FREE_Y_POSITION_TYPES = new Set(['ceilingPanel', 'floorPanel', 'tv', 'cooktop', 'tableLamp', 'pendantLamp']);
 const NON_BLOCKING_SPAWN_TYPES = new Set(['floorPanel', 'ceilingPanel']);
 const DEFAULT_FORWARD = [0.707, 0, 0.707];
 const SPAWN_CLEARANCE = 0.2;
@@ -207,7 +227,9 @@ export const DEFAULT_CAMERA_STATE = {
 };
 
 export function getObjectDefinition(type) {
-  return OBJECT_CATALOG_BY_ID[type] ?? OBJECT_CATALOG_BY_ID.cube;
+  return Object.hasOwn(OBJECT_CATALOG_BY_ID, type)
+    ? OBJECT_CATALOG_BY_ID[type]
+    : OBJECT_CATALOG_BY_ID.cube;
 }
 
 export function getObjectLabel(type, locale) {
@@ -228,9 +250,8 @@ export function normalizeNumber(value, fallback = 0) {
   return Number.isFinite(parsed) ? parsed : fallback;
 }
 
-export function roundNumber(value, digits = 3) {
-  const factor = 10 ** digits;
-  return Math.round(normalizeNumber(value) * factor) / factor;
+export function roundNumber(value, digits = 4) {
+  return Number(normalizeNumber(value).toFixed(digits));
 }
 
 export function normalizeVector(value, fallback) {

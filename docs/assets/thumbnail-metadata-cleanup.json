@@ -1,0 +1,157 @@
+{
+  "scope": "Remove PNG textual export metadata only; no image-content edit, resampling, re-encoding or Blender/GLB changes",
+  "files": [
+    {
+      "file": "public/thumbnails/armchair.png",
+      "removedTextChunks": 11,
+      "beforeSha256": "9f726f79fbf1b19dba119f1ef5d80a929f287a311285b68dd833febbbf65169e",
+      "afterSha256": "dc8bd728a4fa5e26380b7dc97df79dbec85d43c5e4a0711854db8cc17be13e1d",
+      "pixelAndColorChunksSha256": "33cb6a943b8b64e907e1a9d4c4a6382b6d734b25364912fd7eaf61996f3644ec",
+      "pixelAndColorChunksByteIdentical": true
+    },
+    {
+      "file": "public/thumbnails/bathtub.png",
+      "removedTextChunks": 11,
+      "beforeSha256": "1f68e364da4577015492a6e3c1d80ba9103be14669f111f6cb0711efbba8c0e7",
+      "afterSha256": "835be1a0c0421e3c803c4a0cb87a25a61c77d9cc126c8b64f9d3093eea1eb381",
+      "pixelAndColorChunksSha256": "daed709a73d10b9ad331eaf998b8c3df420ad99139f3a6a6ac4e0b4d76b0de16",
+      "pixelAndColorChunksByteIdentical": true
+    },
+    {
+      "file": "public/thumbnails/bed.png",
+      "removedTextChunks": 11,
+      "beforeSha256": "871c5659ed471849d1b9fc3446725cbb472579729e91e6fbe4c2c72cd7b876d1",
+      "afterSha256": "cb427797e138d53337369d6f4ab5e48d11405f179d4fffdddc011828f83eb213",
+      "pixelAndColorChunksSha256": "e900e858970bd2e004c847a8c783ae554c1c8a6fcd03025663511b2f76525230",
+      "pixelAndColorChunksByteIdentical": true
+    },
+    {
+      "file": "public/thumbnails/cabinet.png",
+      "removedTextChunks": 11,
+      "beforeSha256": "92364fca6db01a7961752852c55cbb40003ca8c549edf410be073bc42f459a78",
+      "afterSha256": "46b389d1870cd11c9ec7e8f6bc563727cbe1c235501941ccf7afc7f28d13fef0",
+      "pixelAndColorChunksSha256": "df788fbb5072be69949be1240a81c3179503b716b105e4a435075ebc18e03e92",
+      "pixelAndColorChunksByteIdentical": true
+    },
+    {
+      "file": "public/thumbnails/chair.png",
+      "removedTextChunks": 11,
+      "beforeSha256": "fef13de54ec240f7877ec2641898552a1824278693b9ee75d33503f707d59fcb",
+      "afterSha256": "e9dc556028c92d061641ee87e69024ca1321f14280ad11c5f1dc15fd4bd1f4ac",
+      "pixelAndColorChunksSha256": "fb9f2ef1fe7cd6a87259e477bb33d41405b5a2a42adb908825d920dc31dce2f8",
+      "pixelAndColorChunksByteIdentical": true
+    },
+    {
+      "file": "public/thumbnails/cooktop.png",
+      "removedTextChunks": 11,
+      "beforeSha256": "c1568a2aa56e9cef766944dbf30eb68c403c150080d0f129dda035eac1ad48c6",
+      "afterSha256": "63b9e3922c9bc19ff82927e5a17730e433eaa7217836a76d80188df25d8e1f1e",
+      "pixelAndColorChunksSha256": "285bc0af64aa11a9747bc3ab4897bd08fa4083d9e40b554e685a9bc2843e4110",
+      "pixelAndColorChunksByteIdentical": true
+    },
+    {
+      "file": "public/thumbnails/desk.png",
+      "removedTextChunks": 11,
+      "beforeSha256": "41a60984f798ecb7923798a1c0f2f57f88497a96f38cbe2e1c97acc5ac6999fd",
+      "afterSha256": "bcc2f34e8cd89407461b0aad877e1faf2fdddd249f0559feee4ab313ef1cc079",
+      "pixelAndColorChunksSha256": "7d3502034c51a30d8f254ac552407d7535d73d64391f644e89e7ad819a8125fb",
+      "pixelAndColorChunksByteIdentical": true
+    },
+    {
+      "file": "public/thumbnails/floorLamp.png",
+      "removedTextChunks": 11,
+      "beforeSha256": "34065010db47d919e7e7f72a0fae204a6c0aa45f86cfd3327423c9f363ecbf24",
+      "afterSha256": "4872e67ec731fef2579e14a4f24c11aab410cc0246b1c85eeeba075e100e9f7b",
+      "pixelAndColorChunksSha256": "6f7c07c671460f4e2423b909b1c9359bc020ac74a75cfe3a0f6b5651c9b62b9f",
+      "pixelAndColorChunksByteIdentical": true
+    },
+    {
+      "file": "public/thumbnails/pendantLamp.png",
+      "removedTextChunks": 11,
+      "beforeSha256": "7669bdf17458c27e6f97d70b97047e5f17a002ef9ccbd6aa03bdf0b468d9f2ff",
+      "afterSha256": "6561d27ce58051344adeb1b06b4fd0d761f6518b3c6966841f4d1c65c76dd09d",
+      "pixelAndColorChunksSha256": "f77d916289ee063f50e32ec9f55d02e6c884cd066b74ebc2d3edc1ad808276f4",
+      "pixelAndColorChunksByteIdentical": true
+    },
+    {
+      "file": "public/thumbnails/refrigerator.png",
+      "removedTextChunks": 11,
+      "beforeSha256": "fcf67f4b9a2786fb9d604927dd80c1a999480aa799844f40a164207f0136ed11",
+      "afterSha256": "fbe1984dd0fe6efb663116a3fc742f42e15207afac9187362d013e870b5e3cf9",
+      "pixelAndColorChunksSha256": "0e2dde1df5f976733197c8a47a270d61ffdd33a7aa7e18bb7ef9bd69d1a8e287",
+      "pixelAndColorChunksByteIdentical": true
+    },
+    {
+      "file": "public/thumbnails/shower.png",
+      "removedTextChunks": 11,
+      "beforeSha256": "c02f35a4b91620682117ab24822c360e19c7501833d96c1930c121af5f5e33ec",
+      "afterSha256": "a7041c16b6b0e50c00736591a594ca4fa65b8c301253c4221cd4aa51b9f6b355",
+      "pixelAndColorChunksSha256": "62a6fea73597adfd4c98d6d7f69a5cb3dbc351920d2ed9d3a265857dacb7b13e",
+      "pixelAndColorChunksByteIdentical": true
+    },
+    {
+      "file": "public/thumbnails/sink.png",
+      "removedTextChunks": 11,
+      "beforeSha256": "85572fdb0d2f1c0130804c142c603bce0835bcc5999c2d8f61f601184656db53",
+      "afterSha256": "007e03f24716f26f1480c3d1d79470f22fd9409c44ddcbc5cbf1c51f41ae424d",
+      "pixelAndColorChunksSha256": "f1af00871b8d2078da4ec83566edbe325e95fb8d0ece2f08787aba0439540343",
+      "pixelAndColorChunksByteIdentical": true
+    },
+    {
+      "file": "public/thumbnails/sofa.png",
+      "removedTextChunks": 11,
+      "beforeSha256": "f2076dbb57a83a0e9df5280a9f7733096a9b382d68ce8f5e2c5ef9ede0e70ef4",
+      "afterSha256": "e663da4fab8aa2bc22eba0dcb332c3c0eb933cebcb7601e1129bd86fe4cb260f",
+      "pixelAndColorChunksSha256": "234b20f03f653abba5a01580f83952927846e45f99608c557ba5453cd7aa59cf",
+      "pixelAndColorChunksByteIdentical": true
+    },
+    {
+      "file": "public/thumbnails/table.png",
+      "removedTextChunks": 11,
+      "beforeSha256": "ea4adb6a4fddd2ae1847b11737e641da61e184c37b9d3a3d3a621802e3c64d3c",
+      "afterSha256": "eb6c0d505eeeb6ce658599e192cb19667d0d096e2203065bc3fe3f39b775bc66",
+      "pixelAndColorChunksSha256": "f48ecbe6a8e09d12f66d0e5d64ab66bde1a3ca3700b2a1d4819e598946d8a021",
+      "pixelAndColorChunksByteIdentical": true
+    },
+    {
+      "file": "public/thumbnails/tableLamp.png",
+      "removedTextChunks": 11,
+      "beforeSha256": "ac5af41b4933784e91080bc2c51886ada65cb6651488cd285062c90b5ebfb492",
+      "afterSha256": "2503b68a2c28faa85965413735aa3b6cb9c1dbc5f44cd52325145c727e2e2bc2",
+      "pixelAndColorChunksSha256": "7dc25260177c9b056be913110d6ceab8081895b686d350a79e9706f030c61703",
+      "pixelAndColorChunksByteIdentical": true
+    },
+    {
+      "file": "public/thumbnails/toilet.png",
+      "removedTextChunks": 11,
+      "beforeSha256": "ef877759d8c508394afa0d4f4cb8f496ea12c7f1312e4e97ec9c8138d91dd90d",
+      "afterSha256": "b523037e162f0cae3a3c7895ec6bf1453552bec7f88448586096de32acc5800b",
+      "pixelAndColorChunksSha256": "95a8eeef028336bbbc362b59e1ed34d37a34feb882c8ab69d8b42765eec8a913",
+      "pixelAndColorChunksByteIdentical": true
+    },
+    {
+      "file": "public/thumbnails/tv.png",
+      "removedTextChunks": 11,
+      "beforeSha256": "3b59cbf3cd8b6088197958bcfa77e1118fabeed111c4bd3408719268697f6fc5",
+      "afterSha256": "4db3140995da0ec2cce66858788b5570ab30a9c5920f169d45cacc35fc8b064e",
+      "pixelAndColorChunksSha256": "921c7461c3967c14ecd08b3f960d55ccd1eaf47dd39bd3c98161e55ac4bb976a",
+      "pixelAndColorChunksByteIdentical": true
+    },
+    {
+      "file": "public/thumbnails/wardrobe.png",
+      "removedTextChunks": 11,
+      "beforeSha256": "bc2c8f5c842e5d6b4d7b3a1d2d681e08d11ac59ef58f7f61c6bf3d15cfc0731f",
+      "afterSha256": "9f8290648f24ca3740d96ece5cb5864b0dd2165757888f5f8c4c153722ce7269",
+      "pixelAndColorChunksSha256": "52f41b2b844df999d5d6e770f44b95f58e1c7800fd241f721bc803fda863dd78",
+      "pixelAndColorChunksByteIdentical": true
+    },
+    {
+      "file": "public/thumbnails/washingMachine.png",
+      "removedTextChunks": 11,
+      "beforeSha256": "53924a4e2cd8df190816780a2c5912f947bc193c1efcd89054f83aaab353e0dd",
+      "afterSha256": "23a863de9330d36f2ecd8da970254340359b166fa6714460bc9b52bdba80a5a2",
+      "pixelAndColorChunksSha256": "82b66201ff81cb01ce4dc479012210fd773e6de72dcbfdb42c6fab805ab87957",
+      "pixelAndColorChunksByteIdentical": true
+    }
+  ]
+}

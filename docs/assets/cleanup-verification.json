@@ -1,0 +1,46 @@
+{
+  "date": "2026-09-06",
+  "scope": "Authorized cleanup of the dedicated scratch master only; original file preserved",
+  "transport": "Real MCP execute_blender_code through the reviewed project-local stdio client and loopback Blender bridge",
+  "blenderVersion": "4.5.11 LTS",
+  "originalMaster": {
+    "bytes": 13053588,
+    "sha256Before": "dc646f4d7fa73ce159dd090243ea8aa5e1639d90813917be5266ce5f75b9d5c9",
+    "sha256After": "dc646f4d7fa73ce159dd090243ea8aa5e1639d90813917be5266ce5f75b9d5c9",
+    "unchanged": true
+  },
+  "sanitizedMaster": {
+    "file": "interior-furniture.blend",
+    "bytes": 13056212,
+    "sha256": "03dac07c9a72d9b439abfeab9c48c87fcbafab23ecfb889750c21402cda450f5",
+    "savedThroughBlender": true,
+    "successfullyReopenedThroughBlender": true,
+    "actualAssetCollectionCountAfterReopen": 19,
+    "packedImagesAfterReopen": [
+      { "name": "ash_grain", "path": "//textures/ash_grain.png", "size": [256, 256] },
+      { "name": "woven_fabric", "path": "//textures/woven_fabric.png", "size": [128, 128] }
+    ],
+    "renderPath": "//renders/",
+    "userAbsolutePathOccurrences": 0,
+    "originalUserNameFragments": 0,
+    "originalWorkspaceFragments": 0,
+    "pathBuffersOverwrittenBeforeShortRelativeAssignment": true,
+    "binaryPatchedOutsideBlender": false
+  },
+  "sampleReexport": {
+    "types": ["sofa", "cabinet", "toilet", "floorLamp", "shower"],
+    "geometryRebuilt": false,
+    "geometryAccessorBytesEqual": true,
+    "nodeTransformsAndMotionExtrasEqual": true,
+    "materialsAndEmbeddedImageBytesEqual": true,
+    "comparisonNormalization": "Remove only the source collection name prefix; compare mesh accessors, hierarchy, transforms, materials and image bytes",
+    "wholeGlbBytesEqual": false,
+    "evidence": "sample-comparison.json"
+  },
+  "notPerformed": [
+    "Fresh code-generated all-19 build",
+    "Re-export comparison of the other 14 collections",
+    "Browser or GPU appearance verification",
+    "GitHub writes, account changes, global Blender preferences or unrelated document changes"
+  ]
+}
