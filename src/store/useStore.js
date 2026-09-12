@@ -10,10 +10,12 @@ import {
   normalizeVector,
   clampDimensions,
 } from '../lib/objectCatalog.js';
-import { loadSceneFromUrl } from '../lib/sceneUrl.js';
+import { loadInitialProject } from '../lib/draftStorage.js';
+import { validateProjectScene } from '../lib/projectFiles.js';
 import { buildDesignRoom } from '../lib/designRooms.js';
 
-const initialScene = loadSceneFromUrl();
+export const projectStartup = loadInitialProject();
+const initialScene = projectStartup.scene;
 const HISTORY_LIMIT = 60;
 const PASTE_OFFSET = [0.45, 0, 0.45];
 
@@ -79,6 +81,7 @@ function createHistoryEntry(state) {
   return {
     objects: state.objects.map(cloneSceneObject),
     selectedId: state.selectedId,
+    unitSystem: state.unitSystem,
   };
 }
 
@@ -217,6 +220,19 @@ const useStore = create((set, get) => ({
       };
     }),
 
+  loadProject: (scene) => {
+    // Validation precedes the mutation, so rejected imports leave selection,
+    // clipboard and both history stacks intact.
+    const prepared = validateProjectScene(scene);
+    set((state) => ({
+      historyPast: pushHistoryEntry(state.historyPast, state),
+      historyFuture: [],
+      objects: prepared.objects.map(createPreparedObject),
+      unitSystem: prepared.unitSystem,
+      selectedId: null,
+    }));
+  },
+
   removeObject: (id) =>
     set((state) => ({
       historyPast:
@@ -232,9 +248,14 @@ const useStore = create((set, get) => ({
   selectObject: (id) => set({ selectedId: id }),
 
   setUnitSystem: (unitSystem) =>
-    set({
-      unitSystem:
-        unitSystem === 'cm' ? 'cm' : unitSystem === 'ft' ? 'ft' : 'm',
+    set((state) => {
+      const next = unitSystem === 'cm' ? 'cm' : unitSystem === 'ft' ? 'ft' : 'm';
+      if (next === state.unitSystem) return state;
+      return {
+        historyPast: pushHistoryEntry(state.historyPast, state),
+        historyFuture: [],
+        unitSystem: next,
+      };
     }),
 
   setTransformMode: (transformMode) =>
@@ -377,6 +398,7 @@ const useStore = create((set, get) => ({
         ),
         objects: previousEntry.objects.map(cloneSceneObject),
         selectedId: previousEntry.selectedId,
+        unitSystem: previousEntry.unitSystem,
       };
     }),
 
@@ -393,6 +415,7 @@ const useStore = create((set, get) => ({
         historyFuture: state.historyFuture.slice(1),
         objects: nextEntry.objects.map(cloneSceneObject),
         selectedId: nextEntry.selectedId,
+        unitSystem: nextEntry.unitSystem,
       };
     }),
 }));
