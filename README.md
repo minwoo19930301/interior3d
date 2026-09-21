@@ -1,7 +1,10 @@
 # interior3d
 
-[![OPEN PLANNER](https://img.shields.io/badge/OPEN%20PLANNER-GitHub%20Pages-4caf50?style=for-the-badge&logo=githubpages&logoColor=white)](https://minwoo19930301.github.io/interior3d/) [![SOURCE CODE](https://img.shields.io/badge/SOURCE%20CODE-minwoo19930301-e7322d?style=for-the-badge&logo=github&logoColor=white)](https://github.com/minwoo19930301/interior3d)
+<!-- PROJECT-PRESENTATION:START -->
+<a href="https://minwoo19930301.github.io/interior3d/"><img src=".github/project-cover.svg" alt="interior3d" width="960"></a>
 
+[![OPEN APP](https://img.shields.io/badge/OPEN%20APP-2C6049?style=for-the-badge)](https://minwoo19930301.github.io/interior3d/) [![QUICK START](https://img.shields.io/badge/QUICK%20START-374151?style=for-the-badge)](#사용하는-방법) [![SOURCE](https://img.shields.io/badge/SOURCE-444444?style=for-the-badge)](https://github.com/minwoo19930301/interior3d)
+<!-- PROJECT-PRESENTATION:END -->
 
 ## 실존 디자인 · Blender MCP 재제작
 
