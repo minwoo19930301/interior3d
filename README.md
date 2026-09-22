@@ -1,11 +1,5 @@
 # interior3d
 
-<!-- PROJECT-PRESENTATION:START -->
-<a href="https://minwoo19930301.github.io/interior3d/"><img src=".github/project-cover.svg" alt="interior3d" width="960"></a>
-
-[![OPEN APP](https://img.shields.io/badge/OPEN%20APP-2C6049?style=for-the-badge)](https://minwoo19930301.github.io/interior3d/) [![QUICK START](https://img.shields.io/badge/QUICK%20START-374151?style=for-the-badge)](#사용하는-방법) [![SOURCE](https://img.shields.io/badge/SOURCE-444444?style=for-the-badge)](https://github.com/minwoo19930301/interior3d)
-<!-- PROJECT-PRESENTATION:END -->
-
 ## 실존 디자인 · Blender MCP 재제작
 
 기존 가구 15종을 실제 Blender MCP로 새로 모델링했고 POÄNG·LAUTERS·FADO·SINNERLIG 4종을 추가했습니다. `public/models/catalog.json`이 제품명, SKU, 공식 출처, `[W,H,D]` 치수와 피벗을 함께 관리합니다. 제조사 공식 CAD가 아닌 비공식 참고 재제작입니다. 샤워존은 자체 설계이며 수전만 Crometta E를 참고했습니다.
