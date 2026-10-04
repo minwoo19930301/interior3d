@@ -4,7 +4,9 @@ import Sidebar from './components/Sidebar';
 import PropertiesPanel from './components/PropertiesPanel';
 import ErrorBoundary from './components/ErrorBoundary';
 import RoomPlannerModal from './components/RoomPlannerModal';
-import useStore from './store/useStore';
+import ProjectDialog from './components/ProjectDialog';
+import useStore, { projectStartup } from './store/useStore';
+import { createDraftAutosave } from './lib/draftStorage';
 import { buildSceneUrl, syncSceneToUrl } from './lib/sceneUrl';
 import { buildHouseObjects } from './lib/roomBuilder';
 import { getObjectLabel, toDisplayValue } from './lib/objectCatalog';
@@ -98,12 +100,31 @@ function App() {
   const redo = useStore((state) => state.redo);
   const [shareStatus, setShareStatus] = useState('idle');
   const [isRoomPlannerOpen, setIsRoomPlannerOpen] = useState(false);
+  const [isProjectOpen, setIsProjectOpen] = useState(false);
+  const [saveStatus, setSaveStatus] = useState(() => ({
+    status: projectStartup.source === 'draft' ? 'restored' :
+      ['unavailable', 'invalid'].includes(projectStartup.draft.status) ? projectStartup.draft.status : 'ready',
+  }));
   const [isMobileLayout, setIsMobileLayout] = useState(() =>
     typeof window !== 'undefined' ? window.innerWidth <= MOBILE_BREAKPOINT : false,
   );
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isPropertiesOpen, setIsPropertiesOpen] = useState(false);
   const selectedObject = objects.find((object) => object.id === selectedId);
+
+  useEffect(() => {
+    const autosave = createDraftAutosave(useStore, { onStatus: setSaveStatus });
+    const flushWhenHidden = () => {
+      if (document.visibilityState === 'hidden') autosave.flush();
+    };
+    window.addEventListener('pagehide', autosave.flush);
+    document.addEventListener('visibilitychange', flushWhenHidden);
+    return () => {
+      window.removeEventListener('pagehide', autosave.flush);
+      document.removeEventListener('visibilitychange', flushWhenHidden);
+      autosave.stop();
+    };
+  }, []);
 
   useEffect(() => {
     let timeout;
@@ -153,13 +174,14 @@ function App() {
       const key = event.key.toLowerCase();
 
       if (key === 'escape') {
+        setIsProjectOpen(false);
         setIsRoomPlannerOpen(false);
         setIsSidebarOpen(false);
         setIsPropertiesOpen(false);
         return;
       }
 
-      if (isRoomPlannerOpen || isEditableTarget(event.target)) return;
+      if (isRoomPlannerOpen || isProjectOpen || isEditableTarget(event.target)) return;
 
       if ((key === 'backspace' || key === 'delete') && selectedId) {
         event.preventDefault();
@@ -199,7 +221,7 @@ function App() {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [copySelectedObject, pasteClipboardObject, redo, removeObject, selectedId, undo, isRoomPlannerOpen]);
+  }, [copySelectedObject, pasteClipboardObject, redo, removeObject, selectedId, undo, isRoomPlannerOpen, isProjectOpen]);
 
   const handleCopyShareLink = async () => {
     try {
@@ -256,6 +278,8 @@ function App() {
 
         <div style={{ flex: 1, position: 'relative', minWidth: 0 }}>
           <Scene />
+
+          {isProjectOpen && <ProjectDialog onClose={() => setIsProjectOpen(false)} saveStatus={saveStatus} />}
 
           {isRoomPlannerOpen ? (
             <RoomPlannerModal
@@ -440,6 +464,20 @@ function App() {
                   {t('ui_redo', locale)}
                 </button>
               </div>
+
+              <button
+                onClick={() => {
+                  setIsRoomPlannerOpen(false);
+                  setIsSidebarOpen(false);
+                  setIsPropertiesOpen(false);
+                  setIsProjectOpen(true);
+                }}
+                style={badgeStyle}
+                title={t(`project_save_${saveStatus.status}`, locale)}
+              >
+                {t('project_title', locale)}
+                {['unavailable', 'invalid', 'too_large'].includes(saveStatus.status) ? ' !' : saveStatus.status === 'saving' ? ' …' : ''}
+              </button>
 
               <button
                 onClick={handleCopyShareLink}
