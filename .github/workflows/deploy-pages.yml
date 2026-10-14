@@ -1,0 +1,66 @@
+name: Build and deploy site
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+concurrency:
+  group: pages
+  cancel-in-progress: false
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - run: npm test --if-present
+      - run: npm run build
+      - name: Record release identity
+        run: |
+          node --input-type=module -e 'import {writeFileSync} from "node:fs"; writeFileSync("dist/release.json", JSON.stringify({commit:process.env.GITHUB_SHA})+"\n")'
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+      - uses: actions/deploy-pages@v4
+        id: deployment
+      - name: Verify published commit and asset URLs
+        env:
+          SITE_URL: ${{ steps.deployment.outputs.page_url }}
+        run: |
+          python3 - <<'PY'
+          import json, os, time, urllib.request, urllib.parse
+          from html.parser import HTMLParser
+          base = os.environ['SITE_URL'].rstrip('/') + '/'
+          sha = os.environ['GITHUB_SHA']
+          def read(path):
+              return urllib.request.urlopen(urllib.parse.urljoin(base, path), timeout=30).read()
+          for attempt in range(12):
+              try:
+                  assert json.loads(read('release.json?commit=' + sha))['commit'] == sha
+                  break
+              except Exception:
+                  if attempt == 11: raise
+                  time.sleep(10)
+          class Assets(HTMLParser):
+              def handle_starttag(self, tag, attrs):
+                  a = dict(attrs)
+                  url = a.get('src') if tag == 'script' else a.get('href') if tag == 'link' and a.get('rel') == 'stylesheet' else None
+                  if url:
+                      target = urllib.parse.urljoin(base, url)
+                      if urllib.parse.urlsplit(target).netloc == urllib.parse.urlsplit(base).netloc:
+                          assert read(target), target
+          Assets().feed(read('').decode())
+          print('Verified live release:', sha)
+          PY
